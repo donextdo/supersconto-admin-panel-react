@@ -1,0 +1,96 @@
+import React from 'react'
+import logo from '../../assets/react.svg'
+import { Link } from 'react-router-dom'
+import {ChartPieIcon, UsersIcon } from '@heroicons/react/solid'
+import { FaShopify,FaFirstOrder } from "react-icons/fa";
+import { BiCategory,BiNews } from "react-icons/bi";
+import { TbUsers } from "react-icons/tb";
+import { AiOutlineStock } from "react-icons/ai";
+
+const Sidebar = () => {
+  return (
+    <div className="fixed left-0 top-0 bottom-0 h-screen w-56 bg-slate-900 flex flex-col gap-10 text-white">
+    
+        <div className="w-full h-20 border-b border-slate-700 flex items-center px-4 py-3">
+
+            <img src={logo} alt="" />
+
+        </div>
+
+        <ul className="w-full h-max flex flex-col gap-2">
+
+          
+
+            <li className="listItem">
+                <Link to={'/'} className="listItemLink">
+                    <ChartPieIcon className='w-5 h-5'/>
+                    <span>Dashboard</span> 
+                </Link>
+            </li>
+
+            <li className="listItem">
+                <Link to={'/shop'} className="listItemLink">
+                    <FaShopify className='w-5 h-5'/>
+                    <span>Shop</span> 
+                </Link>
+            </li>
+
+            <li className="listItem">
+                <Link to={'/catalog'} className="listItemLink">
+                    <UsersIcon className='w-5 h-5'/>
+                    <span>Catalog</span> 
+                </Link>
+            </li>
+
+            <li className="listItem">
+                <Link to={'/category'} className="listItemLink">
+                    <BiCategory className='w-5 h-5'/>
+                    <span>Category</span>
+                </Link>
+            </li>
+
+            <li className="listItem">
+                <Link to={'/users'} className="listItemLink">
+                    <TbUsers className='w-5 h-5'/>
+                    <span>Users</span>
+                </Link>
+            </li>
+
+            <li className="listItem">
+                <Link to={'/news'} className="listItemLink">
+                    <BiNews className='w-5 h-5'/>
+                    <span>News</span>
+                </Link>
+            </li>
+
+            <li className="listItem">
+                <Link to={'/orders'} className="listItemLink">
+                    <FaFirstOrder className='w-5 h-5'/>
+                    <span>Orders</span>
+                </Link>
+            </li>
+
+            <li className="listItem">
+                <Link to={'/stocks'} className="listItemLink">
+                    <AiOutlineStock className='w-5 h-5'/>
+                    <span>Stocks</span>
+                </Link>
+            </li>
+
+            <li className="listItem">
+                <Link to={'/vender'} className="listItemLink">
+                    <TbUsers className='w-5 h-5'/>
+                    <span>Vender</span>
+                </Link>
+            </li>
+        </ul>
+
+        <div className="w-full h-max flex flex-col px-4 self-baseline">
+        
+        </div>
+        
+    </div>
+  )
+}
+
+export default Sidebar

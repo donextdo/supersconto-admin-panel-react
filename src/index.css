@@ -1,0 +1,29 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-gray-100;
+  }
+}
+
+@layer components {
+  .nav {
+        min-width: calc(100% - 14rem);
+  }
+
+  .listItem {
+    @apply py-3 px-6 w-full bg-slate-900 hover:bg-slate-700 text-sm font-medium cursor-pointer;
+  }
+
+  .listItemLink {
+    @apply w-full h-full flex items-center gap-2;
+  }
+
+  .content {
+    @apply ml-56 mt-20 p-6 flex flex-col;
+    min-width: calc(100% - 14rem);
+    min-height: calc(100vh - 5rem);
+  }
+}
