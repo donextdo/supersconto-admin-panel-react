@@ -8,10 +8,11 @@ import { PencilAltIcon } from '@heroicons/react/solid'
 import { MdPreview } from "react-icons/md";
 import axios from 'axios'
 import { ButtonSuccess } from '../components/shared/Button'
-import { RiAddCircleLine } from 'react-icons/ri'
+import { RiAddCircleLine, RiPagesFill } from 'react-icons/ri'
 import Modal from '../components/shared/Modal'
 import Form from '../components/catelog/Form'
 import { normalizeDate } from '../utils/functions'
+import { Link } from 'react-router-dom'
 
 const Catalog = () => {
 
@@ -140,6 +141,10 @@ const Catalog = () => {
                       </TD>
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
+
+                          <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id}&catelog=${d._id}` }}>
+                            <RiPagesFill className='w-4 h-4 fill-emerald-500 cursor-pointer'/>
+                          </Link>
                           <MdPreview className='w-4 h-4 fill-green-500 cursor-pointer'/>
                           <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
                           <PencilAltIcon className='w-4 h-4 fill-blue-500 cursor-pointer'/>

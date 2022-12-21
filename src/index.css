@@ -26,4 +26,10 @@
     min-width: calc(100% - 14rem);
     min-height: calc(100vh - 5rem);
   }
+
+  .content-expand {
+    @apply ml-16 mt-20 p-6 flex flex-col;
+    min-width: calc(100% - 4rem);
+    min-height: calc(100vh - 5rem);
+  }
 }

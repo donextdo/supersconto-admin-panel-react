@@ -1,6 +1,6 @@
-export const Content = ({ children }) => {
+export const Content = ({ children, expand }) => {
   return (
-    <div className="content">
+    <div className={`${expand ? 'content-expand' : 'content'}`}>
         { children }
     </div>
   )
