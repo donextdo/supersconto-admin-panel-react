@@ -33,3 +33,35 @@
     min-height: calc(100vh - 5rem);
   }
 }
+
+/*apply tailwind styles*/
+.image-processor {
+  display: flex;
+}
+
+.image-processor > div {
+  flex-basis: 33.33%;
+}
+
+.previewer {
+  display: flex;
+  flex-direction: column;
+  max-height: 50vh;
+  overflow: auto;
+}
+
+img {
+  max-width: 100%;
+  margin: 0rem auto;
+}
+
+.selection-div {
+  position: absolute;
+  background: rgba(0, 0, 255, 0.24);
+  top: 0;
+
+}
+
+.selection-div:hover {
+  background: rgba(0, 0, 255, 0.79);
+}
