@@ -14,6 +14,7 @@ import {FaTrash} from 'react-icons/fa'
 import {PencilAltIcon} from '@heroicons/react/solid'
 import {RiShoppingBag3Fill} from 'react-icons/ri'
 import PageSlider from "./PageSlider.jsx";
+import baseUrl from '../utils/baseUrl'
 
 
 const Pages = () => {
@@ -40,7 +41,7 @@ const Pages = () => {
     })
 
     async function fetchData(catelog) {
-        return axios.get(`http://apidev.marriextransfer.com/v1/api/catelog/page?catelog=${catelog}`)
+        return axios.get(`${baseUrl}/catelog/page?catelog=${catelog}`)
     }
 
 
@@ -91,7 +92,7 @@ const Pages = () => {
                 pageDto.append('page_image', dataURLtoFile(img, 'page_1'))
 
 
-                const {data} = await axios.post('http://apidev.marriextransfer.com/v1/api/catelog/page', pageDto)
+                const {data} = await axios.post(`${baseUrl}/catelog/page`, pageDto)
 
             })
 
@@ -113,7 +114,7 @@ const Pages = () => {
     const onDelete = async (id) => {
         try {
 
-            const res = await axios.delete(`http://apidev.marriextransfer.com/v1/api/catelog/page/${id}`)
+            const res = await axios.delete(`${baseUrl}/catelog/page/${id}`)
             console.log(res.data)
 
             const {data} = await fetchData(catelog)

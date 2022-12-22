@@ -10,6 +10,7 @@ import { RiAddCircleLine } from 'react-icons/ri'
 import { ButtonNormal} from '../components/shared/Button'
 import Modal from '../components/shared/Modal'
 import TextInput from '../components/shared/TextInput'
+import baseUrl from '../utils/baseUrl'
 
 
 const Shop = () => {
@@ -18,7 +19,7 @@ const Shop = () => {
   useEffect( () => {
       async function fetchData() {
           try {
-              const res = await axios.get('http://apidev.marriextransfer.com/v1/api/shop'); 
+              const res = await axios.get(`${baseUrl}/shop`); 
               setData(res.data);
           } catch (err) {
               console.log(err);
@@ -82,7 +83,7 @@ const Shop = () => {
   const onSave = () => {
     axios({
       method: "post",
-      url: "http://apidev.marriextransfer.com/v1/api/shop",
+      url: `${baseUrl}/shop`,
       data: bodyFormData,
       headers: { "Content-Type": "multipart/form-data" },
     })

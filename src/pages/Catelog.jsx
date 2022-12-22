@@ -13,6 +13,7 @@ import Modal from '../components/shared/Modal'
 import Form from '../components/catelog/Form'
 import { normalizeDate } from '../utils/functions'
 import { Link } from 'react-router-dom'
+import baseUrl from '../utils/baseUrl'
 
 const Catalog = () => {
 
@@ -31,7 +32,7 @@ const Catalog = () => {
 
   async function fetchData() {
     try {
-        const res = await axios.get('http://apidev.marriextransfer.com/v1/api/catelog/book'); 
+        const res = await axios.get(`${baseUrl}/catelog/book`); 
         setData(res.data);
     } catch (err) {
         console.log(err);
@@ -45,7 +46,7 @@ const Catalog = () => {
   const onSave = async () => {
     try {
 
-      const res = await axios.post('http://apidev.marriextransfer.com/v1/api/catelog/book', catelog)
+      const res = await axios.post(`${baseUrl}/catelog/book`, catelog)
       console.log(res.data)
 
       fetchData()
@@ -71,7 +72,7 @@ const Catalog = () => {
   const onDelete = async (id) => {
     try {
 
-      const res = await axios.delete(`http://apidev.marriextransfer.com/v1/api/catelog/book/${id}`)
+      const res = await axios.delete(`${baseUrl}/catelog/book/${id}`)
       console.log(res.data)
 
       fetchData()

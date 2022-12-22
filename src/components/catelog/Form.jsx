@@ -3,6 +3,7 @@ import axios from 'axios'
 import TextInput from '../shared/TextInput'
 import Dropdown from '../shared/Dropdown'
 import Textarea from '../shared/Textarea'
+import baseUrl from '../../utils/baseUrl'
 
 const Form = ({ catelog, setCatelog }) => {
 
@@ -13,7 +14,7 @@ const [defaultValue, setDefaultValue] = useState(null)
 useEffect( () => {
     async function fetchData() {
         try {
-            const res = await axios.get('http://apidev.marriextransfer.com/v1/api/shop'); 
+            const res = await axios.get(`${baseUrl}/shop`); 
             const shopData = res.data.map(d => {
               return {
                 value: d._id,

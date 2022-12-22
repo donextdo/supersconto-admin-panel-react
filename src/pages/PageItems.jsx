@@ -8,6 +8,7 @@ import axios from "axios";
 import ImageProcessor from "../components/page/ImageProcessor.jsx";
 import Modal from '../components/shared/Modal'
 import AddPageItems from '../components/page_items/AddPageItems'
+import baseUrl from '../utils/baseUrl'
 
 import image from '../assets/flyer_1.jpg'
 
@@ -47,7 +48,7 @@ const PageItems = () => {
     }, [])
 
     async function fetchData(pageId) {
-        return axios.get(`http://apidev.marriextransfer.com/v1/api/catelog/page/find/${pageId}`);
+        return axios.get(`${baseUrl}/catelog/page/find/${pageId}`);
     }
 
     const toggleModal = () => {
@@ -67,7 +68,7 @@ const PageItems = () => {
             formData.append('product_image', blobToFile(product_image, pageItem.product_name))
             formData.append('data', JSON.stringify(rest))
             console.log({formData, product_image, rest})
-            const {data} = await axios.post('http://apidev.marriextransfer.com/v1/api/catelog/item', formData)
+            const {data} = await axios.post(`${baseUrl}/catelog/item`, formData)
 
         } catch (error) {
             console.log(error)
