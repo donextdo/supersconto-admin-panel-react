@@ -4,7 +4,7 @@ import CroppedItemsPreview from "./CroppedItemsPreview.jsx";
 import StrokeImagePreview from "./StrokeImagePreview.jsx";
 import SingleItemPreview from "./SingleItemPreview.jsx";
 
-function App({imgSrc}) {
+function App({imgSrc, onClick}) {
     const [src, setSrc] = useState(null)
     const [crop, setCrop] = useState({
         unit: '%',
@@ -198,9 +198,10 @@ function App({imgSrc}) {
 
     const handleItemSelection = (data) => {
         console.log(data, croppedImages[data.index])
+        console.log(croppedImages)
     }
 
-    console.log({croppedImages, coordinates})
+    // console.log({croppedImages, coordinates})
 
 
     return (
@@ -227,7 +228,7 @@ function App({imgSrc}) {
                 <StrokeImagePreview strokeImageUrl={strokeImageUrl}/>
 
                 <SingleItemPreview coordinates={coordinates} strokeImageUrl={strokeImageUrl}
-                                   handleSelection={handleItemSelection}
+                                   handleSelection={onClick}
                                    imageHeight={imageRef.current?.height} imageWidth={imageRef.current?.width}/>
 
 

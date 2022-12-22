@@ -27,20 +27,19 @@ const [table, setTable] = useState(false)
 const [imagePreviews, setImagePreviews] = useState([]);
 const [showImagePreview, setShowImagePreview] = useState(false)
 
-const fetchData = async () => {
-    try {
-        const { data } = await axios.get(`http://apidev.marriextransfer.com/v1/api/catelog/page?catelog=${catelog}`)
-
-        setPages(data)
-
-    } catch (error) {
+useEffect(() => {
+    fetchData(catelog).then(res => {
+        setPages(res?.data)
+    }).catch(error => {
+        // TODO
         console.log(error)
-    }
+    })
+})
+
+async function fetchData(catelog) {
+    return axios.get(`http://apidev.marriextransfer.com/v1/api/catelog/page?catelog=${catelog}`)
 }
 
-useEffect(() => {
-    fetchData()
-}, [pages])
 
 const toggleTable = (type) => {
     type == 'table' && setTable(true)
@@ -93,10 +92,11 @@ const onUpload = async () => {
 
         })
 
-        fetchData()
         setImagePreviews(null)
         toggleImagePreview()
-        
+
+        const {data} = await fetchData(catelog)
+        setPages(data)
 
     } catch (error) {
         console.log(error)
@@ -113,7 +113,8 @@ const onDelete = async (id) => {
         const res = await axios.delete(`http://apidev.marriextransfer.com/v1/api/catelog/page/${id}`)
         console.log(res.data)
 
-        fetchData()
+        const {data} = await fetchData(catelog)
+        setPages(data)
 
     } catch (error) {
         console.log(error)
