@@ -32,6 +32,7 @@ const PageItems = () => {
         crop_id: 0,
         quantity: 0,
         unit_price: 0,
+        online_sell: false,
         product_image: image, //SET THIS IN IMAGE PROCESSOR
         demensions: null
     })

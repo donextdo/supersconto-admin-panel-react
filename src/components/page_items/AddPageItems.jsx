@@ -35,9 +35,16 @@ const handleChange = (e) => {
 }
 
 const handleDropDownChange = (selectedOption) => {
-    setCatelog({
+    setPageItem({
         ...pageItem,
         category : selectedOption.value
+    })
+}
+
+const handleCheck = (event) => {
+    setPageItem({
+        ...pageItem,
+        online_sell : event.target.checked
     })
 }
 
@@ -90,6 +97,19 @@ const handleDropDownChange = (selectedOption) => {
             value={pageItem.unit_price}
             onChange={handleChange}
         />
+
+            <div className='flex items-center justify-start gap-2'>
+
+                <label htmlFor="checkbox" className='text-sm font-medium text-gray-900'>Selling online</label>
+
+                <input
+                    id='checkbox'
+                    type="checkbox"
+                    checked={pageItem.online_sell}
+                    onChange={handleCheck}
+                />
+
+            </div>
 
         </div>
 
