@@ -22,16 +22,16 @@ const Modal = ({children, onClose, onCancel, onSave, title, width}) => {
             {children}
 
             <div className='flex items-center justify-end self-end gap-4'>
-                <ButtonNormal
-                onClick={onCancel}>
+                {onCancel && <ButtonNormal
+                    onClick={onCancel}>
                     Cancel
-                </ButtonNormal>
+                </ButtonNormal>}
 
-                <ButtonSave
-                onClick={onSave}>
-                    <FaSave />
+                {onSave && <ButtonSave
+                    onClick={onSave}>
+                    <FaSave/>
                     <span>Save</span>
-                </ButtonSave>
+                </ButtonSave>}
             </div>
 
         </div>

@@ -34,7 +34,7 @@ const PageItems = () => {
         unit_price: 0,
         online_sell: false,
         product_image: image, //SET THIS IN IMAGE PROCESSOR
-        demensions: null
+        coordinates: null
     })
 
     useEffect(() => {
@@ -54,19 +54,34 @@ const PageItems = () => {
         setModal(!modal)
     }
 
+    const handleSave = async (payload) => {
+        const {croppedImages, index, crop} = payload
+        setPageItem(prevState => ({...prevState, product_image: croppedImages[index - 1], coordinates: crop}))
+        toggleModal()
+    }
+
     const onSave = async () => {
         try {
-    
-          console.log('on save')
-    
+            const {product_image, ...rest} = pageItem
+            const formData = new FormData();
+            formData.append('product_image', blobToFile(product_image, pageItem.product_name))
+            formData.append('data', JSON.stringify(rest))
+            console.log({formData, product_image, rest})
+            const {data} = await axios.post('http://apidev.marriextransfer.com/v1/api/catelog/item', formData)
+
         } catch (error) {
-          console.log(error)
+            console.log(error)
         }
-      }
-    
-      const onCancel = () => {
+    }
+
+    function blobToFile(theBlob, fileName){
+        return new File([theBlob], fileName, { lastModified: new Date().getTime(), type: theBlob.type })
+    }
+
+    const onCancel = () => {
         toggleModal()
-      }
+    }
+
 
     console.log('page-items-rendered', {pageData})
     return (
@@ -76,22 +91,22 @@ const PageItems = () => {
 
             {pageData && <Content expand>
 
-                {modal && 
-                    <Modal 
-                    width='w-[60vw]'
-                    onClose={toggleModal}
-                    onCancel={onCancel}
-                    onSave={onSave}
-                    title='Add page product'> 
-                    
-                    <AddPageItems pageItem={pageItem} setPageItem={setPageItem} />
+                {modal &&
+                    <Modal
+                        width='w-[60vw]'
+                        onClose={toggleModal}
+                        onCancel={onCancel}
+                        onSave={onSave}
+                        title='Add page product'>
+
+                        <AddPageItems pageItem={pageItem} setPageItem={setPageItem}/>
 
                     </Modal>
                 }
 
                 <Card>
 
-                    <ImageProcessor imgSrc={pageData.page_image} onClick={toggleModal}/>
+                    <ImageProcessor imgSrc={pageData.page_image} onClick={handleSave}/>
 
                 </Card>
 

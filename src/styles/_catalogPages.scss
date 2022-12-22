@@ -1,0 +1,16 @@
+.page-slider {
+
+  .image-container {
+    position: relative;
+    .slider-img {
+      width: 45vw;
+      height: 80vh;
+      object-fit: contain;
+    }
+  }
+
+  .full-width {
+    width: 99vw;
+    margin: 0 auto;
+  }
+}

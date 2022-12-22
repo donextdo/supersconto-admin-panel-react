@@ -1,0 +1,14 @@
+.page-slider .image-container {
+  position: relative;
+}
+.page-slider .image-container .slider-img {
+  width: 45vw;
+  height: 80vh;
+  object-fit: contain;
+}
+.page-slider .full-width {
+  width: 99vw;
+  margin: 0 auto;
+}
+
+/*# sourceMappingURL=app.css.map */
