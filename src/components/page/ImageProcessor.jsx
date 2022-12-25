@@ -4,7 +4,7 @@ import CroppedItemsPreview from "./CroppedItemsPreview.jsx";
 import StrokeImagePreview from "./StrokeImagePreview.jsx";
 import SingleItemPreview from "./SingleItemPreview.jsx";
 
-function App({imgSrc, onClick}) {
+function App({imgSrc, onClick, exCoordinates}) {
     const [src, setSrc] = useState(null)
     const [crop, setCrop] = useState({
         unit: '%',
@@ -27,6 +27,16 @@ function App({imgSrc, onClick}) {
 
         }
     }, [coordinates, imageRef.current])
+
+    useEffect(() => {
+        if (coordinates.length === 0 && imageRef.current){
+            exCoordinates.forEach(crop => {
+                onCropComplete(crop)
+            })
+        }
+        console.log('exCoordinates-effect', exCoordinates)
+    }, [exCoordinates,imageRef.current])
+
 
     useEffect(() => {
         if (imgSrc) {
@@ -57,6 +67,8 @@ function App({imgSrc, onClick}) {
     };
 
     const makeClientCrop = async (crop) => {
+        console.log('makeClientCrop', {crop, coordinates})
+        if (crop.x === 0 && crop.y === 0) return
         setCoordinates(prevState => [...prevState, crop])
         if (imageRef.current && crop.width && crop.height) {
             const croppedImageUrl = await getCroppedImg(
@@ -187,7 +199,7 @@ function App({imgSrc, onClick}) {
     const handleRemove = (index) => {
         const cloneCo = [...coordinates]
         const clonePrev = [...croppedImages]
-        console.log({clonePrev, cloneCo})
+        console.log({coordinates, croppedImages})
         cloneCo.splice(index, 1);
         clonePrev.splice(index, 1);
 
@@ -201,7 +213,7 @@ function App({imgSrc, onClick}) {
         console.log(croppedImages)
     }
 
-    // console.log({croppedImages, coordinates})
+    console.log('image-processor-rendered', {croppedImages, exCoordinates, coordinates})
 
 
     return (
@@ -227,9 +239,9 @@ function App({imgSrc, onClick}) {
 
                 <StrokeImagePreview strokeImageUrl={strokeImageUrl}/>
 
-                <SingleItemPreview coordinates={coordinates} strokeImageUrl={strokeImageUrl}
-                                   handleSelection={({crop, index, strokeImageUrl}) => {
-                                       console.log(croppedImages[index]);
+                <SingleItemPreview coordinates={coordinates} strokeImageUrl={strokeImageUrl} height={300} width={200}
+                                   handleSelection={({crop, index}) => {
+                                       console.log(index);
                                        onClick({crop, croppedImages, index})
                                    }}
                                    imageHeight={imageRef.current?.height} imageWidth={imageRef.current?.width}/>

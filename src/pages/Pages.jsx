@@ -38,7 +38,7 @@ const Pages = () => {
             // TODO
             console.log(error)
         })
-    })
+    }, [])
 
     async function fetchData(catelog) {
         return axios.get(`${baseUrl}/catelog/page?catelog=${catelog}`)
@@ -85,7 +85,7 @@ const Pages = () => {
                 const page_no = currentPageNo + ++index
 
                 const pageDto = new FormData()
-
+                console.log(shop)
                 pageDto.append('shop_id', shop)
                 pageDto.append('catelog_book_id', catelog)
                 pageDto.append('page_no', page_no)
@@ -257,7 +257,7 @@ const Pages = () => {
                             }
                         </div>
                     }
-                    <PageSlider showModal={showModal} setShowModal={setShowModal} items={pages}/>
+                    <PageSlider showModal={showModal} setShowModal={setShowModal} catalogs={pages}/>
 
 
                 </Card>

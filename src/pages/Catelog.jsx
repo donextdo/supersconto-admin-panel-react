@@ -143,7 +143,7 @@ const Catalog = () => {
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
 
-                          <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id}&catelog=${d._id}` }}>
+                          <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id._id}&catelog=${d._id}` }}>
                             <RiPagesFill className='w-4 h-4 fill-emerald-500 cursor-pointer'/>
                           </Link>
                           <MdPreview className='w-4 h-4 fill-green-500 cursor-pointer'/>

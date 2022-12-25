@@ -21,13 +21,14 @@ const PageItems = () => {
     const catelog = query.get('catelog');
     const page = query.get('page')
     const [pageData, setPageData] = useState(null)
+    const [exCoordinates, setExCoordinates] = useState([])
     const [modal, setModal] = useState(false)
     const [pageItem, setPageItem] = useState({
         shop_id: shop,
         catelog_book_id: catelog,
         catelog_page_id: page,
         product_name: '',
-        product_catergory: '',
+        product_category: '',
         product_description: '',
         item_index: 0,
         crop_id: 0,
@@ -39,8 +40,10 @@ const PageItems = () => {
     })
 
     useEffect(() => {
+        console.log('api-call')
         fetchData(page).then(res => {
             setPageData(res?.data)
+            setExCoordinates(res?.data?.items.map(it => it.coordinates).flatMap(a => a) ?? [])
         }).catch(error => {
             // TODO
             console.log(error)
@@ -57,7 +60,8 @@ const PageItems = () => {
 
     const handleSave = async (payload) => {
         const {croppedImages, index, crop} = payload
-        setPageItem(prevState => ({...prevState, product_image: croppedImages[index - 1], coordinates: crop}))
+        console.log({payload})
+        setPageItem(prevState => ({...prevState, product_image: croppedImages[index], coordinates: crop}))
         toggleModal()
     }
 
@@ -65,7 +69,7 @@ const PageItems = () => {
         try {
             const {product_image, ...rest} = pageItem
             const formData = new FormData();
-            formData.append('product_image', blobToFile(product_image, pageItem.product_name))
+            formData.append('product_image', blobToFile(product_image, `${pageItem.product_name}.jpeg`))
             formData.append('data', JSON.stringify(rest))
             console.log({formData, product_image, rest})
             const {data} = await axios.post(`${baseUrl}/catelog/item`, formData)
@@ -75,8 +79,9 @@ const PageItems = () => {
         }
     }
 
-    function blobToFile(theBlob, fileName){
-        return new File([theBlob], fileName, { lastModified: new Date().getTime(), type: theBlob.type })
+    function blobToFile(theBlob, fileName) {
+        console.log(theBlob)
+        return new File([theBlob], fileName, {lastModified: new Date().getTime(), type: theBlob.type})
     }
 
     const onCancel = () => {
@@ -107,7 +112,11 @@ const PageItems = () => {
 
                 <Card>
 
-                    <ImageProcessor imgSrc={pageData.page_image} onClick={handleSave}/>
+                    <ImageProcessor
+                        imgSrc={pageData.page_image}
+                        exCoordinates={exCoordinates}
+                        onClick={handleSave}
+                    />
 
                 </Card>
 

@@ -37,7 +37,7 @@ const handleChange = (e) => {
 const handleDropDownChange = (selectedOption) => {
     setPageItem({
         ...pageItem,
-        category : selectedOption.value
+        product_category : selectedOption.value
     })
 }
 
@@ -73,7 +73,7 @@ const handleCheck = (event) => {
             label='Description'
             border
             borderColor='border-gray-600'
-            name={'description'}
+            name={'product_description'}
             value={pageItem.description}
             onChange={handleChange}
         />
