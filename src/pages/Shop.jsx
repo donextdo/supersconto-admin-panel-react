@@ -1,35 +1,36 @@
-import React, { useState,useEffect } from 'react'
-import { Content, Card } from '../components/shared/Utils'
-import Navbar from '../components/shared/Navbar'
-import Sidebar from '../components/shared/Sidebar'
-import { Table, THead, TBody, TH, Row, TD } from '../components/shared/Table'
-import { FaTrash } from 'react-icons/fa'
-import { PencilAltIcon } from '@heroicons/react/solid'
 import axios from 'axios'
 import { RiAddCircleLine } from 'react-icons/ri'
 import { ButtonNormal} from '../components/shared/Button'
 import Modal from '../components/shared/Modal'
 import TextInput from '../components/shared/TextInput'
-import baseUrl from '../utils/baseUrl'
-
+import React, { useEffect, useState } from 'react'
+import Navbar from '../components/shared/Navbar';
+import Sidebar from '../components/shared/Sidebar';
+import { Content, Card } from '../components/shared/Utils';
+import Fileinput from '../components/shared/Fileinput'
+import { Table, THead, TBody, TH, Row, TD } from '../components/shared/Table'
+import { FaTrash } from 'react-icons/fa'
+import { PencilAltIcon } from '@heroicons/react/solid'
+// import Alert from '../components/shared/Alert' 
 
 const Shop = () => {
   const [data, setData] =useState([])
-    
+  async function fetchData() {
+    try {
+        const res = await axios.get('http://apidev.marriextransfer.com/v1/api/shop'); 
+        setData(res.data);
+    } catch (err) {
+        console.log(err);
+    }
+}  
   useEffect( () => {
-      async function fetchData() {
-          try {
-              const res = await axios.get(`${baseUrl}/shop`); 
-              setData(res.data);
-          } catch (err) {
-              console.log(err);
-          }
-      }
       fetchData();
   }, []);
 
   const [modal, setModal] = useState(false)
-  
+  const [alertMessage, setAlertMessage] = useState(false)
+  const [color, setColor] = useState('bg-lime-300 text-black')
+
   
   const [formData, setFormData] = useState({
     shop_name:'',
@@ -43,23 +44,31 @@ const Shop = () => {
     shop_unique_id:'',
     owner_name:'',
     status:'',
-    logo_img:'',
+    logo_img:null,
     latitude:'',
     longitude:'',
     shop_category:'',
     is_online_selling:false,
+    province:'',
+    municipality:'',
+    region:'',
     telephone:''
-
   })
-  const handleChange = (e) => setValue(e.target.value);
 
 
   const toggleModal = () => {
     setModal(!modal)
   }
+  const [alertTitle,setAlertTitle]=useState(null)
+  const toggleAlert = (title) => {
+    
+    setAlertTitle(title)
+    setAlertMessage(!alertMessage)
+    setTimeout( setAlertMessage,1000,false)
+  }
   var bodyFormData = new FormData();
   
-  const setbodyFormData=()=>{
+  const setbodyFormData=async ()=>{
   bodyFormData.append('shop_name', formData.shop_name);
   bodyFormData.append('description', formData.description);
   bodyFormData.append('address[address_line1]', formData.address_line1);
@@ -70,36 +79,93 @@ const Shop = () => {
   bodyFormData.append('address[postal_code]', formData.shop_name);
   bodyFormData.append('shop_unique_id', formData.shop_unique_id);
   bodyFormData.append('owner_name', formData.owner_name);
-  bodyFormData.append('status', formData.status);
+  bodyFormData.append('status', true);
   bodyFormData.append('logo_img', formData.logo_img);
   bodyFormData.append('latitude', formData.latitude);
   bodyFormData.append('longitude', formData.longitude);
   bodyFormData.append('shop_category', formData.shop_category);
   bodyFormData.append('is_online_selling', formData.is_online_selling);
   bodyFormData.append('telephone', formData.telephone);
+  bodyFormData.append('region', formData.region);
 
   }
 
-  const onSave = () => {
+  const onSave = async() => {
+    setbodyFormData()
+    console.log(bodyFormData)
     axios({
       method: "post",
-      url: `${baseUrl}/shop`,
+      url: "http://apidev.marriextransfer.com/v1/api/shop",
       data: bodyFormData,
       headers: { "Content-Type": "multipart/form-data" },
     })
     .then((response) => {
-      setResponse(response.data)
       console.log(response.data)
     })
     .catch(function (error) {
       console.log(error);
- });  }
+ }); 
+ toggleModal()
+//  toggleAlert('Data inserted Successfully')
+ fetchData()
+}
+
+const CurrentData=(data)=>{
+ setFormData(prevState => {return {...prevState,  ['shop_name']: data.shop_name,['update']:true,['id']:data._id }});
+}
+
+const toUpdate = (data)=>{
+    CurrentData(data)
+    toggleModal()
+    bodyFormData = new FormData();
+  }
+
+ const onDelete = (id) => {
+  axios({
+    method: "delete",
+    url: "http://apidev.marriextransfer.com/v1/api/shop/"+id,
+    
+  })
+  .then((response) => {
+    console.log(response.data)
+    toggleAlert('Data deleted Successfully')
+    fetchData()
+
+  })
+  .catch(function (error) {
+    console.log(error);
+}); 
+}
+const onClose=()=>{
+  setFormData({})
+  toggleModal()
+}
+const onUpdate= async() => {
+  setbodyFormData()
+  axios({
+    method: "patch",
+    url: "http://apidev.marriextransfer.com/v1/api/shop/"+formData.id,
+    data: bodyFormData,
+    headers: { "Content-Type": "multipart/form-data" },
+  })
+  .then((response) => {
+    console.log(response.data)
+  })
+  .catch(function (error) {
+    console.log(error);
+}); 
+toggleModal()
+fetchData()
+}
 
   const onCancel = () => {
     alert('oncancel clicked')
   }
  const update = (name, e) => {
-    setFormData(prevState => {return {...prevState, [name]: e.target.value }});
+    setFormData(prevState => {return {...prevState,  [name]: e.target.value }});
+  }
+  const updateImg = (name, e) => {
+    setFormData(prevState => {return {...prevState,  [name]: e.target.files[0] }});
   }
 
   return (
@@ -108,9 +174,16 @@ const Shop = () => {
         <Navbar />
 
         <Content>
+        { alertMessage &&
+            <Alert 
+            title={alertTitle}
+            color={color}
+            width='60%'
+            > 
+        </Alert>}
         {modal && 
             <Modal 
-            onClose={toggleModal}
+            onClose={onClose}
             onCancel={onCancel}
             onSave={onSave}
             title='Create Shop'
@@ -208,11 +281,11 @@ const Shop = () => {
               </div>
               <div className='flex gap-4'>
                 <div className= 'flex-1'>
-                  <TextInput 
-                    label='Logo' 
-                    border
-                    borderColor='border-gray-600'
-                  />
+                 <Fileinput 
+                    label={'Logo Image'}
+                    multiple
+                    onChange={(e) =>updateImg("logo_img", e)}
+                    />
                 </div>
                 <div className= 'flex-1'>
                   <TextInput 
@@ -276,7 +349,7 @@ const Shop = () => {
                       </TD>
 
                       <TD>
-                        { d.telephone }
+                       
                       </TD>
 
                       <TD>
@@ -295,8 +368,8 @@ const Shop = () => {
                       </TD>
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
-                          <FaTrash className='w-3 h-3 fill-red-500 cursor-pointer'/>
-                          <PencilAltIcon className='w-4 h-4 fill-blue-500 cursor-pointer'/>
+                          <FaTrash onClick={() =>onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
+                          <PencilAltIcon onClick={() =>toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
                         </div>  
                       </TD>
                     </Row>

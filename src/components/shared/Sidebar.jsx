@@ -1,11 +1,14 @@
 import React from 'react'
 import logo from '../../assets/react.svg'
 import { Link } from 'react-router-dom'
-import {ChartPieIcon, UsersIcon } from '@heroicons/react/solid'
-import { FaShopify,FaFirstOrder } from "react-icons/fa";
-import { BiCategory,BiNews } from "react-icons/bi";
+import {ChartPieIcon } from '@heroicons/react/solid'
+import { FaShopify,FaFirstOrder,FaList } from "react-icons/fa";
+import { BiCategory,BiNews,BiBook ,BiClipboard} from "react-icons/bi";
 import { TbUsers } from "react-icons/tb";
-import { AiOutlineStock } from "react-icons/ai";
+import { AiOutlineStock} from "react-icons/ai";
+
+
+
 
 const Sidebar = ({ minimize }) => {
   return (
@@ -37,24 +40,24 @@ const Sidebar = ({ minimize }) => {
 
             <li className="listItem">
                 <Link to={'/catelog'} className="listItemLink">
-                    <UsersIcon className='w-5 h-5'/>
+                    <BiBook className='w-5 h-5'/>
                     {!minimize && <span>Catalog</span> }
                 </Link>
             </li>
 
             <li className="listItem">
                 <Link to={'/category'} className="listItemLink">
-                    <BiCategory className='w-5 h-5'/>
+                    <FaList className='w-5 h-5'/>
                     {!minimize && <span>Category</span>}
                 </Link>
             </li>
 
-            <li className="listItem">
+            {/* <li className="listItem">
                 <Link to={'/users'} className="listItemLink">
                     <TbUsers className='w-5 h-5'/>
                     {!minimize && <span>Users</span>}
                 </Link>
-            </li>
+            </li> */}
 
             <li className="listItem">
                 <Link to={'/news'} className="listItemLink">
@@ -63,19 +66,19 @@ const Sidebar = ({ minimize }) => {
                 </Link>
             </li>
 
-            <li className="listItem">
+            {/* <li className="listItem">
                 <Link to={'/orders'} className="listItemLink">
-                    <FaFirstOrder className='w-5 h-5'/>
+                    <BiClipboard className='w-5 h-5'/>
                     {!minimize && <span>Orders</span>}
                 </Link>
-            </li>
+            </li> */}
 
-            <li className="listItem">
+            {/* <li className="listItem">
                 <Link to={'/stocks'} className="listItemLink">
                     <AiOutlineStock className='w-5 h-5'/>
                     {!minimize && <span>Stocks</span>}
                 </Link>
-            </li>
+            </li> */}
 
             <li className="listItem">
                 <Link to={'/vender'} className="listItemLink">
