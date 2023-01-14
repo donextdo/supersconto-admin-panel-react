@@ -69,19 +69,23 @@ const PageItems = () => {
         try {
             const {product_image, ...rest} = pageItem
             const formData = new FormData();
-            formData.append('product_image', blobToFile(product_image, `${pageItem.product_name}.jpeg`))
+            formData.append('product_image', await blobToFile(product_image, `${pageItem.product_name}.jpeg`))
             formData.append('data', JSON.stringify(rest))
             console.log({formData, product_image, rest})
             const {data} = await axios.post(`${baseUrl}/catelog/item`, formData)
+            toggleModal()
 
         } catch (error) {
             console.log(error)
         }
     }
 
-    function blobToFile(theBlob, fileName) {
-        console.log(theBlob)
-        return new File([theBlob], fileName, {lastModified: new Date().getTime(), type: theBlob.type})
+    async function blobToFile(theBlob, fileName) {
+
+        const response = await fetch(theBlob);
+        const blob = await response.blob();
+        return new File([blob], fileName);
+        // return new File([theBlob], fileName, {lastModified: new Date().getTime(), type: theBlob.type})
     }
 
     const onCancel = () => {

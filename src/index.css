@@ -41,7 +41,12 @@
 }
 
 .image-processor > div {
-  flex-basis: 33.33%;
+  flex: 1;
+}
+.image-processor > .cropper {
+  min-width: 600px;
+  max-width: 600px;
+  max-height: 700px;
 }
 
 .previewer {
@@ -49,11 +54,14 @@
   flex-direction: column;
   max-height: 50vh;
   overflow: auto;
+  margin: 0 1rem;
+
 }
 
-img {
+.previewer img {
   max-width: 100%;
-  margin: 0rem auto;
+  margin: 0rem auto 1rem;
+  cursor: no-drop;
 }
 
 .selection-div {

@@ -237,9 +237,9 @@ function App({imgSrc, onClick, exCoordinates}) {
 
                 <CroppedItemsPreview cropImageUrl={croppedImages} handleRemove={handleRemove}/>
 
-                <StrokeImagePreview strokeImageUrl={strokeImageUrl}/>
+                {/*<StrokeImagePreview strokeImageUrl={strokeImageUrl}/>*/}
 
-                <SingleItemPreview coordinates={coordinates} strokeImageUrl={strokeImageUrl} height={300} width={200}
+                <SingleItemPreview coordinates={coordinates} strokeImageUrl={strokeImageUrl} height={imageRef.current?.height} width={imageRef.current?.width}
                                    handleSelection={({crop, index}) => {
                                        console.log(index);
                                        onClick({crop, croppedImages, index})
