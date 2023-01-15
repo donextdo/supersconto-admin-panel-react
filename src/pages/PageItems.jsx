@@ -74,7 +74,7 @@ const PageItems = () => {
             console.log({formData, product_image, rest})
             const {data} = await axios.post(`${baseUrl}/catelog/item`, formData)
             toggleModal()
-
+            
         } catch (error) {
             console.log(error)
         }

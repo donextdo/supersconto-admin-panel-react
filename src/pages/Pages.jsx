@@ -38,12 +38,12 @@ const Pages = () => {
             // TODO
             console.log(error)
         })
+
     }, [])
 
     async function fetchData(catelog) {
         return axios.get(`${baseUrl}/catelog/page?catelog=${catelog}`)
     }
-
 
     const toggleTable = (type) => {
         type == 'table' && setTable(true)
@@ -96,11 +96,14 @@ const Pages = () => {
 
             })
 
-            setImagePreviews(null)
-            toggleImagePreview()
+            
 
             const {data} = await fetchData(catelog)
             setPages(data)
+            setImagePreviews(null)
+            toggleImagePreview()
+            console.log("hello")
+
 
         } catch (error) {
             console.log(error)
