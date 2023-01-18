@@ -11,16 +11,18 @@ function SingleItemPreview({strokeImageUrl, coordinates, imageWidth, imageHeight
                     const scaleX = width / imageWidth;
                     const scaleY = height / imageHeight;
                     return (
-                        <div className="selection-div" key={`interactive-div-${index}`} style={{
-                            width: crop.width * scaleX,
-                            height: crop.height * scaleY,
-                            transform: `translate(${crop.x * scaleX}px, ${crop.y * scaleY}px)`
-                        }} onClick={() => handleSelection({
-                            crop: {...crop, imageWidth, imageHeight},
-                            index,
-                            imageWidth,
-                            imageHeight
-                        })}>
+                        <div className={`selection-div ${crop?.id ? 'active' : ''}`} key={`interactive-div-${index}`}
+                             style={{
+                                 width: crop.width * scaleX,
+                                 height: crop.height * scaleY,
+                                 transform: `translate(${crop.x * scaleX}px, ${crop.y * scaleY}px)`
+                             }}
+                             onClick={() => handleSelection({
+                                 crop: {...crop, imageWidth, imageHeight},
+                                 index,
+                                 imageWidth,
+                                 imageHeight
+                             })}>
                         </div>
                     )
                 })}

@@ -104,13 +104,14 @@ const Shop = () => {
         })
             .then((response) => {
                 console.log(response.data)
+                fetchData()
             })
             .catch(function (error) {
                 console.log(error);
             });
         toggleModal()
 //  toggleAlert('Data inserted Successfully')
-        fetchData()
+
     }
 
     const CurrentData = (data) => {

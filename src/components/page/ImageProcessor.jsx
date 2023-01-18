@@ -1,7 +1,6 @@
 import React, {useEffect, useRef, useState} from 'react';
 import ReactCrop from "react-image-crop";
 import CroppedItemsPreview from "./CroppedItemsPreview.jsx";
-import StrokeImagePreview from "./StrokeImagePreview.jsx";
 import SingleItemPreview from "./SingleItemPreview.jsx";
 
 function App({imgSrc, onClick, exCoordinates}) {
@@ -11,12 +10,13 @@ function App({imgSrc, onClick, exCoordinates}) {
         aspect: undefined
     })
     const [croppedImages, setCroppedImages] = useState([])
-    const [strokeImageUrl, setStrokeImageUrl] = useState()
+    const [strokeImageUrl, setStrokeImageUrl] = useState("")
     const [coordinates, setCoordinates] = useState([])
     const imageRef = useRef()
 
     useEffect(() => {
         if (imageRef.current) {
+            console.log("generate stroke", {coordinates})
             getStrokeImg(
                 imageRef.current,
                 coordinates,
@@ -29,13 +29,33 @@ function App({imgSrc, onClick, exCoordinates}) {
     }, [coordinates, imageRef.current])
 
     useEffect(() => {
-        if (coordinates.length === 0 && imageRef.current){
-            exCoordinates.forEach(crop => {
-                onCropComplete(crop)
-            })
+        setCoordinates([])
+        setCroppedImages([])
+
+        if (imageRef.current) {
+/*
+            const blah = () => {
+                exCoordinates.map(async crop => {
+                    await onCropComplete(crop)
+                })
+            }
+            blah()*/
+
+            const asyncTasks = exCoordinates.map(async (item, index) => {
+                // perform async task and return result
+                return await makeClientCrop2(item, generateUUID());
+            });
+
+            Promise.all(asyncTasks)
+                .then((results) => {
+                    console.log({results})
+                    setCoordinates(results)
+                })
+                .catch((error) => console.error(error));
+
         }
-        console.log('exCoordinates-effect', exCoordinates)
-    }, [exCoordinates,imageRef.current])
+        console.log('exCoordinates-effect', imageRef.current)
+    }, [exCoordinates, imageRef.current])
 
 
     useEffect(() => {
@@ -59,24 +79,47 @@ function App({imgSrc, onClick, exCoordinates}) {
     }
 
     const onImageLoaded = (image) => {
+        console.log("image load call on rerender check")
         imageRef.current = image;
     };
 
-    const onCropComplete = (crop) => {
-        makeClientCrop(crop);
+    const onCropComplete = async (crop) => {
+        const index = generateUUID()
+        await makeClientCrop(crop, index);
     };
 
-    const makeClientCrop = async (crop) => {
+    const makeClientCrop = async (crop, index) => {
         console.log('makeClientCrop', {crop, coordinates})
         if (crop.x === 0 && crop.y === 0) return
-        setCoordinates(prevState => [...prevState, crop])
+        // setCoordinates(prevState => [...prevState, {...crop}])
+
         if (imageRef.current && crop.width && crop.height) {
             const croppedImageUrl = await getCroppedImg(
                 imageRef.current,
                 crop,
                 'newFile.jpeg'
             );
-            setCroppedImages(prevState => ([...prevState, croppedImageUrl]));
+
+            setCoordinates(prevState => [...prevState, {...crop, croppedImageUrl, index}])
+            setCroppedImages(prevState => ([...prevState, {croppedImageUrl, index}]));
+
+        }
+    }
+    const makeClientCrop2 = async (crop, index) => {
+        console.log('makeClientCrop', {crop, coordinates})
+        if (crop.x === 0 && crop.y === 0) return
+        // setCoordinates(prevState => [...prevState, {...crop}])
+
+        if (imageRef.current && crop.width && crop.height) {
+            const croppedImageUrl = await getCroppedImg(
+                imageRef.current,
+                crop,
+                'newFile.jpeg'
+            );
+
+            // setCoordinates(prevState => [...prevState, {...crop, croppedImageUrl}])
+            setCroppedImages(prevState => ([...prevState, {croppedImageUrl,index}] ));
+            return {...crop, croppedImageUrl, index}
 
         }
     }
@@ -197,11 +240,8 @@ function App({imgSrc, onClick, exCoordinates}) {
 
 
     const handleRemove = (index) => {
-        const cloneCo = [...coordinates]
-        const clonePrev = [...croppedImages]
-        console.log({coordinates, croppedImages})
-        cloneCo.splice(index, 1);
-        clonePrev.splice(index, 1);
+        const cloneCo = [...coordinates].filter(co => co.index !== index)
+        const clonePrev = [...croppedImages].filter(co => co.index !== index)
 
         setCoordinates(cloneCo)
         setCroppedImages(clonePrev)
@@ -213,7 +253,19 @@ function App({imgSrc, onClick, exCoordinates}) {
         console.log(croppedImages)
     }
 
-    console.log('image-processor-rendered', {croppedImages, exCoordinates, coordinates})
+    function generateUUID() {
+        let d = new Date().getTime();
+        if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+            d += performance.now(); //use high-precision timer if available
+        }
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            let r = (d + Math.random() * 16) % 16 | 0;
+            d = Math.floor(d / 16);
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+        });
+    }
+
+    console.log('image-processor-rendered', {croppedImages,coordinates, exCoordinates})
 
 
     return (
@@ -239,10 +291,12 @@ function App({imgSrc, onClick, exCoordinates}) {
 
                 {/*<StrokeImagePreview strokeImageUrl={strokeImageUrl}/>*/}
 
-                <SingleItemPreview coordinates={coordinates} strokeImageUrl={strokeImageUrl} height={imageRef.current?.height} width={imageRef.current?.width}
+                <SingleItemPreview coordinates={coordinates} strokeImageUrl={strokeImageUrl}
+                                   height={imageRef.current?.height} width={imageRef.current?.width}
                                    handleSelection={({crop, index}) => {
                                        console.log(index);
-                                       onClick({crop, croppedImages, index})
+                                       onClick({crop})
+                                       // setCoordinates([])
                                    }}
                                    imageHeight={imageRef.current?.height} imageWidth={imageRef.current?.width}/>
 

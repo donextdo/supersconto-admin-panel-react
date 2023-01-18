@@ -78,11 +78,12 @@ const Pages = () => {
 
     const onUpload = async () => {
         try {
+            const currentPageNo = pages.length > 0 ? pages.length : 0
+            console.log({pl: pages.length})
+            imagePreviews.map(async (img, index) => {
 
-            imagePreviews.forEach(async (img, index) => {
-
-                const currentPageNo = pages.length > 0 ? pages[pages.length - 1].page_no : 0
-                const page_no = currentPageNo + ++index
+                const page_no = currentPageNo + 1 + index
+                console.log({currentPageNo, page_no})
 
                 const pageDto = new FormData()
                 console.log(shop)
@@ -92,15 +93,22 @@ const Pages = () => {
                 pageDto.append('page_image', dataURLtoFile(img, 'page_1'))
 
 
-                const {data} = await axios.post(`${baseUrl}/catelog/page`, pageDto)
+                axios.post(`${baseUrl}/catelog/page`, pageDto).then(res => {
+                    console.log({add: res})
+                    fetchData(catelog).then(res => {
+                        setPages(res?.data)
+                        console.log({pages: res})
+                    }).catch(error => {
+                        // TODO
+                        console.log(error)
+                    })
+                })
 
             })
 
             setImagePreviews(null)
             toggleImagePreview()
 
-            const {data} = await fetchData(catelog)
-            setPages(data)
 
         } catch (error) {
             console.log(error)
@@ -124,7 +132,7 @@ const Pages = () => {
             console.log(error)
         }
     }
-
+    console.log("render pages", {pages})
     return (
         <div>
             <Navbar screen/>

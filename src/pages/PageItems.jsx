@@ -43,7 +43,7 @@ const PageItems = () => {
         console.log('api-call')
         fetchData(page).then(res => {
             setPageData(res?.data)
-            setExCoordinates(res?.data?.items.map(it => it.coordinates).flatMap(a => a) ?? [])
+            setExCoordinates(res?.data?.items.map(it => ({...it.coordinates, id: it._id})).flatMap(a => a) ?? [])
         }).catch(error => {
             // TODO
             console.log(error)
@@ -59,9 +59,15 @@ const PageItems = () => {
     }
 
     const handleSave = async (payload) => {
-        const {croppedImages, index, crop} = payload
+        const {crop} = payload
+        let extra
         console.log({payload})
-        setPageItem(prevState => ({...prevState, product_image: croppedImages[index], coordinates: crop}))
+        if (crop.id) {
+            console.log("crop has id", pageData.items)
+            extra = {...crop, ...pageData?.items.find(it => it._id === crop.id)}
+        }
+        console.log({crop})
+        setPageItem(prevState => ({...prevState, product_image: crop.croppedImageUrl, coordinates: crop, ...extra}))
         toggleModal()
     }
 
@@ -72,7 +78,23 @@ const PageItems = () => {
             formData.append('product_image', await blobToFile(product_image, `${pageItem.product_name}.jpeg`))
             formData.append('data', JSON.stringify(rest))
             console.log({formData, product_image, rest})
-            const {data} = await axios.post(`${baseUrl}/catelog/item`, formData)
+
+            axios.post(`${baseUrl}/catelog/item`, formData).then(() => {
+                fetchData(page).then(res => {
+                    setPageData(res?.data)
+                    setExCoordinates(res?.data?.items.map(it => ({
+                        ...it.coordinates,
+                        id: it._id
+                    })).flatMap(a => a) ?? [])
+                }).catch(error => {
+                    // TODO
+                    console.log(error)
+                })
+            }).catch(error => {
+                // TODO
+                console.log(error)
+            })
+
             toggleModal()
 
         } catch (error) {
@@ -93,7 +115,7 @@ const PageItems = () => {
     }
 
 
-    console.log('page-items-rendered', {pageData})
+    console.log('page-items-rendered', {pageData, pageItem})
     return (
         <div>
             <Navbar screen/>

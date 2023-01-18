@@ -42,7 +42,7 @@ function PageSlider({catalogs, showModal, setShowModal}) {
         }
     }
 
-    console.log({catalogs, pages})
+    // console.log({catalogs, pages})
     return (
         <div className="page-slider">
             {showModal &&

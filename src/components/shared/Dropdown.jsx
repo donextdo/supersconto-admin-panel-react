@@ -33,7 +33,7 @@ return (
     }
 
         <Select
-            // value={value}
+            value={value}
             onChange={onChange}
             options={options}
             defaultValue={defaultValue}

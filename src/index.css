@@ -70,6 +70,9 @@
   top: 0;
 
 }
+.selection-div.active {
+  background: rgba(72, 255, 0, 0.24);
+}
 
 .selection-div:hover {
   background: rgba(0, 0, 255, 0.79);
