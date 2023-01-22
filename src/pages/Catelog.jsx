@@ -20,10 +20,10 @@ const Catalog = () => {
   const [data, setData] =useState([])
   const [modal, setModal] = useState(false)
   const [catelog, setCatelog] = useState({
-    shop_id: '',
-    title: '',
-    description: '',
-    expiredate: ''
+    shop_id: 'a',
+    title: 'b',
+    description: 'c',
+    expiredate: 'd'
   })
     
   useEffect( () => {
@@ -41,6 +41,12 @@ const Catalog = () => {
   
   const toggleModal = () => {
     setModal(!modal)
+    setCatelog({
+      shop_id: '',
+      title: '',
+      description: '',
+      expiredate: ''
+    })
   }
 
   const onSave = async () => {
@@ -82,6 +88,21 @@ const Catalog = () => {
     }
   }
 
+  const onUpdate = async (d) => {
+    setModal(true)
+    setCatelog(d)
+    try {
+
+      const res = await axios.patch(`${baseUrl}/catelog/book/${id}`)
+      console.log(res.data)
+
+      fetchData()
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  
 
   return (
     <div>
@@ -146,9 +167,11 @@ const Catalog = () => {
                           <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id._id}&catelog=${d._id}` }}>
                             <RiPagesFill className='w-4 h-4 fill-emerald-500 cursor-pointer'/>
                           </Link>
+                          <Link>
                           <MdPreview className='w-4 h-4 fill-green-500 cursor-pointer'/>
+                          </Link>
                           <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
-                          <PencilAltIcon className='w-4 h-4 fill-blue-500 cursor-pointer'/>
+                          <PencilAltIcon onClick={() => onUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
 
                         </div>  
                       </TD>

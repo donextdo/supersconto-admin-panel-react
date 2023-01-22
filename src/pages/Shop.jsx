@@ -38,12 +38,14 @@ const Shop = () => {
     const [formData, setFormData] = useState({
         shop_name: '',
         description: '',
-        address_line1: '',
-        address_line2: '',
-        address_line3: '',
-        state: '',
-        city: '',
-        postal_code: '',
+        address: {
+            address_line1: '',
+            address_line2: '',
+            address_line3: '',
+            state: '',
+            city: '',
+            postal_code: '',
+        } ,      
         shop_unique_id: '',
         owner_name: '',
         status: '',
@@ -61,6 +63,30 @@ const Shop = () => {
 
     const toggleModal = () => {
         setModal(!modal)
+        setFormData({
+            shop_name: '',
+            description: '',
+            address: {
+                address_line1: '',
+                address_line2: '',
+                address_line3: '',
+                state: '',
+                city: '',
+                postal_code: '',
+            } ,
+            shop_unique_id: '',
+            owner_name: '',
+            status: '',
+            logo_img: null,
+            latitude: '',
+            longitude: '',
+            shop_category: '',
+            is_online_selling: false,
+            province: '',
+            municipality: '',
+            region: '',
+            telephone: ''
+        })
     }
     const [alertTitle, setAlertTitle] = useState(null)
     const toggleAlert = (title) => {
@@ -79,7 +105,7 @@ const Shop = () => {
         bodyFormData.append('address[address_line3]', formData.address_line3);
         bodyFormData.append('address[state]', formData.state);
         bodyFormData.append('address[city]', formData.city);
-        bodyFormData.append('address[postal_code]', formData.shop_name);
+        bodyFormData.append('address[postal_code]', formData.postal_code);
         bodyFormData.append('shop_unique_id', formData.shop_unique_id);
         bodyFormData.append('owner_name', formData.owner_name);
         bodyFormData.append('status', true);
@@ -120,27 +146,48 @@ const Shop = () => {
         });
     }
 
-    const toUpdate = (data) => {
-        CurrentData(data)
-        toggleModal()
+    const toUpdate = async (data) => {
+        // console.log(data)
+        setFormData(data)
+       setModal(true)
+       try {
+
+        const res = await axios.patch(`${baseUrl}/shop/${id}`)
+        console.log(res.data)
+  
+        fetchData()
+  
+      } catch (error) {
+        console.log(error)
+      }
         bodyFormData = new FormData();
     }
 
-    const onDelete = (id) => {
-        axios({
-            method: "delete",
-            url: `${baseUrl}/shop/${id}`,
+    const onDelete = async (id) => {
+        // axios({
+        //     method: "delete",
+        //     url: `${baseUrl}/shop/${id}`,
 
-        })
-            .then((response) => {
-                console.log(response.data)
-                toggleAlert('Data deleted Successfully')
-                fetchData()
+        // })
+        //     .then((response) => {
+        //         console.log(response.data)
+        //         toggleAlert('Data deleted Successfully')
+        //         fetchData()
 
-            })
-            .catch(function (error) {
-                console.log(error);
-            });
+        //     })
+        //     .catch(function (error) {
+        //         console.log(error);
+        //     });
+        try {
+
+            const res = await axios.delete(`${baseUrl}/shop/${id}`)
+            console.log(res.data)
+      
+            fetchData()
+      
+          } catch (error) {
+            console.log(error)
+          }
     }
     const onClose = () => {
         setFormData({})
@@ -165,9 +212,14 @@ const Shop = () => {
     }
 
     const onCancel = () => {
-        alert('oncancel clicked')
+        setModal(false)
     }
     const update = (name, e) => {
+        if (name=="city" || name == "address_line1" || name == "address_line2" || name == "address_line3" || name == "state" || name == "postal_code"){
+            setFormData(prevState => {
+                return {...prevState, address : {[name]: e.target.value}}
+            });
+        }
         setFormData(prevState => {
             return {...prevState, [name]: e.target.value}
         });
@@ -231,7 +283,7 @@ const Shop = () => {
                                     label='Province'
                                     border
                                     borderColor='border-gray-600'
-                                    value={formData.state} onChange={(e) => update("state", e)}
+                                    value={formData.address.state} onChange={(e) => update("state", e)}
 
                                 />
                             </div>
@@ -240,7 +292,7 @@ const Shop = () => {
                             <div className='flex-1'>
                                 <TextInput
                                     label='Address Line 1'
-                                    value={formData.address_line1} onChange={(e) => update("address_line1", e)}
+                                    value={formData.address.address_line1} onChange={(e) => update("address_line1", e)}
                                     border
                                     borderColor='border-gray-600'
                                 />
@@ -248,7 +300,7 @@ const Shop = () => {
                             <div className='flex-1'>
                                 <TextInput
                                     label='Initials'
-                                    value={formData.address_line2} onChange={(e) => update("address_line2", e)}
+                                    value={formData.address.address_line2} onChange={(e) => update("address_line2", e)}
                                     border
                                     borderColor='border-gray-600'
                                 />
@@ -258,7 +310,7 @@ const Shop = () => {
                             <div className='flex-1'>
                                 <TextInput
                                     label='Address Line 2'
-                                    value={formData.address_line3} onChange={(e) => update("address_line3", e)}
+                                    value={formData.address.address_line3} onChange={(e) => update("address_line3", e)}
                                     border
                                     borderColor='border-gray-600'
                                 />
@@ -266,6 +318,7 @@ const Shop = () => {
                             <div className='flex-1'>
                                 <TextInput
                                     label='Municipality'
+                                    value={formData.address.postal_code} onChange={(e) => update("postal_code", e)}
                                     border
                                     borderColor='border-gray-600'
                                 />
@@ -275,7 +328,7 @@ const Shop = () => {
                             <div className='flex-1'>
                                 <TextInput
                                     label='City'
-                                    value={formData.city} onChange={(e) => update("city", e)}
+                                    value={formData.address.city} onChange={(e) => update("city", e)}
                                     border
                                     borderColor='border-gray-600'
                                 />

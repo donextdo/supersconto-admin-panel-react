@@ -70,7 +70,7 @@ const Dashboard = () => {
                   <span>Add</span>
                 </ButtonNormal>
 
-                <ButtonSuccess >
+                {/* <ButtonSuccess >
                   Button Success
                 </ButtonSuccess>
 
@@ -84,7 +84,7 @@ const Dashboard = () => {
 
                 <ButtonDanger >
                   Button Danger
-                </ButtonDanger>
+                </ButtonDanger> */}
 
           </div>
             <Table>

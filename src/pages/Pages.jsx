@@ -15,6 +15,7 @@ import {PencilAltIcon} from '@heroicons/react/solid'
 import {RiShoppingBag3Fill} from 'react-icons/ri'
 import PageSlider from "./PageSlider.jsx";
 import baseUrl from '../utils/baseUrl'
+import {FaAngleLeft} from 'react-icons/fa'
 
 
 const Pages = () => {
@@ -138,6 +139,10 @@ const Pages = () => {
             <Navbar screen/>
             <Sidebar minimize/>
 
+            <Link to="/catelog">
+                    <button className="text-4xl pl-20 fixed z-50 left-6 top-4"><FaAngleLeft /></button>
+            </Link>
+
             <Content expand>
 
                 {
@@ -249,11 +254,17 @@ const Pages = () => {
                             {
                                 pages.map((page) => (
                                     <div key={page._id} className='w-full aspect-square bg-gray-200 relative'>
+                                       <Link to={{
+                                            pathname: '/catelog/pages/items',
+                                            search: `shop=${page.shop_id}&catelog=${page.catelog_book_id}&page=${page._id}`
+                                        }}>
                                         <img src={page.page_image} alt={page._id}
                                              className='w-full h-full object-contain'/>
+                                        </Link>
+                                        {/* <div className='bg-white w-6 h-6 shadow-lg top-4 right-4'> */}
                                         <FaTrash onClick={() => onDelete(page._id)}
-                                                 className='w-3 h-3 fill-red-500 cursor-pointer absolute top-4 right-4'/>
-
+                                                 className='w-5 h-5 fill-red-500 cursor-pointer absolute top-4 right-4 m-1 bg-white p-1 rounded-full'/>
+                                        {/* </div> */}
                                         <Link to={{
                                             pathname: '/catelog/pages/items',
                                             search: `shop=${page.shop_id}&catelog=${page.catelog_book_id}&page=${page._id}`
