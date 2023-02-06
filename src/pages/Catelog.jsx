@@ -13,7 +13,7 @@ import Modal from '../components/shared/Modal'
 import Form from '../components/catelog/Form'
 import { normalizeDate } from '../utils/functions'
 import { Link } from 'react-router-dom'
-import baseUrl from '../utils/baseUrl'
+import baseUrl, {clientAppUrl} from '../utils/baseUrl'
 
 const Catalog = () => {
 
@@ -167,9 +167,9 @@ const Catalog = () => {
                           <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id._id}&catelog=${d._id}` }}>
                             <RiPagesFill className='w-4 h-4 fill-emerald-500 cursor-pointer'/>
                           </Link>
-                          <Link>
-                          <MdPreview className='w-4 h-4 fill-green-500 cursor-pointer'/>
-                          </Link>
+                          <a href={`${clientAppUrl}/catalog-preview/${d._id}`} target="_blank" rel="noopener noreferrer">
+                            <MdPreview className='w-4 h-4 fill-green-500 cursor-pointer'/>
+                          </a>
                           <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
                           <PencilAltIcon onClick={() => onUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
 
