@@ -1,96 +1,111 @@
-import React, { useState,useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import { Content, Card } from '../components/shared/Utils'
 import Navbar from '../components/shared/Navbar'
 import Sidebar from '../components/shared/Sidebar'
 import { Table, THead, TBody, TH, Row, TD } from '../components/shared/Table'
 import axios from 'axios'
+import { ButtonSuccess } from '../components/shared/Button'
+import { RiAddCircleLine,} from 'react-icons/ri'
 
 
 
 const Stocks = () => {
 
-    const [data, setData] =useState([])
-      
-    useEffect( () => {
-        async function fetchData() {
-            try {
-                const res = await axios.get('http://localhost/stock.php'); 
-                setData(res.data);
-            } catch (err) {
-                console.log(err);
-            }
-        }
-        fetchData();
-    }, []);
-  
-    const [modal, setModal] = useState(false)
-    
-    const toggleModal = () => {
-      setModal(!modal)
+  const [data, setData] = useState([])
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const res = await axios.get('http://localhost/stock.php');
+        setData(res.data);
+      } catch (err) {
+        console.log(err);
+      }
     }
-  
-    const onSave = () => {
-      alert('onsave clicked')
-    }
-  
-    const onCancel = () => {
-      alert('oncancel clicked')
-    }
-  
+    fetchData();
+  }, []);
+
+  const [modal, setModal] = useState(false)
+
+  const toggleModal = () => {
+    setModal(!modal)
+  }
+
+  const onSave = () => {
+    alert('onsave clicked')
+  }
+
+  const onCancel = () => {
+    alert('oncancel clicked')
+  }
+
 
   return (
     <div>
-        <Sidebar />
-        <Navbar />
+      <Sidebar />
+      <Navbar />
 
-        <Content>
-          
-          <Card>
-            
-            <Table>
+      <Content>
 
-              <THead>
-                <TH title={'Shop Name'}/>
-                <TH title={'Catalog Name'}/>
-                <TH title={'Product Name'}/>
-                <TH title={'Quantity'}/>
-              </THead>
+        <Card>
 
-              <TBody>
+          <div className='w-full py-4 flex gap-6'>
 
-                {data.map(d => {
-                  return (
-                    <Row key={d.id}>
-                    
+            <ButtonSuccess onClick={toggleModal}>
+              <RiAddCircleLine className='w-5 h-5' />
+              <span>Add Stock</span>
+            </ButtonSuccess>
 
-                      <TD>
-                        { d.shopName }
-                      </TD>
+          </div>
 
-                      <TD>
-                        { d.catalogName }
-                      </TD>
+          <Table>
 
-                      <TD>
-                        { d.productName }
-                      </TD>
-                      <TD>
-                        { d.quantity }
-                      </TD>
-                  
-                    </Row>
-                  )
-                })
+            <THead>
+              <TH title={'ID'} />
+              <TH title={'Item Name'} />
+              <TH title={'Shop Name'} />
+              <TH title={'Shop Address'} />
+              <TH title={'Quantity'} />
+            </THead>
 
-                }
+            <TBody>
 
-              </TBody>
+              {data.map(d => {
+                return (
+                  <Row key={d.id}>
 
-            </Table>
 
-          </Card>
+                    <TD>
+                      {d.shopName}
+                    </TD>
 
-        </Content>
+                    <TD>
+                      {d.catalogName}
+                    </TD>
+
+                    <TD>
+                      {d.productName}
+                    </TD>
+                    <TD>
+                      {d.shopAddress}
+                    </TD>
+                    <TD>
+                      {d.quantity}
+                    </TD>
+
+                  </Row>
+                )
+              })
+
+              }
+
+            </TBody>
+
+          </Table>
+
+        </Card>
+
+      </Content>
     </div>
   )
 }

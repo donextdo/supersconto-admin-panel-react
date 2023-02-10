@@ -73,12 +73,12 @@ const Sidebar = ({ minimize }) => {
                 </Link>
             </li> */}
 
-            {/* <li className="listItem">
+            <li className="listItem">
                 <Link to={'/stocks'} className="listItemLink">
                     <AiOutlineStock className='w-5 h-5'/>
                     {!minimize && <span>Stocks</span>}
                 </Link>
-            </li> */}
+            </li>
 
             <li className="listItem">
                 <Link to={'/vender'} className="listItemLink">
