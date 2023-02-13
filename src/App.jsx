@@ -9,6 +9,7 @@ import Vender from "./pages/Venders"
 import Stocks from "./pages/Stock"
 import Pages from "./pages/Pages"
 import PageItems from "./pages/PageItems"
+import Main from "./layouts/Main"
 import {
   BrowserRouter as Router,
   Routes,
@@ -22,18 +23,22 @@ function App() {
   return (
     <Router>
       <Routes>
-      <Route exact path="/" element={<Login/>}/>
+        <Route exact path='/' element={<Main/>} >
+            <Route index element={<Dashboard/>}/>
+            <Route exact path="/shop" element={<Shop/>}/>
+            <Route exact path="/catelog" element={<Catelog />}/>
+            <Route path="/catelog/pages" element={<Pages/>}/>
+            <Route path="/catelog/pages/items" element={<PageItems/>}/>
+            <Route exact path="/category" element={<Category/>}/>
+            <Route exact path="/users" element={<Users/>}/>
+            <Route exact path="/news" element={<News/>}/>
+            <Route exact path="/orders" element={<Order/>}/>
+            <Route exact path="/stocks" element={<Stocks/>}/>
+            <Route exact path="/vender" element={<Vender/>}/>
+        </Route>
+        <Route exact path="/login" element={<Login/>}/>
         {/* <Route exact path="/" element={<Dashboard/>}/> */}
-        <Route exact path="/shop" element={<Shop/>}/>
-        <Route exact path="/catelog" element={<Catelog />}/>
-        <Route path="/catelog/pages" element={<Pages/>}/>
-        <Route path="/catelog/pages/items" element={<PageItems/>}/>
-        <Route exact path="/category" element={<Category/>}/>
-        <Route exact path="/users" element={<Users/>}/>
-        <Route exact path="/news" element={<News/>}/>
-        <Route exact path="/orders" element={<Order/>}/>
-        <Route exact path="/stocks" element={<Stocks/>}/>
-        <Route exact path="/vender" element={<Vender/>}/>
+        
 
       </Routes>
     </Router>

@@ -232,10 +232,11 @@ const Shop = () => {
 
     return (
         <div>
-            <Sidebar/>
+            {/* <Sidebar/>
             <Navbar/>
 
-            <Content>
+            <Content> */}
+            <>
                 {alertMessage &&
                     <Alert
                         title={alertTitle}
@@ -448,8 +449,8 @@ const Shop = () => {
                     </Table>
 
                 </Card>
-
-            </Content>
+            </>
+            {/* </Content> */}
         </div>
     )
 }

@@ -86,20 +86,11 @@ const Stocks = () => {
 
   return (
     <div>
-      <Sidebar />
+      {/* <Sidebar />
       <Navbar />
 
-      <Content>
-      {modal && 
-            <Modal 
-            onClose={toggleModal}
-            onCancel={onCancel}
-            onSave={onSave}
-            title='Add catelog'> 
-              
-
-            </Modal>
-          }
+      <Content> */}
+      
         <Card>
 
           <div className='w-full py-4 flex gap-6'>
@@ -171,7 +162,7 @@ const Stocks = () => {
 
         </Card>
 
-      </Content>
+      {/* </Content> */}
     </div>
   )
 }

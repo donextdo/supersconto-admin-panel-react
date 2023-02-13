@@ -106,11 +106,11 @@ const Catalog = () => {
 
   return (
     <div>
-        <Sidebar />
+        {/* <Sidebar />
         <Navbar />
 
-        <Content>
-
+        <Content> */}
+        <>
         {modal && 
             <Modal 
             onClose={toggleModal}
@@ -186,8 +186,8 @@ const Catalog = () => {
             </Table>
 
           </Card>
-
-        </Content>
+        </>
+        {/* </Content> */}
     </div>
   )
 }

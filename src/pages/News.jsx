@@ -45,10 +45,11 @@ const News = () => {
 
   return (
     <div>
-        <Sidebar />
+        {/* <Sidebar />
         <Navbar />
 
-        <Content>
+        <Content> */}
+        <>
         {modal && 
             <Modal 
             onClose={toggleModal}
@@ -130,8 +131,8 @@ const News = () => {
             </Table>
 
           </Card>
-
-        </Content>
+        </>
+        {/* </Content> */}
     </div>
   )
 }

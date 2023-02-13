@@ -136,15 +136,15 @@ const Pages = () => {
     console.log("render pages", {pages})
     return (
         <div>
-            <Navbar screen/>
-            <Sidebar minimize/>
+            {/* <Navbar screen/>
+            <Sidebar minimize/> */}
 
             <Link to="/catelog">
                     <button className="text-4xl pl-20 fixed z-50 left-6 top-4"><FaAngleLeft /></button>
             </Link>
 
-            <Content expand>
-
+            {/* <Content expand> */}
+            <>
                 {
                     showImagePreview &&
                     <ImagePreview
@@ -280,8 +280,8 @@ const Pages = () => {
 
 
                 </Card>
-
-            </Content>
+            </>
+            {/* </Content> */}
         </div>
     )
 }
