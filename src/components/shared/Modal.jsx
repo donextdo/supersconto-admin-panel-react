@@ -5,7 +5,7 @@ import { Button, ButtonNormal, ButtonSave } from './Button'
 
 const Modal = ({children, onClose, onCancel, onSave, title, width}) => {
   return (
-    <div className='fixed inset-0 z-50 grid place-items-center bg-slate-900 bg-opacity-10'>
+    <div className='fixed inset-0 z-50 grid place-items-center bg-slate-900 bg-opacity-10 overflow-y-scroll'>
         
         <div className={`py-6 px-4 flex gap-6 flex-col relative bg-white shadow-md rounded-md ${width ? width : 'w-96'}`}>
 
