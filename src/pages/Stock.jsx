@@ -6,12 +6,14 @@ import { Table, THead, TBody, TH, Row, TD } from '../components/shared/Table'
 import axios from 'axios'
 import { ButtonSuccess } from '../components/shared/Button'
 import { RiAddCircleLine,} from 'react-icons/ri'
+import Modal from '../components/shared/Modal'
 
 
 
 const Stocks = () => {
 
   const [data, setData] = useState([])
+  const [modal, setModal] = useState(false)
 
   useEffect(() => {
     async function fetchData() {
@@ -25,7 +27,7 @@ const Stocks = () => {
     fetchData();
   }, []);
 
-  const [modal, setModal] = useState(false)
+  
 
   const toggleModal = () => {
     setModal(!modal)
@@ -36,7 +38,7 @@ const Stocks = () => {
   }
 
   const onCancel = () => {
-    alert('oncancel clicked')
+    setModal(false)
   }
 
 
@@ -46,7 +48,16 @@ const Stocks = () => {
       <Navbar />
 
       <Content>
+      {modal && 
+            <Modal 
+            onClose={toggleModal}
+            onCancel={onCancel}
+            onSave={onSave}
+            title='Add catelog'> 
+              
 
+            </Modal>
+          }
         <Card>
 
           <div className='w-full py-4 flex gap-6'>
