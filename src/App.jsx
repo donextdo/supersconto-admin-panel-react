@@ -15,14 +15,15 @@ import {
   Route,
   Navigate
 } from "react-router-dom"
+import Login from "./pages/Login"
 
 function App() {
 
   return (
     <Router>
       <Routes>
-
-        <Route exact path="/" element={<Dashboard/>}/>
+      <Route exact path="/" element={<Login/>}/>
+        {/* <Route exact path="/" element={<Dashboard/>}/> */}
         <Route exact path="/shop" element={<Shop/>}/>
         <Route exact path="/catelog" element={<Catelog />}/>
         <Route path="/catelog/pages" element={<Pages/>}/>

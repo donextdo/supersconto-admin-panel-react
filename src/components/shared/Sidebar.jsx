@@ -24,12 +24,12 @@ const Sidebar = ({ minimize }) => {
 
           
 
-            <li className="listItem">
+            {/* <li className="listItem">
                 <Link to={'/'} className="listItemLink">
                     <ChartPieIcon className='w-5 h-5'/>
                     {!minimize && <span>Dashboard</span>} 
                 </Link>
-            </li>
+            </li> */}
 
             <li className="listItem">
                 <Link to={'/shop'} className="listItemLink">

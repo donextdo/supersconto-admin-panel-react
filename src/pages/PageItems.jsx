@@ -35,7 +35,7 @@ const PageItems = () => {
         quantity: 0,
         unit_price: 0,
         online_sell: false,
-        product_image: image, //SET THIS IN IMAGE PROCESSOR
+        product_image:  image, //SET THIS IN IMAGE PROCESSOR
         coordinates: null
     })
 
