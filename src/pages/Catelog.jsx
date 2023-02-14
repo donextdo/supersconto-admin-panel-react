@@ -13,16 +13,17 @@ import Modal from '../components/shared/Modal'
 import Form from '../components/catelog/Form'
 import { normalizeDate } from '../utils/functions'
 import { Link } from 'react-router-dom'
+import baseUrl, {clientAppUrl} from '../utils/baseUrl'
 
 const Catalog = () => {
 
   const [data, setData] =useState([])
   const [modal, setModal] = useState(false)
   const [catelog, setCatelog] = useState({
-    shop_id: '',
-    title: '',
-    description: '',
-    expiredate: ''
+    shop_id: 'a',
+    title: 'b',
+    description: 'c',
+    expiredate: 'd'
   })
     
   useEffect( () => {
@@ -31,7 +32,7 @@ const Catalog = () => {
 
   async function fetchData() {
     try {
-        const res = await axios.get('http://apidev.marriextransfer.com/v1/api/catelog/book'); 
+        const res = await axios.get(`${baseUrl}/catelog/book`); 
         setData(res.data);
     } catch (err) {
         console.log(err);
@@ -40,12 +41,18 @@ const Catalog = () => {
   
   const toggleModal = () => {
     setModal(!modal)
+    setCatelog({
+      shop_id: '',
+      title: '',
+      description: '',
+      expiredate: ''
+    })
   }
 
   const onSave = async () => {
     try {
 
-      const res = await axios.post('http://apidev.marriextransfer.com/v1/api/catelog/book', catelog)
+      const res = await axios.post(`${baseUrl}/catelog/book`, catelog)
       console.log(res.data)
 
       fetchData()
@@ -71,7 +78,7 @@ const Catalog = () => {
   const onDelete = async (id) => {
     try {
 
-      const res = await axios.delete(`http://apidev.marriextransfer.com/v1/api/catelog/book/${id}`)
+      const res = await axios.delete(`${baseUrl}/catelog/book/${id}`)
       console.log(res.data)
 
       fetchData()
@@ -81,14 +88,29 @@ const Catalog = () => {
     }
   }
 
+  const onUpdate = async (d) => {
+    setModal(true)
+    setCatelog(d)
+    try {
+
+      const res = await axios.patch(`${baseUrl}/catelog/book/${id}`)
+      console.log(res.data)
+
+      fetchData()
+
+    } catch (error) {
+      console.log(error)
+    }
+  }
+  
 
   return (
     <div>
-        <Sidebar />
+        {/* <Sidebar />
         <Navbar />
 
-        <Content>
-
+        <Content> */}
+        <>
         {modal && 
             <Modal 
             onClose={toggleModal}
@@ -142,12 +164,14 @@ const Catalog = () => {
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
 
-                          <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id}&catelog=${d._id}` }}>
+                          <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id._id}&catelog=${d._id}` }}>
                             <RiPagesFill className='w-4 h-4 fill-emerald-500 cursor-pointer'/>
                           </Link>
-                          <MdPreview className='w-4 h-4 fill-green-500 cursor-pointer'/>
+                          <a href={`${clientAppUrl}/catalog-preview/${d._id}`} target="_blank" rel="noopener noreferrer">
+                            <MdPreview className='w-4 h-4 fill-green-500 cursor-pointer'/>
+                          </a>
                           <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
-                          <PencilAltIcon className='w-4 h-4 fill-blue-500 cursor-pointer'/>
+                          <PencilAltIcon onClick={() => onUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
 
                         </div>  
                       </TD>
@@ -162,8 +186,8 @@ const Catalog = () => {
             </Table>
 
           </Card>
-
-        </Content>
+        </>
+        {/* </Content> */}
     </div>
   )
 }

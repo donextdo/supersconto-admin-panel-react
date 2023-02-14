@@ -1,14 +1,15 @@
-import Select from 'react-select'
+import Switch from "react-switch";
 
 
-const Dropdown = ({
+const MySwitch = ({
     label, 
     error, 
     errorMessage,  
     value, 
-    options,
+    Styles, 
     onChange,
-    defaultValue
+    border, 
+    borderColor,
 }) => {
 
 const customStyles = {
@@ -31,16 +32,10 @@ return (
             {label}
         </label>
     }
-
-        <Select
-            value={value}
-            onChange={onChange}
-            options={options}
-            defaultValue={defaultValue}
-            styles={customStyles}
-            className='w-full text-black'
-        />
-
+             <Switch 
+             checked={value}
+             className={`${Styles ? Styles : 'text-sm font-medium bg-white'} w-full px-6 py-2 focus:outline-none ${border && 'border'} ${border && error ? 'border-red-600': borderColor} `}
+             onChange={onChange} />
     {error && 
         <small className="text-xs text-red-600">
             { errorMessage }
@@ -52,4 +47,4 @@ return (
 }
 
 
-export default Dropdown
+export default MySwitch

@@ -9,6 +9,7 @@ import { RiAddCircleLine } from 'react-icons/ri'
 import { ButtonNormal} from '../components/shared/Button'
 import Modal from '../components/shared/Modal'
 import TextInput from '../components/shared/TextInput'
+import baseUrl from '../utils/baseUrl'
 
 
 const Category = () => {
@@ -17,7 +18,7 @@ const Category = () => {
   useEffect( () => {
       async function fetchData() {
           try {
-              const res = await axios.get('http://localhost/category.php'); 
+              const res = await axios.get(baseUrl+'/category'); 
               setData(res.data);
           } catch (err) {
               console.log(err);
@@ -43,10 +44,11 @@ const Category = () => {
 
   return (
     <div>
-        <Sidebar />
+        {/* <Sidebar />
         <Navbar />
 
-        <Content>
+        <Content> */}
+        <>
         {modal && 
             <Modal 
             onClose={toggleModal}
@@ -161,8 +163,8 @@ const Category = () => {
             </Table>
 
           </Card>
-
-        </Content>
+        </>
+        {/* </Content> */}
     </div>
   )
 }
