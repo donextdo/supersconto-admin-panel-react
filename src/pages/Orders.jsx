@@ -150,7 +150,7 @@ const Order = () => {
                       {order.phone}
                     </TD>
                     <TD>
-                      {`${order.billingAddress.address_line1}, ${order.billingAddress.city}, ${order.billingAddress.status}`}
+                      {`${order.billingAddress.address_line1}, ${order.billingAddress.city}, ${order.billingAddress.state}`}
                     </TD>
                     <TD>
                       {order.paymentMethod}
