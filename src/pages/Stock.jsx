@@ -26,6 +26,7 @@ const Stocks = () => {
     try {
       const { data } = await axios.get(`${baseUrl}/stock`)
       setStockData(data)
+      console.log(data)
     }
     catch (error) {
       console.log(error)
@@ -40,10 +41,11 @@ const Stocks = () => {
       const shopData = res?.data.map(d => {
           return {
               value: d._id,
-              label: d.shop_name
+              label: `${d.shop_name} - ${d.address.address_line1}, ${d.address.city}`
           }
       })
       setShops(shopData);
+      console.log(res.data)
     }
     catch (error) {
       console.log(error)
@@ -95,7 +97,7 @@ const Stocks = () => {
 
           <div className='w-full py-4 flex gap-6'>
 
-            <div className='flex w-2/5'>
+            <div className='flex w-3/5'>
               <div className='py-2 px-3 whitespace-nowrap bg-gray-600 text-white text-sm font-medium'>
                 Filter by shop
               </div>
@@ -121,8 +123,11 @@ const Stocks = () => {
               <TH title={'ID'} />
               <TH title={'Item Name'} />
               <TH title={'Shop Name'} />
+              <TH title={'Shop City'} />
               <TH title={'Shop Address'} />
-              <TH title={'Quantity'} />
+              <TH title={'Unit Price'} />
+              <TH title={'Total QTY'} />
+              <TH title={'Remaining QTY'} />
             </THead>
 
             <TBody>
@@ -147,7 +152,16 @@ const Stocks = () => {
                       {stock.shop_id.address.city}
                     </TD>
                     <TD>
+                      {`${stock.shop_id.address.address_line1}, ${stock.shop_id.address.address_line2}, ${stock.shop_id.address.city}, ${stock.shop_id.address.state}`}
+                    </TD>
+                    <TD>
+                      {stock.unit_price}
+                    </TD>
+                    <TD>
                       {stock.quantity}
+                    </TD>
+                    <TD>
+                      {stock.remaining_qty}
                     </TD>
 
                   </Row>
