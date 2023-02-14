@@ -83,12 +83,12 @@ useEffect(() => {
                 </Link>
             </li>
 
-            {/* <li className="listItem">
+            <li className="listItem">
                 <Link to={'/orders'} className="listItemLink">
                     <BiClipboard className='w-5 h-5'/>
                     {!minimize && <span>Orders</span>}
                 </Link>
-            </li> */}
+            </li>
 
             <li className="listItem">
                 <Link to={'/stocks'} className="listItemLink">
