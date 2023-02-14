@@ -175,10 +175,10 @@ const toDelete = async (id) => {
   return (
 
     <div>
-        <Sidebar />
+        {/* <Sidebar />
         <Navbar />
 
-        <Content>
+        <Content> */}
         {modal && 
             <Modal 
             onClose={toggleModal}
@@ -378,7 +378,7 @@ const toDelete = async (id) => {
 
           </Card>
 
-        </Content>
+        {/* </Content> */}
     </div>
   )
 }

@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import logo from '../../assets/react.svg'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import {ChartPieIcon } from '@heroicons/react/solid'
 import { FaShopify,FaFirstOrder,FaList } from "react-icons/fa";
 import { BiCategory,BiNews,BiBook ,BiClipboard} from "react-icons/bi";
@@ -8,9 +8,26 @@ import { TbUsers } from "react-icons/tb";
 import { AiOutlineStock} from "react-icons/ai";
 
 
+const Sidebar = () => {
 
+const location = useLocation()
+const [minimize, setMinimize] = useState(false)
+const pathname = location.pathname
 
-const Sidebar = ({ minimize }) => {
+useEffect(() => {
+    
+    console.log(pathname)
+    if(
+        pathname == '/catelog/pages/items' ||
+        pathname == '/catelog/pages'
+    ) {
+        setMinimize(true)
+    }
+    else {
+        setMinimize(false)
+    }
+}, [pathname])
+
   return (
     <div className={`${ minimize ? 'w-16' : 'w-56'} fixed left-0 top-0 bottom-0 h-screen bg-slate-900 flex flex-col gap-10 text-white`}>
     
@@ -73,12 +90,12 @@ const Sidebar = ({ minimize }) => {
                 </Link>
             </li> */}
 
-            {/* <li className="listItem">
+            <li className="listItem">
                 <Link to={'/stocks'} className="listItemLink">
                     <AiOutlineStock className='w-5 h-5'/>
                     {!minimize && <span>Stocks</span>}
                 </Link>
-            </li> */}
+            </li>
 
             <li className="listItem">
                 <Link to={'/vender'} className="listItemLink">

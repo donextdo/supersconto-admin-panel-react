@@ -42,10 +42,11 @@ const Dashboard = () => {
   }
   return (
     <div>
-        <Sidebar />
+        {/* <Sidebar />
         <Navbar />
 
-        <Content>
+        <Content> */}
+        <>
           
           {modal && 
             <Modal 
@@ -130,8 +131,8 @@ const Dashboard = () => {
             </Table>
 
           </Card>
-
-        </Content>
+        </>
+        {/* </Content> */}
     </div>
   )
 }

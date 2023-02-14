@@ -44,10 +44,11 @@ const Category = () => {
 
   return (
     <div>
-        <Sidebar />
+        {/* <Sidebar />
         <Navbar />
 
-        <Content>
+        <Content> */}
+        <>
         {modal && 
             <Modal 
             onClose={toggleModal}
@@ -162,8 +163,8 @@ const Category = () => {
             </Table>
 
           </Card>
-
-        </Content>
+        </>
+        {/* </Content> */}
     </div>
   )
 }

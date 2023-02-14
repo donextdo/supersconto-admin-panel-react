@@ -35,7 +35,7 @@ const PageItems = () => {
         quantity: 0,
         unit_price: 0,
         online_sell: false,
-        product_image: image, //SET THIS IN IMAGE PROCESSOR
+        product_image:  image, //SET THIS IN IMAGE PROCESSOR
         coordinates: null
     })
 
@@ -118,10 +118,10 @@ const PageItems = () => {
     console.log('page-items-rendered', {pageData, pageItem})
     return (
         <div>
-            <Navbar screen/>
-            <Sidebar minimize/>
+            {/* <Navbar screen/>
+            <Sidebar minimize/> */}
 
-            {pageData && <Content expand>
+            {pageData && <div>
 
                 {modal &&
                     <Modal
@@ -146,7 +146,7 @@ const PageItems = () => {
 
                 </Card>
 
-            </Content>}
+            </div>}
         </div>
     )
 }
