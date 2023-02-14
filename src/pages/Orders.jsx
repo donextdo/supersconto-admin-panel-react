@@ -43,11 +43,11 @@ const Order = () => {
 
   return (
     <div>
-        <Sidebar />
+        {/* <Sidebar />
         <Navbar />
 
-        <Content>
-          
+        <Content> */}
+        <> 
           <Card>
             <div className='py-4'>
                 <ButtonSuccess >
@@ -108,8 +108,8 @@ const Order = () => {
             </Table>
 
           </Card>
-
-        </Content>
+        </>
+        {/* </Content> */}
     </div>
   )
 }

@@ -118,10 +118,10 @@ const PageItems = () => {
     console.log('page-items-rendered', {pageData, pageItem})
     return (
         <div>
-            <Navbar screen/>
-            <Sidebar minimize/>
+            {/* <Navbar screen/>
+            <Sidebar minimize/> */}
 
-            {pageData && <Content expand>
+            {pageData && <div>
 
                 {modal &&
                     <Modal
@@ -146,7 +146,7 @@ const PageItems = () => {
 
                 </Card>
 
-            </Content>}
+            </div>}
         </div>
     )
 }

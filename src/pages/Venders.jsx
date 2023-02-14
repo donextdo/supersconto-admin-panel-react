@@ -46,10 +46,10 @@ const Vender = () => {
 
   return (
     <div>
-        <Sidebar />
+        {/* <Sidebar />
         <Navbar />
 
-        <Content>
+        <Content> */}
         {modal && 
             <Modal 
             onClose={toggleModal}
@@ -197,7 +197,7 @@ const Vender = () => {
 
           </Card>
 
-        </Content>
+        {/* </Content> */}
     </div>
   )
 }
