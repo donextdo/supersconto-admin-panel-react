@@ -13,7 +13,7 @@ import {FaTrash} from 'react-icons/fa'
 import {PencilAltIcon} from '@heroicons/react/solid'
 import baseUrl from "../utils/baseUrl.js";
 // import Alert from '../components/shared/Alert' 
-
+import MySwitch from "../components/shared/Switch"
 const Shop = () => {
     const [data, setData] = useState([])
 
@@ -38,14 +38,12 @@ const Shop = () => {
     const [formData, setFormData] = useState({
         shop_name: '',
         description: '',
-        address: {
-            address_line1: '',
-            address_line2: '',
-            address_line3: '',
-            state: '',
-            city: '',
-            postal_code: '',
-        } ,      
+        address_line1: '',
+        address_line2: '',
+        address_line3: '',
+        state: '',
+        city: '',
+        postal_code: '',
         shop_unique_id: '',
         owner_name: '',
         status: '',
@@ -66,14 +64,12 @@ const Shop = () => {
         setFormData({
             shop_name: '',
             description: '',
-            address: {
-                address_line1: '',
-                address_line2: '',
-                address_line3: '',
-                state: '',
-                city: '',
-                postal_code: '',
-            } ,
+            address_line1: '',
+            address_line2: '',
+            address_line3: '',
+            state: '',
+            city: '',
+            postal_code: '',
             shop_unique_id: '',
             owner_name: '',
             status: '',
@@ -215,11 +211,12 @@ const Shop = () => {
         setModal(false)
     }
     const update = (name, e) => {
-        if (name=="city" || name == "address_line1" || name == "address_line2" || name == "address_line3" || name == "state" || name == "postal_code"){
+       if(name=='is_online_selling')
+        {
             setFormData(prevState => {
-                return {...prevState, address : {[name]: e.target.value}}
-            });
-        }
+                return {...prevState, [name]: !prevState.is_online_selling}
+            });  
+        }else
         setFormData(prevState => {
             return {...prevState, [name]: e.target.value}
         });
@@ -284,7 +281,7 @@ const Shop = () => {
                                     label='Province'
                                     border
                                     borderColor='border-gray-600'
-                                    value={formData.address.state} onChange={(e) => update("state", e)}
+                                    value={formData.state} onChange={(e) => update("state", e)}
 
                                 />
                             </div>
@@ -293,15 +290,15 @@ const Shop = () => {
                             <div className='flex-1'>
                                 <TextInput
                                     label='Address Line 1'
-                                    value={formData.address.address_line1} onChange={(e) => update("address_line1", e)}
+                                    value={formData.address_line1} onChange={(e) => update("address_line1", e)}
                                     border
                                     borderColor='border-gray-600'
                                 />
                             </div>
                             <div className='flex-1'>
                                 <TextInput
-                                    label='Initials'
-                                    value={formData.address.address_line2} onChange={(e) => update("address_line2", e)}
+                                    label='Address Line 2'
+                                    value={formData.address_line2} onChange={(e) => update("address_line2", e)}
                                     border
                                     borderColor='border-gray-600'
                                 />
@@ -310,8 +307,8 @@ const Shop = () => {
                         <div className='flex gap-4'>
                             <div className='flex-1'>
                                 <TextInput
-                                    label='Address Line 2'
-                                    value={formData.address.address_line3} onChange={(e) => update("address_line3", e)}
+                                    label='Address Line 3'
+                                    value={formData.address_line3} onChange={(e) => update("address_line3", e)}
                                     border
                                     borderColor='border-gray-600'
                                 />
@@ -319,7 +316,7 @@ const Shop = () => {
                             <div className='flex-1'>
                                 <TextInput
                                     label='Municipality'
-                                    value={formData.address.postal_code} onChange={(e) => update("postal_code", e)}
+                                    value={formData.postal_code} onChange={(e) => update("postal_code", e)}
                                     border
                                     borderColor='border-gray-600'
                                 />
@@ -329,7 +326,7 @@ const Shop = () => {
                             <div className='flex-1'>
                                 <TextInput
                                     label='City'
-                                    value={formData.address.city} onChange={(e) => update("city", e)}
+                                    value={formData.city} onChange={(e) => update("city", e)}
                                     border
                                     borderColor='border-gray-600'
                                 />
@@ -347,12 +344,11 @@ const Shop = () => {
                             <div className='flex-1'>
                                 <Fileinput
                                     label={'Logo Image'}
-                                    multiple
                                     onChange={(e) => updateImg("logo_img", e)}
                                 />
                             </div>
                             <div className='flex-1'>
-                                <TextInput
+                                <MySwitch
                                     label='Does Online Selling'
                                     border
                                     value={formData.is_online_selling} onChange={(e) => update("is_online_selling", e)}
@@ -413,7 +409,7 @@ const Shop = () => {
                                         </TD>
 
                                         <TD>
-
+                                            {d.telephone}
                                         </TD>
 
                                         <TD>
@@ -428,7 +424,7 @@ const Shop = () => {
                                             {d.status ? "true" : "false"}
                                         </TD>
                                         <TD>
-                                            {d.logo}
+                                           <img src={d.logo_img}></img>
                                         </TD>
                                         <TD>
                                             <div className='w-full h-full flex items-center justify-center gap-4'>

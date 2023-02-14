@@ -293,7 +293,6 @@ const toDelete = async (id) => {
                 <div className= 'flex-1'>
                   <Fileinput
                     label={'Profile Picture'}
-                    multiple
                     onChange={(e) => updateImg(e)}
 
                    />

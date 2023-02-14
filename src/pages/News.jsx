@@ -10,38 +10,138 @@ import { RiAddCircleLine } from 'react-icons/ri'
 import { ButtonNormal} from '../components/shared/Button'
 import Modal from '../components/shared/Modal'
 import TextInput from '../components/shared/TextInput'
-
-
+import Fileinput from '../components/shared/Fileinput'
+import baseUrl from '../utils/baseUrl'
 const News = () => {
-
-  const [data, setData] =useState([])
-    
-  useEffect( () => {
-      async function fetchData() {
-          try {
-              const res = await axios.get('http://localhost/news.php'); 
-              setData(res.data);
-          } catch (err) {
-              console.log(err);
-          }
-      }
-      fetchData();
+  const [formData, setFormData] = useState({
+    title: '',
+    expiredDate: '',
+    content:'',
+    image:[],
+   
+  })
+  const [isEdit,setIsEdit] = useState(false)
+  useEffect(() => {
+    fetchData();
   }, []);
+  const setbodyFormData = (formData) => {
+    var bodyFormData = new FormData();
+    if(formData.password && formData.password==formData.confirmpassword)
+    {
+      bodyFormData.append('password', formData.password);
+    }
+    bodyFormData.append('title',formData.title);
+    bodyFormData.append('expiredDate', formData.expiredDate);
+    bodyFormData.append('status', true);
+    bodyFormData.append('description', formData.content);
+    bodyFormData.append('images', formData.image);
+    bodyFormData.append('created_at', new Date());
+    bodyFormData.append('updated_at', new Date());
 
+
+    return bodyFormData
+  }  
+  const [data, setData] =useState([])
   const [modal, setModal] = useState(false)
+ 
+  async function fetchData() {
+    try {
+        const res = await axios.get(`${baseUrl}/news`);
+        setData(res.data);
+    } catch (err) {
+        console.log(err);
+    }
+}
+
+  const updateImg = (e) => {
+    console.log(e.target.files[0])
+    setFormData(prevState => {
+        return {...prevState, 'image': e.target.files[0]}
+    });
+
+  }
+  const update = (name, e) => {
+    setFormData(prevState => {
+        return {...prevState, [name]: e.target.value}
+    });
+  }
   
+  const onSave = async () => {
+    const bodyFormData=  setbodyFormData(formData)
+    console.log(bodyFormData)
+   await axios({
+        method: "post",
+        url: `${baseUrl}/news`,
+        data: bodyFormData,
+        headers: {"Content-Type": "multipart/form-data"},
+    })
+        .then((response) => {
+            console.log(response.data)
+            fetchData()
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    toggleModal()
+//  toggleAlert('Data inserted Successfully')
+
+}
+const onUpdate = async () => {
+  const bodyFormData=  setbodyFormData(formData)
+  await axios({
+      method: "patch",
+      url: `${baseUrl}/news/${sessionStorage.getItem('id')}`,
+      data: bodyFormData,
+      headers: {"Content-Type": "multipart/form-data"},
+  })
+      .then((response) => {
+          console.log(response.data)
+          fetchData()
+      })
+      .catch(function (error) {
+          console.log(error);
+      });
+  toggleModal()
+//  toggleAlert('Data inserted Successfully')
+
+  }
+
+const toDelete = async (id) => {
+  await axios({
+      method: "delete",
+      url: `${baseUrl}/news/${id}`,
+      headers: {"Content-Type": "multipart/form-data"},
+  })
+      .then((response) => {
+          console.log(response.data)
+          fetchData()
+      })
+      .catch(function (error) {
+          console.log(error);
+      });
+//  toggleAlert('Data inserted Successfully')
+
+}
   const toggleModal = () => {
+    setIsEdit(false)
     setModal(!modal)
   }
-
-  const onSave = () => {
-    alert('onsave clicked')
-  }
-
   const onCancel = () => {
     alert('oncancel clicked')
   }
-
+  const toUpdate = (data) =>{
+    setIsEdit(true)
+    setFormData({
+      'title':data.title,
+      'expiredDate':data.expiredDate,
+      'content':data.description,
+      }
+      
+  );
+  sessionStorage.setItem('id',data._id)
+  setModal(!modal)
+  
+  }
 
   return (
     <div>
@@ -54,7 +154,7 @@ const News = () => {
             <Modal 
             onClose={toggleModal}
             onCancel={onCancel}
-            onSave={onSave}
+            onSave={isEdit ? onUpdate : onSave}
             title='Add News'
             width='w-1/2'
             > 
@@ -63,21 +163,30 @@ const News = () => {
                     label='News title' 
                     border
                     borderColor='border-gray-600'
+                    value={formData.title} onChange={(e) => update("title", e)}
+
                   />
                   <TextInput 
                     label='Expired Date' 
                     border
+                    type='date'
                     borderColor='border-gray-600'
+                    value={formData.expiredDate} onChange={(e) => update("expiredDate", e)}
+
                   />
                     <TextInput 
                     label='Content' 
                     border
                     borderColor='border-gray-600'
+                    value={formData.content} onChange={(e) => update("content", e)}
+
                   />
-                  <TextInput 
+                  <Fileinput 
                     label='Image' 
                     border
                     borderColor='border-gray-600'
+                    value={formData.image} onChange={(e) => updateImg(e)}
+
                   />
               </div>
         
@@ -96,6 +205,7 @@ const News = () => {
                 <TH title={'Id'}/>
                 <TH title={'Title'}/>
                 <TH title={'Expired Date'}/>
+                <TH title={'Description'}/>
                 <TH title={'Actions'}/>
               </THead>
 
@@ -103,21 +213,24 @@ const News = () => {
 
                 {data.map(d => {
                   return (
-                    <Row key={d.id}>
+                    <Row key={d._id}>
                       <TD>
-                        { d.id }
+                        { d._id }
                       </TD>
                       <TD>
-                        { d.Title }
+                        { d.title }
                       </TD>
 
                       <TD>
                         { d.expiredDate }
                       </TD>
                       <TD>
+                        { d.description }
+                      </TD>
+                      <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
-                          <FaTrash className='w-3 h-3 fill-red-500 cursor-pointer'/>
-                          <PencilAltIcon className='w-4 h-4 fill-blue-500 cursor-pointer'/>
+                          <FaTrash onClick={() => toDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
+                          <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
                         </div>  
                       </TD>
                     </Row>
