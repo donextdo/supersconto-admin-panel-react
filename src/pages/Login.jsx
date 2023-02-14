@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import image from '../assets/login_page.jpg'
 import image1 from '../assets/login_page1.jpg'
 import { BsFillPersonFill } from "react-icons/bs";
+import { BiShow } from "react-icons/bi";
 import { Link } from 'react-router-dom'
 import Dropdown from '../components/shared/Dropdown'
 import { ToastContainer, toast } from 'react-toastify';
@@ -16,6 +17,7 @@ const [email, setEmail] = useState()
 const [password, setPassword] = useState()
 const [role, setRole] = useState(0)
 const navigate = useNavigate()
+const[showPassword,setShowPassword] = useState(false)
 
 const onEmailChange = (e) => {
     setEmail(e.target.value)
@@ -58,6 +60,10 @@ const login = async () => {
     
 }
 
+const passwordShow = () => {
+    setShowPassword(!showPassword)
+}
+
     return (
         <>
             <div className="grid grid-cols-2 w-full h-screen">
@@ -79,9 +85,10 @@ const login = async () => {
                     </div>
                     <div className='relative w-full mb-2'>
                         <BsFillPersonFill className='absolute fill-black mt-4 ml-3 text-lg' />
-                        <input type="Password" placeholder="Password"
+                        <input type={showPassword ? "text" : "password"} placeholder="Password"
                             onChange={onPasswordChange}
                             className="w-full pl-12 pr-6 py-3 border-2 border-black text-gray-600 text-sm font-semibold focus:outline-none bg-white" />
+                        <button onClick={passwordShow}><BiShow className='absolute fill-black right-4 top-3 text-2xl'/></button>
 
                     </div>
                     <div className="flex items-center mb-1">
