@@ -14,7 +14,7 @@ import Form from '../components/catelog/Form'
 import { normalizeDate } from '../utils/functions'
 import { Link } from 'react-router-dom'
 import baseUrl, {clientAppUrl} from '../utils/baseUrl'
-
+import { ToastContainer, toast } from 'react-toastify';
 const Catalog = () => {
 
   const [data, setData] =useState([])
@@ -54,7 +54,6 @@ const Catalog = () => {
 
       const res = await axios.post(`${baseUrl}/catelog/book`, catelog)
       console.log(res.data)
-
       fetchData()
 
       setCatelog({
@@ -65,9 +64,11 @@ const Catalog = () => {
       })
 
       setModal(!modal)
+     return toast.success('Data saved successfully')
 
     } catch (error) {
       console.log(error)
+      toast.error(error.message)
     }
   }
 
@@ -82,9 +83,11 @@ const Catalog = () => {
       console.log(res.data)
 
       fetchData()
+      return toast.success('Data deleted successfully')
+
 
     } catch (error) {
-      console.log(error)
+      toast.error(error.message)
     }
   }
 
@@ -95,11 +98,13 @@ const Catalog = () => {
 
       const res = await axios.patch(`${baseUrl}/catelog/book/${id}`)
       console.log(res.data)
+      return toast.success('Data updated successfully')
+
 
       fetchData()
 
     } catch (error) {
-      console.log(error)
+      toast.error(error.message)
     }
   }
   
@@ -111,6 +116,8 @@ const Catalog = () => {
 
         <Content> */}
         <>
+
+        <ToastContainer/>
         {modal && 
             <Modal 
             onClose={toggleModal}
@@ -150,9 +157,9 @@ const Catalog = () => {
 
                 {data.map(d => {
                   return (
-                    <Row key={d._id}>
+                    <Row key={d?._id}>
                       <TD>
-                        { d._id }
+                        { d?._id }
                       </TD>
                       <TD>
                         { d.title }
@@ -164,13 +171,13 @@ const Catalog = () => {
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
 
-                          <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id._id}&catelog=${d._id}` }}>
+                          <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id?._id}&catelog=${d?._id}` }}>
                             <RiPagesFill className='w-4 h-4 fill-emerald-500 cursor-pointer'/>
                           </Link>
-                          <a href={`${clientAppUrl}/catalog-preview/${d._id}`} target="_blank" rel="noopener noreferrer">
+                          <a href={`${clientAppUrl}/catalog-preview/${d?._id}`} target="_blank" rel="noopener noreferrer">
                             <MdPreview className='w-4 h-4 fill-green-500 cursor-pointer'/>
                           </a>
-                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
+                          <FaTrash onClick={() => onDelete(d?._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
                           <PencilAltIcon onClick={() => onUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
 
                         </div>  

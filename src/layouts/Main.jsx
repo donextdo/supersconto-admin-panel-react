@@ -24,7 +24,7 @@ useEffect(() => {
         <Navbar />
 
         <Content>
-            <Outlet />
+            <Outlet/>
         </Content>
         
     </>
