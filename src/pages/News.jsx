@@ -12,7 +12,13 @@ import Modal from '../components/shared/Modal'
 import TextInput from '../components/shared/TextInput'
 import Fileinput from '../components/shared/Fileinput'
 import baseUrl from '../utils/baseUrl'
+import Textarea from '../components/shared/Textarea'
+import Alert from '../components/shared/Alert' 
+import Confirm from '../components/shared/Confirm'
+import { ToastContainer, toast } from 'react-toastify';
+
 const News = () => {
+  const [confirm, setConfirm] = useState(false)
   const [formData, setFormData] = useState({
     title: '',
     expiredDate: '',
@@ -20,6 +26,21 @@ const News = () => {
     image:[],
    
   })
+
+  const onDelete = (id) => {
+    sessionStorage.setItem('id',id)
+    setConfirm(true)
+  }
+  const [alertMessage, setAlertMessage] = useState(false)
+    const [alertError, setAlertError] = useState(false)
+
+  const [alertTitle, setAlertTitle] = useState(null)
+  const toggleAlert = (title) => {
+
+      setAlertTitle(title)
+      setAlertMessage(!alertMessage)
+      setTimeout(setAlertMessage, 1000, false)
+  }
   const [isEdit,setIsEdit] = useState(false)
   useEffect(() => {
     fetchData();
@@ -77,10 +98,15 @@ const News = () => {
     })
         .then((response) => {
             console.log(response.data)
+            setAlertError(false)
+            return toast.success('Data inserted Successfully')
             fetchData()
         })
         .catch(function (error) {
             console.log(error);
+            setAlertError(true)
+            console.log(error);
+            return toast.error(error.message)
         });
     toggleModal()
 //  toggleAlert('Data inserted Successfully')
@@ -96,10 +122,15 @@ const onUpdate = async () => {
   })
       .then((response) => {
           console.log(response.data)
+          setAlertError(false)
+         return  toast.success('Data Updated Successfully')
           fetchData()
       })
       .catch(function (error) {
           console.log(error);
+          setAlertError(true)
+          console.log(error);
+          return toast.error('Something went Wrong')
       });
   toggleModal()
 //  toggleAlert('Data inserted Successfully')
@@ -109,21 +140,29 @@ const onUpdate = async () => {
 const toDelete = async (id) => {
   await axios({
       method: "delete",
-      url: `${baseUrl}/news/${id}`,
+      url: `${baseUrl}/news/${sessionStorage.getItem('id')}`,
       headers: {"Content-Type": "multipart/form-data"},
   })
       .then((response) => {
           console.log(response.data)
+          setAlertError(false)
+          return toast.success('Data Deleted Successfully')
           fetchData()
       })
       .catch(function (error) {
           console.log(error);
+          setAlertError(true)
+          console.log(error);
+          return toast.error(error.message)
       });
+      setConfirm(false)
+
 //  toggleAlert('Data inserted Successfully')
 
 }
   const toggleModal = () => {
     setIsEdit(false)
+    setFormData({})
     setModal(!modal)
   }
   const onCancel = () => {
@@ -150,6 +189,22 @@ const toDelete = async (id) => {
 
         <Content> */}
         <>
+        <ToastContainer/>
+        {confirm &&
+        <Confirm
+            onSave={toDelete}
+            onCancel={()=>setConfirm(false)}
+            onClose={()=>setConfirm(false)}
+
+        >
+        </Confirm>}
+        {alertMessage &&
+                    <Alert
+                        title={alertTitle}
+                        error={alertError}
+                        width='60%'
+                    >
+                    </Alert>}
         {modal && 
             <Modal 
             onClose={toggleModal}
@@ -158,7 +213,7 @@ const toDelete = async (id) => {
             title='Add News'
             width='w-1/2'
             > 
-               <div className='grid grid-rows-4 grid-flow-col gap-4'>
+               <div className='grid grid-rows-4 grid-flow-col gap-1'>
                   <TextInput 
                     label='News title' 
                     border
@@ -174,7 +229,7 @@ const toDelete = async (id) => {
                     value={formData.expiredDate} onChange={(e) => update("expiredDate", e)}
 
                   />
-                    <TextInput 
+                    <Textarea 
                     label='Content' 
                     border
                     borderColor='border-gray-600'
@@ -229,7 +284,7 @@ const toDelete = async (id) => {
                       </TD>
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
-                          <FaTrash onClick={() => toDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
+                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
                           <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
                         </div>  
                       </TD>

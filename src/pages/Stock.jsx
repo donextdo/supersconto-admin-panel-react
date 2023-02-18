@@ -8,6 +8,7 @@ import { ButtonSuccess, ButtonNormal } from '../components/shared/Button'
 import { FcClearFilters } from 'react-icons/fc'
 import baseUrl from '../utils/baseUrl'
 import Dropdown from '../components/shared/Dropdown'
+import { ToastContainer, toast } from 'react-toastify';
 
 
 const Stocks = () => {
@@ -61,8 +62,8 @@ const Stocks = () => {
         {
           shop
         }
-      )
 
+      )
       console.log(data)
 
       setStockData(data)
@@ -92,7 +93,7 @@ const Stocks = () => {
       <Navbar />
 
       <Content> */}
-      
+      <ToastContainer/>
         <Card>
 
           <div className='w-full py-4 flex gap-6'>
@@ -146,13 +147,13 @@ const Stocks = () => {
                     </TD>
 
                     <TD>
-                      {stock.shop_id.shop_name}
+                      {stock.shop_id?.shop_name}
                     </TD>
                     <TD>
-                      {stock.shop_id.address.city}
+                      {stock?.shop_id?.address.city}
                     </TD>
                     <TD>
-                      {`${stock.shop_id.address.address_line1}, ${stock.shop_id.address.address_line2}, ${stock.shop_id.address.city}, ${stock.shop_id.address.state}`}
+                      {`${stock.shop_id?.address.address_line1}, ${stock.shop_id?.address.address_line2}, ${stock.shop_id?.address.city}, ${stock.shop_id?.address.state}`}
                     </TD>
                     <TD>
                       {stock.unit_price}

@@ -10,6 +10,7 @@ import { ButtonNormal} from '../components/shared/Button'
 import Modal from '../components/shared/Modal'
 import TextInput from '../components/shared/TextInput'
 import baseUrl from '../utils/baseUrl'
+import { ToastContainer, toast } from 'react-toastify';
 
 
 const Category = () => {
@@ -49,6 +50,7 @@ const Category = () => {
 
         <Content> */}
         <>
+        <ToastContainer/>
         {modal && 
             <Modal 
             onClose={toggleModal}

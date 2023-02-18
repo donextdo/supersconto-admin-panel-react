@@ -24,7 +24,7 @@ function App() {
     <Router>
       <Routes>
         <Route exact path='/' element={<Main/>} >
-            <Route index element={<Dashboard/>}/>
+            <Route index element={<Shop/>}/>
             <Route exact path="/shop" element={<Shop/>}/>
             <Route exact path="/catelog" element={<Catelog />}/>
             <Route path="/catelog/pages" element={<Pages/>}/>

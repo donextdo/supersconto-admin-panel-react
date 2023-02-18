@@ -13,8 +13,16 @@ import Modal from '../components/shared/Modal'
 import TextInput from '../components/shared/TextInput'
 import Fileinput from '../components/shared/Fileinput'
 import baseUrl from '../utils/baseUrl'
+import Confirm from '../components/shared/Confirm'
+import Alert from '../components/shared/Alert'
+import { ToastContainer, toast } from 'react-toastify';
 
 const Vender = () => {
+  const [alertTitle, setAlertTitle] = useState(null)
+  const [alertMessage, setAlertMessage] = useState(false)
+  const [alertError, setAlertError] = useState(false)
+  const [confirm, setConfirm] = useState(false)
+  const [med, setMed] = useState('delete')
   const [formData, setFormData] = useState({
     fullname: '',
     username: '',
@@ -39,6 +47,7 @@ const Vender = () => {
     if(formData.password && formData.password==formData.confirmpassword)
     {
       bodyFormData.append('password', formData.password);
+      return toast.error(error.message)       
     }
     bodyFormData.append('fullName',formData.fullName);
     bodyFormData.append('username', formData.username);
@@ -53,7 +62,12 @@ const Vender = () => {
     bodyFormData.append('address[postal_code]', formData.postal_code);
     return bodyFormData
   }  
+  const tryUpdate= () =>{
+    setModal(!modal)
+    setMed('update')
+    setConfirm(true)
 
+}
   const updateImg = (e) => {
     console.log(e.target.files[0])
     setFormData(prevState => {
@@ -83,7 +97,12 @@ console.log(res)
     fetchData();
   }, []);
   
-  
+  const toggleAlert = (title) => {
+
+    setAlertTitle(title)
+    setAlertMessage(!alertMessage)
+    setTimeout(setAlertMessage, 1000, false)
+}
   
   const toggleModal = () => {
     setFormData({})
@@ -103,12 +122,16 @@ console.log(res)
         headers: {"Content-Type": "multipart/form-data"},
     })
         .then((response) => {
+          setAlertError(false)
+        return  toast.success('Data inserted Successfully')
+
             console.log(response.data)
             fetchData()
         })
         .catch(function (error) {
-            console.log(error);
-        });
+          setAlertError(true)
+          console.log(error);
+         return toast.error(error.message)        });
     toggleModal()
 //  toggleAlert('Data inserted Successfully')
 
@@ -132,7 +155,7 @@ const toUpdate = (data) =>{
 );
 sessionStorage.setItem('id',data._id)
 setModal(!modal)
-
+setConfirm(false)
 }
 
 const onUpdate = async () => {
@@ -144,30 +167,45 @@ const onUpdate = async () => {
       headers: {"Content-Type": "multipart/form-data"},
   })
       .then((response) => {
+        setAlertError(false)
+       return toast.success('Data updated Successfully')
           console.log(response.data)
           fetchData()
       })
       .catch(function (error) {
-          console.log(error);
+        setAlertError(true)
+        console.log(error);
+      return  toast.error(error.message)
       });
-  toggleModal()
-//  toggleAlert('Data inserted Successfully')
+      setConfirm(false)
+setFormData({})
+      //  toggleAlert('Data inserted Successfully')
 
 }
-
-const toDelete = async (id) => {
+const onDelete = (id) => {
+  sessionStorage.setItem('id',id)
+  setMed('delete')
+  setConfirm(true)
+}
+const toDelete = async () => {
   await axios({
       method: "delete",
-      url: `${baseUrl}/vendor/${id}`,
+      url: `${baseUrl}/vendor/${sessionStorage.getItem('id')}`,
       headers: {"Content-Type": "multipart/form-data"},
   })
       .then((response) => {
           console.log(response.data)
+          return toast.success('Data deleted Successfully')
+          console.log(response.data)
+          fetchData()
           fetchData()
       })
       .catch(function (error) {
-          console.log(error);
+        setAlertError(true)
+        console.log(error);
+         return  toast.error(error.message)
       });
+      setConfirm(false)
 //  toggleAlert('Data inserted Successfully')
 
 }
@@ -179,11 +217,28 @@ const toDelete = async (id) => {
         <Navbar />
 
         <Content> */}
+        <ToastContainer/>
+         {alertMessage &&
+                    <Alert
+                        title={alertTitle}
+                        error={alertError}
+                        width='60%'
+                    >
+                    </Alert>}
+        {confirm &&
+        <Confirm
+        onSave={med=='delete' ?toDelete:onUpdate}
+        onCancel={()=>setConfirm(false)}
+        onClose={()=>setConfirm(false)}
+        method={med}
+
+        >
+        </Confirm>}
         {modal && 
             <Modal 
             onClose={toggleModal}
             onCancel={onCancel}
-            onSave={isEdit ? onUpdate : onSave}
+            onSave={isEdit ? tryUpdate : onSave}
             title='Create Vendor'
             width='w-1/2'
             > 
@@ -361,7 +416,7 @@ const toDelete = async (id) => {
                       </TD>
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
-                          <FaTrash onClick={() => toDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
+                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
                           <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
                         </div>  
                       </TD>

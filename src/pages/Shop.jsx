@@ -11,12 +11,21 @@ import Fileinput from '../components/shared/Fileinput'
 import {Table, THead, TBody, TH, Row, TD} from '../components/shared/Table'
 import {FaTrash} from 'react-icons/fa'
 import {PencilAltIcon} from '@heroicons/react/solid'
-import baseUrl from "../utils/baseUrl.js";
-// import Alert from '../components/shared/Alert' 
+import baseUrl from "../utils/baseUrl.js"; 
+import Alert from '../components/shared/Alert' 
 import MySwitch from "../components/shared/Switch"
-const Shop = () => {
-    const [data, setData] = useState([])
+import Confirm from '../components/shared/Confirm'
+import { ToastContainer, toast } from 'react-toastify';
 
+const Shop = () => {
+    const [confirm, setConfirm] = useState(false)
+    const [data, setData] = useState([])
+    const [modal, setModal] = useState(false)
+    const [alertMessage, setAlertMessage] = useState(false)
+    const [alertError, setAlertError] = useState(false)
+    const [med, setMed] = useState('delete')
+
+    const [isEdit,setIsEdit] = useState(false)
     async function fetchData() {
         try {
             const res = await axios.get(`${baseUrl}/shop`);
@@ -30,11 +39,7 @@ const Shop = () => {
         fetchData();
     }, []);
 
-    const [modal, setModal] = useState(false)
-    const [alertMessage, setAlertMessage] = useState(false)
-    const [color, setColor] = useState('bg-lime-300 text-black')
-
-
+ 
     const [formData, setFormData] = useState({
         shop_name: '',
         description: '',
@@ -58,7 +63,11 @@ const Shop = () => {
         telephone: ''
     })
 
-
+    const onDelete = (id) => {
+        sessionStorage.setItem('id',id)
+        setMed('delete')
+        setConfirm(true)
+      }
     const toggleModal = () => {
         setModal(!modal)
         setFormData({
@@ -93,46 +102,50 @@ const Shop = () => {
     }
     var bodyFormData = new FormData();
 
-    const setbodyFormData = async () => {
-        bodyFormData.append('shop_name', formData.shop_name);
-        bodyFormData.append('description', formData.description);
-        bodyFormData.append('address[address_line1]', formData.address_line1);
-        bodyFormData.append('address[address_line2]', formData.address_line2);
-        bodyFormData.append('address[address_line3]', formData.address_line3);
-        bodyFormData.append('address[state]', formData.state);
-        bodyFormData.append('address[city]', formData.city);
-        bodyFormData.append('address[postal_code]', formData.postal_code);
-        bodyFormData.append('shop_unique_id', formData.shop_unique_id);
-        bodyFormData.append('owner_name', formData.owner_name);
+    const setbodyFormData = async (formDatas) => {
+        console.log(formDatas)
+        bodyFormData.append('shop_name', formDatas.shop_name);
+        bodyFormData.append('description', formDatas.description);
+        bodyFormData.append('address[address_line1]', formDatas.address_line1);
+        bodyFormData.append('address[address_line2]', formDatas.address_line2);
+        bodyFormData.append('address[address_line3]', formDatas.address_line3);
+        bodyFormData.append('address[state]', formDatas.state);
+        bodyFormData.append('address[city]', formDatas.city);
+        bodyFormData.append('address[postal_code]', formDatas.postal_code);
+        bodyFormData.append('shop_unique_id', formDatas.shop_unique_id);
+        bodyFormData.append('owner_name', formDatas.owner_name);
         bodyFormData.append('status', true);
-        bodyFormData.append('logo_img', formData.logo_img);
-        bodyFormData.append('latitude', formData.latitude);
-        bodyFormData.append('longitude', formData.longitude);
-        bodyFormData.append('shop_category', formData.shop_category);
-        bodyFormData.append('is_online_selling', formData.is_online_selling);
-        bodyFormData.append('telephone', formData.telephone);
-        bodyFormData.append('region', formData.region);
-
+        bodyFormData.append('logo_img', formDatas.logo_img);
+        bodyFormData.append('latitude', formDatas.latitude);
+        bodyFormData.append('longitude', formDatas.longitude);
+        bodyFormData.append('shop_category', formDatas.shop_category);
+        bodyFormData.append('is_online_selling', formDatas.is_online_selling);
+        bodyFormData.append('telephone', formDatas.telephone);
+        bodyFormData.append('region', formDatas.region);
     }
 
     const onSave = async () => {
-        setbodyFormData()
+        setbodyFormData(formData)
         console.log(bodyFormData)
-        axios({
+        await  axios({
             method: "post",
             url: `${baseUrl}/shop`,
             data: bodyFormData,
             headers: {"Content-Type": "multipart/form-data"},
         })
             .then((response) => {
+                setAlertError(false)
+                return toast.success('Data inserted successfully')
+
                 console.log(response.data)
                 fetchData()
             })
             .catch(function (error) {
                 console.log(error);
+                return toast.error(error.message)
+
             });
         toggleModal()
-//  toggleAlert('Data inserted Successfully')
 
     }
 
@@ -141,25 +154,40 @@ const Shop = () => {
             return {...prevState, ['shop_name']: data.shop_name, ['update']: true, ['id']: data._id}
         });
     }
-
-    const toUpdate = async (data) => {
-        // console.log(data)
-        setFormData(data)
-       setModal(true)
-       try {
-
-        const res = await axios.patch(`${baseUrl}/shop/${id}`)
-        console.log(res.data)
-  
-        fetchData()
-  
-      } catch (error) {
-        console.log(error)
-      }
-        bodyFormData = new FormData();
+    const tryUpdate= () =>{
+        setIsEdit(false)
+        setModal(!modal)
+        setMed('update')
+        setConfirm(true)
+    
     }
 
-    const onDelete = async (id) => {
+    const toUpdate = async (data) => {
+           setIsEdit(true); 
+           sessionStorage.setItem('id',data._id)       
+           setFormData({
+            'shop_name':data.shop_name,
+            'description':data.description,
+            'address_line1':data.address.address_line1,
+            'address_line2':data.address.address_line2,
+            'address_line3':data.address.address_line3,
+            'state':data.address.state,
+            'city':data.address.city,
+            'postal_code':data.address.postal_code,
+            'shop_unique_id':data.shop_unique_id,
+            'owner_name':data.owner_name,
+            'status':data.status,
+            'logo_img':data.logo_img,
+            'latitude':data.latitude,
+            'longitude':data.longitude,
+            'shop_category':data.shop_category,
+             'is_online_selling':data.is_online_selling,
+             'telephone':data.telephone
+        })
+       setModal(true)
+    }
+
+    const toDelete = async (id) => {
         // axios({
         //     method: "delete",
         //     url: `${baseUrl}/shop/${id}`,
@@ -176,34 +204,43 @@ const Shop = () => {
         //     });
         try {
 
-            const res = await axios.delete(`${baseUrl}/shop/${id}`)
+            const res = await axios.delete(`${baseUrl}/shop/${sessionStorage.getItem('id')}`)
             console.log(res.data)
-      
+            setAlertError(false)
+            toast.success('Data Deleted Successfully')
+
             fetchData()
       
           } catch (error) {
+            setAlertError(true)
+            console.log(error);
+            toast.error(error.message)
             console.log(error)
           }
+          setConfirm(false)
     }
     const onClose = () => {
-        setFormData({})
         toggleModal()
     }
     const onUpdate = async () => {
-        setbodyFormData()
-        axios({
+        console.log(formData)
+        setbodyFormData(formData)
+      await  axios({
             method: "patch",
-            url: `${baseUrl}/shop/${formData.id}`,
-            data: bodyFormData,
+            url: `${baseUrl}/shop/${sessionStorage.getItem('id')}`,
+            data: formData,
             headers: {"Content-Type": "multipart/form-data"},
         })
             .then((response) => {
+                setAlertError(false)
+                return toast.success('Data updated successfully')
                 console.log(response.data)
             })
             .catch(function (error) {
                 console.log(error);
+                return toast.error(error.message)
             });
-        toggleModal()
+            setConfirm(false)
         fetchData()
     }
 
@@ -233,19 +270,29 @@ const Shop = () => {
             <Navbar/>
 
             <Content> */}
-            <>
+            <>  
+            <ToastContainer/>
+               {confirm &&
+                <Confirm
+                    onSave={med=='delete' ?toDelete:onUpdate}
+                    onCancel={()=>setConfirm(false)}
+                    onClose={()=>setConfirm(false)}
+                    method={med}
+                >
+                </Confirm>}
                 {alertMessage &&
                     <Alert
                         title={alertTitle}
-                        color={color}
+                        error={alertError}
                         width='60%'
+
                     >
                     </Alert>}
                 {modal &&
                     <Modal
                         onClose={onClose}
                         onCancel={onCancel}
-                        onSave={onSave}
+                        onSave={isEdit ? tryUpdate : onSave}
                         title='Create Shop'
                         width='w-1/2'
                     >
@@ -424,7 +471,7 @@ const Shop = () => {
                                             {d.status ? "true" : "false"}
                                         </TD>
                                         <TD>
-                                           <img src={d.logo_img}></img>
+                                           <img className='w-1/2 h-1/2' src={d.logo_img}></img>
                                         </TD>
                                         <TD>
                                             <div className='w-full h-full flex items-center justify-center gap-4'>
