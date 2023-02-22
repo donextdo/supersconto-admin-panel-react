@@ -41,28 +41,28 @@ useEffect(() => {
 
           
 {/* 
-            <li className="listItem">
+            <li className={pathname=='/shop'? 'listItem active' :'listItem'}>
                 <Link to={'/'} className="listItemLink">
                     <ChartPieIcon className='w-5 h-5'/>
                     {!minimize && <span>Dashboard</span>} 
                 </Link>
             </li> */}
-
-            <li className="listItem">
+{}
+            <li className={pathname=='/shop'? 'listItem active' :'listItem'}>
                 <Link to={'/shop'} className="listItemLink">
                     <FaShopify className='w-5 h-5'/>
                     {!minimize && <span>Shop</span> }
                 </Link>
             </li>
 
-            <li className="listItem">
+            <li className={pathname=='/catelog'? 'listItem active' :'listItem'}>
                 <Link to={'/catelog'} className="listItemLink">
                     <BiBook className='w-5 h-5'/>
                     {!minimize && <span>Catalog</span> }
                 </Link>
             </li>
 
-            <li className="listItem">
+            <li className={pathname=='/category'? 'listItem active' :'listItem'}>
                 <Link to={'/category'} className="listItemLink">
                     <FaList className='w-5 h-5'/>
                     {!minimize && <span>Category</span>}
@@ -76,28 +76,28 @@ useEffect(() => {
                 </Link>
             </li> */}
 
-            <li className="listItem">
+            <li className={pathname=='/news'? 'listItem active' :'listItem'}>
                 <Link to={'/news'} className="listItemLink">
                     <BiNews className='w-5 h-5'/>
                     {!minimize && <span>News</span>}
                 </Link>
             </li>
 
-            <li className="listItem">
+            <li className={pathname=='/orders'? 'listItem active' :'listItem'}>
                 <Link to={'/orders'} className="listItemLink">
                     <BiClipboard className='w-5 h-5'/>
                     {!minimize && <span>Orders</span>}
                 </Link>
             </li>
 
-            <li className="listItem">
+            <li className={pathname=='/stocks'? 'listItem active' :'listItem'}>
                 <Link to={'/stocks'} className="listItemLink">
                     <AiOutlineStock className='w-5 h-5'/>
                     {!minimize && <span>Stocks</span>}
                 </Link>
             </li>
 
-            <li className="listItem">
+            <li className={pathname=='/vender'? 'listItem active' :'listItem'}>
                 <Link to={'/vender'} className="listItemLink">
                     <TbUsers className='w-5 h-5'/>
                     {!minimize && <span>Vender</span>}
