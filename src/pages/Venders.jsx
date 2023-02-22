@@ -44,24 +44,27 @@ const Vender = () => {
   let id=null;
   const setbodyFormData = (formData) => {
     var bodyFormData = new FormData();
-    if(formData.password && formData.password==formData.confirmpassword)
-    {
-      bodyFormData.append('password', formData.password);
-      return toast.error(error.message)       
-    }
-    bodyFormData.append('fullName',formData.fullName);
-    bodyFormData.append('username', formData.username);
-    bodyFormData.append('profile_pic', formData.profilepic);
-    bodyFormData.append('mobile', formData.mobile);
-    bodyFormData.append('email', formData.email);
-    bodyFormData.append('address[address_line1]', formData.address_line1);
-    bodyFormData.append('address[address_line2]', formData.address_line2);
-    bodyFormData.append('address[address_line3]', formData.address_line3);
-    bodyFormData.append('address[state]', formData.state);
-    bodyFormData.append('address[city]', formData.city);
-    bodyFormData.append('address[postal_code]', formData.postal_code);
-    return bodyFormData
-  }  
+    if(isEdit|| formData.password && formData.password==formData.confirmpassword)
+      {
+        bodyFormData.append('password', formData.password);
+      
+      bodyFormData.append('fullName',formData.fullName);
+      bodyFormData.append('username', formData.username);
+      bodyFormData.append('profile_pic', formData.profilepic);
+      bodyFormData.append('mobile', formData.mobile);
+      bodyFormData.append('email', formData.email);
+      bodyFormData.append('address[address_line1]', formData.address_line1);
+      bodyFormData.append('address[address_line2]', formData.address_line2);
+      bodyFormData.append('address[address_line3]', formData.address_line3);
+      bodyFormData.append('address[state]', formData.state);
+      bodyFormData.append('address[city]', formData.city);
+      bodyFormData.append('address[postal_code]', formData.postal_code);
+      return bodyFormData
+    } else{
+      return toast.error('password and confirmation missmatch')       
+    } 
+
+  }
   const tryUpdate= () =>{
     setModal(!modal)
     setMed('update')
@@ -123,10 +126,10 @@ console.log(res)
     })
         .then((response) => {
           setAlertError(false)
-        return  toast.success('Data inserted Successfully')
 
             console.log(response.data)
             fetchData()
+            return  toast.success('Data inserted Successfully')
         })
         .catch(function (error) {
           setAlertError(true)
@@ -168,9 +171,9 @@ const onUpdate = async () => {
   })
       .then((response) => {
         setAlertError(false)
-       return toast.success('Data updated Successfully')
           console.log(response.data)
           fetchData()
+          return toast.success('Data updated Successfully')
       })
       .catch(function (error) {
         setAlertError(true)
@@ -195,10 +198,9 @@ const toDelete = async () => {
   })
       .then((response) => {
           console.log(response.data)
-          return toast.success('Data deleted Successfully')
           console.log(response.data)
           fetchData()
-          fetchData()
+          return toast.success('Data deleted Successfully')
       })
       .catch(function (error) {
         setAlertError(true)

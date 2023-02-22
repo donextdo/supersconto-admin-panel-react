@@ -99,8 +99,8 @@ const News = () => {
         .then((response) => {
             console.log(response.data)
             setAlertError(false)
-            return toast.success('Data inserted Successfully')
             fetchData()
+            return toast.success('Data inserted Successfully')
         })
         .catch(function (error) {
             console.log(error);
@@ -123,8 +123,9 @@ const onUpdate = async () => {
       .then((response) => {
           console.log(response.data)
           setAlertError(false)
-         return  toast.success('Data Updated Successfully')
           fetchData()
+          return  toast.success('Data Updated Successfully')
+
       })
       .catch(function (error) {
           console.log(error);
@@ -146,8 +147,9 @@ const toDelete = async (id) => {
       .then((response) => {
           console.log(response.data)
           setAlertError(false)
-          return toast.success('Data Deleted Successfully')
           fetchData()
+          return toast.success('Data Deleted Successfully')
+
       })
       .catch(function (error) {
           console.log(error);

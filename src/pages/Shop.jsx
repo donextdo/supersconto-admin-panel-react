@@ -103,7 +103,6 @@ const Shop = () => {
     var bodyFormData = new FormData();
 
     const setbodyFormData = async (formDatas) => {
-        console.log(formDatas)
         bodyFormData.append('shop_name', formDatas.shop_name);
         bodyFormData.append('description', formDatas.description);
         bodyFormData.append('address[address_line1]', formDatas.address_line1);
@@ -135,10 +134,10 @@ const Shop = () => {
         })
             .then((response) => {
                 setAlertError(false)
-                return toast.success('Data inserted successfully')
 
                 console.log(response.data)
                 fetchData()
+                return toast.success('Data inserted successfully')
             })
             .catch(function (error) {
                 console.log(error);
@@ -233,15 +232,17 @@ const Shop = () => {
         })
             .then((response) => {
                 setAlertError(false)
+                fetchData()
+
                 return toast.success('Data updated successfully')
                 console.log(response.data)
             })
             .catch(function (error) {
                 console.log(error);
+                fetchData()
                 return toast.error(error.message)
             });
             setConfirm(false)
-        fetchData()
     }
 
     const onCancel = () => {
@@ -392,6 +393,7 @@ const Shop = () => {
                                 <Fileinput
                                     label={'Logo Image'}
                                     onChange={(e) => updateImg("logo_img", e)}
+                                    value={formData.logo_img}
                                 />
                             </div>
                             <div className='flex-1'>
