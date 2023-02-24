@@ -31,9 +31,9 @@ export const TBody = ({ children }) => {
     )
 }
 
-export const TH = ({ title }) => {
+export const TH = ({ title,width }) => {
     return (
-        <th scope="col" className="relative px-6 py-3 font-medium tracking-wider cursor-pointer hover:bg-gray-300 whitespace-nowrap">
+        <th  scope="col" className={`relative px-6 py-3 font-medium tracking-wider cursor-pointer hover:bg-gray-300 whitespace-nowrap ${width}`}>
             <span className='mr-6'>
                 { title }
             </span>

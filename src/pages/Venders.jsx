@@ -384,6 +384,7 @@ const toDelete = async () => {
                 <TH title={'State'}/>
                 <TH title={'City'}/>
                 <TH title={'Postal Code'}/>
+                <TH title={'Profile Picture'}/>
                 <TH title={'Actions'}/>
               </THead>
 
@@ -415,6 +416,9 @@ const toDelete = async () => {
                       </TD>
                       <TD>
                         { d.address.postal_code }
+                      </TD>
+                      <TD>
+                          <img className='w-1/2 h-1/2' src={d.profilePic}></img>
                       </TD>
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>

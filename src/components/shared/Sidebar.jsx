@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import logo from '../../assets/react.svg'
+import logo from '../../assets/logo.jpg'
 import { Link, useLocation } from 'react-router-dom'
 import {ChartPieIcon } from '@heroicons/react/solid'
 import { FaShopify,FaFirstOrder,FaList } from "react-icons/fa";

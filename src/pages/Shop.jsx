@@ -227,7 +227,7 @@ const Shop = () => {
       await  axios({
             method: "patch",
             url: `${baseUrl}/shop/${sessionStorage.getItem('id')}`,
-            data: formData,
+            data: bodyFormData,
             headers: {"Content-Type": "multipart/form-data"},
         })
             .then((response) => {
