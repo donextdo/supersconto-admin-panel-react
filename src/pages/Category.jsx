@@ -11,16 +11,36 @@ import Modal from '../components/shared/Modal'
 import TextInput from '../components/shared/TextInput'
 import baseUrl from '../utils/baseUrl'
 import { ToastContainer, toast } from 'react-toastify';
+import Dropdown from '../components/shared/Dropdown'
 
 
 const Category = () => {
+  
+  let [options,setOptions]=useState([{value:'none',label:'none'}])
   const [data, setData] =useState([])
-    
+  const [modal, setModal] = useState(false)
+  const formData={name:null,mainCategoryName:null}
+  const [selected, setSelected] =useState([])
   useEffect( () => {
       async function fetchData() {
           try {
-              const res = await axios.get(baseUrl+'/category'); 
-              setData(res.data);
+            const categories=[]
+              const res = await axios.get(baseUrl+'/category/categories'); 
+             
+              setOptions([{value:'none',label:'none'}])
+              res.data.mainCategories.forEach(assign)
+              res.data.subCategories.forEach(assign)
+              setData(categories);
+              function assign(val){
+                categories.push(val)
+
+                if(!options.includes({value:val.name,label:val.name}))
+                {
+                  setOptions(prevItems => [...prevItems,{value:val.name,label:val.name}]);
+                }
+              }
+       
+              console.log(options)
           } catch (err) {
               console.log(err);
           }
@@ -28,14 +48,57 @@ const Category = () => {
       fetchData();
   }, []);
 
-  const [modal, setModal] = useState(false)
-  
+
   const toggleModal = () => {
     setModal(!modal)
   }
+  const update = (e) => {
+    formData.name=e.target.value
+  }
 
-  const onSave = () => {
-    alert('onsave clicked')
+  const updateSelect=(option)=>{
+   setSelected(option)
+  }
+  const onSave = async() => {
+  if(selected.value=='none' || !selected.value)
+  {
+    await  axios({
+      method: "post",
+      url: `${baseUrl}/category/main-categories`,
+      data: formData,
+  })
+      .then((response) => {
+          setAlertError(false)
+
+          console.log(response.data)
+          fetchData()
+          return toast.success('Data inserted successfully')
+      })
+      .catch(function (error) {
+          console.log(error);
+          return toast.error(error.message)
+
+      });
+  }
+    else{
+      await  axios({
+        method: "post",
+        url: `${baseUrl}/category/sub-categories`,
+        data: formData,
+    })
+        .then((response) => {
+            setAlertError(false)
+  
+            console.log(response.data)
+            fetchData()
+            return toast.success('Data inserted successfully')
+        })
+        .catch(function (error) {
+            console.log(error);
+            return toast.error(error.message)
+  
+        });
+    }
   }
 
   const onCancel = () => {
@@ -58,36 +121,27 @@ const Category = () => {
             onSave={onSave}
             title='Categories'
             width='w-1/2'
+            height='h-2/3'
             > 
               <div className='flex gap-4'>
                 <div className= 'flex-1'>
-                  <TextInput 
-                    label='Main Categories(English)' 
+                  <Dropdown 
+                    label='Main Category' 
                     border
+                    value={selected?selected:options[0]}
                     borderColor='border-gray-600'
-                  />
-                </div>
-                <div className= 'flex-1'>
-                  <TextInput 
-                    label='Icon' 
-                    border
-                    borderColor='border-gray-600'
+                    options={options}
+                    onChange={updateSelect}
                   />
                 </div>
               </div>
               <div className='flex gap-4'>
                 <div className= 'flex-1'>
                   <TextInput 
-                    label='Category Name(English)' 
+                    label='Sub Category/Category Name' 
                     border
                     borderColor='border-gray-600'
-                  />
-                </div>
-                <div className= 'flex-1'>
-                  <TextInput 
-                    label='Category Name(Italy)' 
-                    border
-                    borderColor='border-gray-600'
+                    value={formData.name} onChange={(e) => update(e)}
                   />
                 </div>
               </div>
@@ -103,57 +157,24 @@ const Category = () => {
             <Table>
 
               <THead>
-                <TH title={'#'}/>
-                <TH title={'View Order'}/>
                 <TH title={'Name'}/>
-                <TH title={'Sub Name(1) English'}/>
-                <TH title={'Sub Name(2) English'}/>
-                <TH title={'Sub Name(3) English'}/>
-                <TH title={'Sub Name(1) Italy'}/>
-                <TH title={'Sub Name(2) Italy'}/>
-                <TH title={'Sub Name(3) Italy'}/>
-                <TH title={'Actions'}/>
+               
+                {/* <TH width={'w-[20px]'} title={'Actions'}/> */}
               </THead>
 
               <TBody>
 
                 {data.map(d => {
                   return (
-                    <Row key={d.id}>
+                    <Row key={d._id}>
                       <TD>
-                        { d.id }
+                        { d.name }
                       </TD>
-
-                      <TD>
-                        { d.ViewOrder }
-                      </TD>
-
-                      <TD>
-                        { d.Name }
-                      </TD>
-                      <TD>
-                        { d.SubName1En }
-                      </TD>
-                      <TD>
-                        { d.SubName2En }
-                      </TD>
-                      <TD>
-                        { d.SubName3En }
-                      </TD>
-                      <TD>
-                        { d.SubName1It }
-                      </TD>
-                      <TD>
-                        { d.SubName2It }
-                      </TD>
-                      <TD>
-                        { d.SubName3It }
-                      </TD>
-                      <TD>
+                      {/* <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
                           <FaTrash className='w-3 h-3 fill-red-500 cursor-pointer'/>
                         </div>  
-                      </TD>
+                      </TD> */}
                     </Row>
                   )
                 })
