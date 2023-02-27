@@ -113,7 +113,7 @@ console.log(res)
     setModal(!modal)
   }
   const onCancel = () => {
-    alert('oncancel clicked')
+    setModal(!modal)
   }
   const onSave = async () => {
     const bodyFormData=  setbodyFormData(formData)

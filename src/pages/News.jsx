@@ -168,7 +168,7 @@ const toDelete = async (id) => {
     setModal(!modal)
   }
   const onCancel = () => {
-    alert('oncancel clicked')
+    setModal(!modal)
   }
   const toUpdate = (data) =>{
     setIsEdit(true)
@@ -263,6 +263,7 @@ const toDelete = async (id) => {
                 <TH title={'Title'}/>
                 <TH title={'Expired Date'}/>
                 <TH title={'Description'}/>
+                <TH title={'Images'}/>
                 <TH title={'Actions'}/>
               </THead>
 
@@ -283,6 +284,9 @@ const toDelete = async (id) => {
                       </TD>
                       <TD>
                         { d.description }
+                      </TD>
+                      <TD>
+                        <img src={d.images} className='w-1/2 h-1/2'></img>
                       </TD>
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
