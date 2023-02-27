@@ -25,12 +25,15 @@ const Order = () => {
     fetchData()
     fetchShops()
   }, [])
+
   const updateSelect=(option)=>{
     setSelected(option)
-   }
+  }
+
   async function fetchData() {
     try {
       const { data } = await axios.get(`${baseUrl}/order`)
+      console.log(data)
       setOrderData(data)
     }
     catch (error) {
@@ -125,11 +128,11 @@ const Order = () => {
 
             <THead>
               <TH title={'Order Id'} />
-              <TH title={'Shop'} />
+              {/* <TH title={'Shop'} /> */}
               <TH title={'Customer Name'} />
-              <TH title={'Order List'} />
-              <TH title={'email'} />
-              <TH title={'Mobile'} />
+              {/* <TH title={'Order List'} /> */}
+              {/* <TH title={'email'} /> */}
+              {/* <TH title={'Mobile'} /> */}
               <TH title={'Billing Address'} />
               <TH title={'Payment method'} />
               <TH title={'Status'} />
@@ -150,34 +153,33 @@ const Order = () => {
                     </TD>
 
                     <TD>
-                      {order.shop.shop_name}
+                      {order.full_name}
                     </TD>
 
                     <TD>
-                      {order.customer.fullName}
-                    </TD>
-                    <TD>
-                      {order.list}
-                    </TD>
-                    <TD>
-                      {order.email}
-                    </TD>
-                    <TD>
-                      {order.phone}
-                    </TD>
-                    <TD>
                       {`${order.billingAddress.address_line1}, ${order.billingAddress.city}, ${order.billingAddress.state}`}
                     </TD>
+
                     <TD>
-                      {order.paymentMethod}
+                      CASH ON DELIVERY
                     </TD>
                     <TD>
-                      {order.status}
+                      {order.status == 0 ? 'pending' : 'shipped'}
                     </TD>
                     <TD>
                       {order.totalPrice}
                     </TD>
+                    
                     <TD>
+                      {order.paymentMethod}
+                    </TD>
+                    {/* <TD>
+                      {order.status}
+                    </TD>
+                    <TD>
+                      {order.totalPrice}
+                    </TD> */}
+                    {/* <TD>
                       <Dropdown 
                         label='Main Category' 
                         border
@@ -186,7 +188,7 @@ const Order = () => {
                         options={options}
                         onChange={updateSelect}
                     />
-                    </TD>
+                    </TD> */}
 
                   </Row>
                 )
