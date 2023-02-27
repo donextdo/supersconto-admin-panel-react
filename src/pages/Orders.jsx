@@ -11,20 +11,29 @@ import Dropdown from '../components/shared/Dropdown'
 
 
 const Order = () => {
-
+  const [selected, setSelected] =useState([])
   const [orderData, setOrderData] = useState([])
   const [modal, setModal] = useState(false)
   const [shops, setShops] = useState([])
   const [filter, setFilter] = useState(null)
+  let [options,setOptions]=useState([{value:'Processing',label:'Processing'},
+  {value:'New',label:'New'},
+  {value:'Delivered',label:'Delivered'},
+  {value:'Rejected',label:'Rejected'}])
 
   useEffect(() => {
     fetchData()
     fetchShops()
   }, [])
 
+  const updateSelect=(option)=>{
+    setSelected(option)
+  }
+
   async function fetchData() {
     try {
       const { data } = await axios.get(`${baseUrl}/order`)
+      console.log(data)
       setOrderData(data)
     }
     catch (error) {
@@ -95,7 +104,7 @@ const Order = () => {
 
           <div className='w-full py-4 flex gap-6'>
 
-            <div className='flex w-2/5'>
+            {/* <div className='flex w-2/5'>
               <div className='py-2 px-3 whitespace-nowrap bg-gray-600 text-white text-sm font-medium'>
                 Filter by shop
               </div>
@@ -106,12 +115,12 @@ const Order = () => {
                     onChange={handleDropDownChange}
                 />
               </div>
-            </div>
-
+            </div> */}
+{/* 
             <ButtonNormal onClick={clearFilter} disabled={!filter}>
                 <FcClearFilters className='w-5 h-5'/>
                 <span>Clear Filter</span>
-            </ButtonNormal>
+            </ButtonNormal> */}
 
           </div>
 
@@ -119,13 +128,17 @@ const Order = () => {
 
             <THead>
               <TH title={'Order Id'} />
-              <TH title={'Shop'} />
-              <TH title={'Customer'} />
-              <TH title={'Mobile'} />
+              {/* <TH title={'Shop'} /> */}
+              <TH title={'Customer Name'} />
+              {/* <TH title={'Order List'} /> */}
+              {/* <TH title={'email'} /> */}
+              {/* <TH title={'Mobile'} /> */}
               <TH title={'Billing Address'} />
               <TH title={'Payment method'} />
               <TH title={'Status'} />
               <TH title={'Total Price'} />
+              {/* <TH title={'Actions'} /> */}
+
             </THead>
 
             <TBody>
@@ -140,27 +153,42 @@ const Order = () => {
                     </TD>
 
                     <TD>
-                      {order.shop.shop_name}
+                      {order.full_name}
                     </TD>
 
                     <TD>
-                      {order.customer.fullName}
-                    </TD>
-                    <TD>
-                      {order.phone}
-                    </TD>
-                    <TD>
                       {`${order.billingAddress.address_line1}, ${order.billingAddress.city}, ${order.billingAddress.state}`}
                     </TD>
+
                     <TD>
-                      {order.paymentMethod}
+                      CASH ON DELIVERY
                     </TD>
                     <TD>
-                      {order.status}
+                      {order.status == 0 ? 'pending' : 'shipped'}
                     </TD>
                     <TD>
                       {order.totalPrice}
                     </TD>
+                    
+                    <TD>
+                      {order.paymentMethod}
+                    </TD>
+                    {/* <TD>
+                      {order.status}
+                    </TD>
+                    <TD>
+                      {order.totalPrice}
+                    </TD> */}
+                    {/* <TD>
+                      <Dropdown 
+                        label='Main Category' 
+                        border
+                        value={selected?selected:options[0]}
+                        borderColor='border-gray-600'
+                        options={options}
+                        onChange={updateSelect}
+                    />
+                    </TD> */}
 
                   </Row>
                 )

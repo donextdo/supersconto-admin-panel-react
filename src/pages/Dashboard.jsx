@@ -38,7 +38,7 @@ const Dashboard = () => {
   }
 
   const onCancel = () => {
-    alert('oncancel clicked')
+    setModal(!modal)
   }
   return (
     <div>
