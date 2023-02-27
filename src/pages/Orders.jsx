@@ -137,7 +137,7 @@ const Order = () => {
               <TH title={'Payment method'} />
               <TH title={'Status'} />
               <TH title={'Total Price'} />
-              <TH title={'Actions'} />
+              {/* <TH title={'Actions'} /> */}
 
             </THead>
 
