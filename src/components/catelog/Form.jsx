@@ -44,7 +44,7 @@ const Form = ({catelog, setCatelog}) => {
             shop_id: selectedOption.value
         })
     }
-    console.log(shops)
+
     return (
         <div className='flex flex-col gap-4'>
 
@@ -79,7 +79,7 @@ const Form = ({catelog, setCatelog}) => {
                 border
                 borderColor='border-gray-600'
                 name={'expiredate'}
-                value={catelog.expiredate}
+                value={catelog.expiredate.substring(0, 10)}
                 onChange={handleChange}
             />
 

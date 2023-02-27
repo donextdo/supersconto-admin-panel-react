@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Content, Card } from '../components/shared/Utils'
-import Navbar from '../components/shared/Navbar'
-import Sidebar from '../components/shared/Sidebar'
 import { Table, THead, TBody, TH, Row, TD } from '../components/shared/Table'
 import { FaTrash } from 'react-icons/fa'
 import { PencilAltIcon } from '@heroicons/react/solid'
@@ -19,11 +17,13 @@ const Catalog = () => {
 
   const [data, setData] =useState([])
   const [modal, setModal] = useState(false)
+  const [updateMode, setUpdateMode] = useState(false)
   const [catelog, setCatelog] = useState({
-    shop_id: 'a',
-    title: 'b',
-    description: 'c',
-    expiredate: 'd'
+    _id: '',
+    shop_id: '',
+    title: '',
+    description: '',
+    expiredate: ''
   })
     
   useEffect( () => {
@@ -42,21 +42,31 @@ const Catalog = () => {
   const toggleModal = () => {
     setModal(!modal)
     setCatelog({
+      _id: '',
       shop_id: '',
       title: '',
       description: '',
       expiredate: ''
     })
+    setUpdateMode(false)
   }
 
   const onSave = async () => {
     try {
 
-      const res = await axios.post(`${baseUrl}/catelog/book`, catelog)
-      console.log(res.data)
+      const { _id, ...catalogData } = catelog
+
+      if(!updateMode) {
+        await axios.post(`${baseUrl}/catelog/book`, catalogData)
+      }
+      else {
+        await axios.patch(`${baseUrl}/catelog/book/${catelog._id}`, catalogData)
+      }
+      
       fetchData()
 
       setCatelog({
+        _id: '',
         shop_id: '',
         title: '',
         description: '',
@@ -64,7 +74,7 @@ const Catalog = () => {
       })
 
       setModal(!modal)
-     return toast.success('Data saved successfully')
+      return toast.success('Data saved successfully')
 
     } catch (error) {
       console.log(error)
@@ -93,19 +103,16 @@ const Catalog = () => {
 
   const onUpdate = async (d) => {
     setModal(true)
-    setCatelog(d)
-    try {
-
-      const res = await axios.patch(`${baseUrl}/catelog/book/${id}`)
-      console.log(res.data)
-      return toast.success('Data updated successfully')
-
-
-      fetchData()
-
-    } catch (error) {
-      toast.error(error.message)
-    }
+    setCatelog({
+      _id: d._id,
+      shop_id: d.shop_id._id,
+      title: d.title,
+      description: d.description,
+      expiredate: d.expiredate
+    })
+    setUpdateMode(true)
+    console.log(d)
+    console.log(catelog)
   }
   
 

@@ -9,6 +9,7 @@ import ImageProcessor from "../components/page/ImageProcessor.jsx";
 import Modal from '../components/shared/Modal'
 import AddPageItems from '../components/page_items/AddPageItems'
 import baseUrl from '../utils/baseUrl'
+import {FaAngleLeft} from 'react-icons/fa'
 
 import image from '../assets/flyer_1.jpg'
 
@@ -120,6 +121,10 @@ const PageItems = () => {
         <div>
             {/* <Navbar screen/>
             <Sidebar minimize/> */}
+
+            <Link to="/catelog/pages">
+                    <button className="text-4xl pl-20 fixed z-50 left-6 top-4"><FaAngleLeft /></button>
+            </Link>
 
             {pageData && <div>
 
