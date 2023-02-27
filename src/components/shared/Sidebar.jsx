@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom'
 import {ChartPieIcon } from '@heroicons/react/solid'
 import { FaShopify,FaFirstOrder,FaList } from "react-icons/fa";
 import { BiCategory,BiNews,BiBook ,BiClipboard} from "react-icons/bi";
-import { TbUsers } from "react-icons/tb";
+import { TbUsers,TbLogout} from "react-icons/tb";
 import { AiOutlineStock} from "react-icons/ai";
 
 
@@ -13,7 +13,10 @@ const Sidebar = () => {
 const location = useLocation()
 const [minimize, setMinimize] = useState(false)
 const pathname = location.pathname
-
+const logout=()=>{
+    sessionStorage.clear()
+    localStorage.clear()
+}
 useEffect(() => {
     
     console.log(pathname)
@@ -103,12 +106,14 @@ useEffect(() => {
                     {!minimize && <span>Vender</span>}
                 </Link>
             </li>
+            <li onClick={logout} className={pathname=='/login'? 'listItem active' :'listItem'}>
+                <Link to={'/login'} className="listItemLink">
+                    <TbLogout className='w-5 h-5'/>
+                    {!minimize && <span>Logout</span>}
+                </Link>
+            </li>
         </ul>
 
-        <div className="w-full h-max flex flex-col px-4 self-baseline">
-        
-        </div>
-        
     </div>
   )
 }

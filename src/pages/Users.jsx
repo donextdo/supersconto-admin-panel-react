@@ -33,7 +33,7 @@ const Users = () => {
   };
 
   const onCancel = () => {
-    alert("oncancel clicked");
+    setModal(!modal);
   };
 
   return (
