@@ -31,12 +31,14 @@ const NewShop = () => {
   const [predictions, setPredictions] = useState([]);
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [location, setLocation] = useState(null);
+  const [hide, setHide] = useState(false);
 
   const [isEdit, setIsEdit] = useState(false);
   async function fetchData() {
     try {
       const res = await axios.get(`${baseUrl}/shop`);
       setData(res.data);
+      console.log("logo display : ", data[6].logo_img);
       console.log("data : ", data);
     } catch (err) {
       console.log(err);
@@ -102,15 +104,15 @@ const NewShop = () => {
     console.log("ddddd : ", formDatas.shop_name);
     bodyFormData.append("shop_name", formDatas.shop_name);
     bodyFormData.append("description", formDatas.description);
-    bodyFormData.append("address[address]", formDatas.address);
+    bodyFormData.append("address[address]", formatAddress);
     bodyFormData.append("address[state]", formDatas.state);
     bodyFormData.append("address[postal_code]", formDatas.postal_code);
     bodyFormData.append("shop_unique_id", formDatas.shop_unique_id);
     bodyFormData.append("owner_name", formDatas.owner_name);
     bodyFormData.append("status", true);
     bodyFormData.append("logo_img", formDatas.logo_img);
-    bodyFormData.append("latitude", formDatas.latitude);
-    bodyFormData.append("longitude", formDatas.longitude);
+    bodyFormData.append("latitude", latitude);
+    bodyFormData.append("longitude", longitude);
     bodyFormData.append("shop_category", formDatas.shop_category);
     bodyFormData.append("is_online_selling", formDatas.is_online_selling);
     bodyFormData.append("telephone", formDatas.telephone);
@@ -215,7 +217,6 @@ const NewShop = () => {
         fetchData();
 
         return toast.success("Data updated successfully");
-        console.log(response.data);
       })
       .catch(function (error) {
         console.log(error);
@@ -244,46 +245,56 @@ const NewShop = () => {
     });
   };
 
-  const handleInputChange = (e) => {
-    setAddress(e.target.value);
-    if (e.target.value.trim() !== "") {
-      fetchPredictions(e.target.value);
-    } else {
-      setPredictions([]);
-    }
+  const handleInputChange = (event) => {
+    setHide(false);
+    const inputValue = event.target.value;
+
+    // Create a new instance of AutocompleteService
+    const autocompleteService =
+      new window.google.maps.places.AutocompleteService();
+
+    // Call the getPlacePredictions method to fetch location suggestions
+    autocompleteService.getPlacePredictions(
+      { input: inputValue },
+      (predictions, status) => {
+        if (status === window.google.maps.places.PlacesServiceStatus.OK) {
+          setPredictions(predictions);
+        }
+      }
+    );
   };
 
-  const fetchPredictions = async (input) => {
-    const apiKey = "AIzaSyALJN3bDbGEk8ppXieiWNnwHVYM_8ntKng";
-    const url = `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${input}&key=${apiKey}`;
-    try {
-      const response = await axios.get(url);
-      setPredictions(response.data.predictions);
-    } catch (error) {
-      console.error(error);
-    }
-  };
+  function handlePlaceSelection(place_id) {
+    setHide(false);
+    console.log("place_id: ", place_id);
+    const placeService = new window.google.maps.places.PlacesService(
+      document.createElement("div")
+    );
+    console.log("placeService: ", placeService);
+    placeService.getDetails(
+      { placeId: place_id },
+      (placeResult, placeStatus) => {
+        console.log("placeResult: ", placeResult);
 
-  const handlePlaceSelection = (placeId) => {
-    setSelectedPlace(placeId);
-    fetchLocation(placeId);
-  };
-
-  const fetchLocation = async (placeId) => {
-    const apiKey = "AIzaSyALJN3bDbGEk8ppXieiWNnwHVYM_8ntKng";
-    const url = `https://maps.googleapis.com/maps/api/place/details/json?placeid=${placeId}&key=${apiKey}`;
-    try {
-      const response = await axios.get(url);
-      const result = response.data.result;
-      setLocation({
-        address: result.formatted_address,
-        lat: result.geometry.location.lat,
-        lng: result.geometry.location.lng,
-      });
-    } catch (error) {
-      console.error(error);
-    }
-  };
+        if (
+          placeStatus === window.google.maps.places.PlacesServiceStatus.OK &&
+          placeResult
+        ) {
+          const lat = placeResult.geometry?.location?.lat();
+          const lng = placeResult.geometry?.location?.lng();
+          const formattedAddress = placeResult.formatted_address;
+          setLatitude(lat);
+          setLongitude(lng);
+          setFormatAddress(formattedAddress);
+          // setLocation()
+          setHide(true);
+          console.log("Formatted Address: ", formattedAddress);
+          console.log("Formatted lat: ", latitude);
+          console.log("Formatted lng: ", longitude);
+        }
+      }
+    );
+  }
 
   return (
     <div>
@@ -334,7 +345,7 @@ const NewShop = () => {
               <div className="flex-1">
                 <TextInput
                   label="Address"
-                  value={formData.address}
+                  value={formatAddress}
                   onChange={(e) => {
                     update("address", e);
                     handleInputChange(e);
@@ -342,7 +353,7 @@ const NewShop = () => {
                   border
                   borderColor="border-gray-600"
                 />
-                {predictions.length > 0 && (
+                {predictions.length > 0 && !hide && (
                   <ul className="mb-4">
                     {predictions.map((prediction) => (
                       <li
@@ -402,7 +413,7 @@ const NewShop = () => {
             <div className="flex gap-4">
               <div className="flex-1">
                 <TextInput
-                  value={formData.latitude}
+                  value={latitude}
                   onChange={(e) => update("latitude", e)}
                   label="Google Map Latitude"
                   border
@@ -411,7 +422,7 @@ const NewShop = () => {
               </div>
               <div className="flex-1">
                 <TextInput
-                  value={formData.longitude}
+                  value={longitude}
                   onChange={(e) => update("longitude", e)}
                   label="Google Map Longitude"
                   border
@@ -456,7 +467,14 @@ const NewShop = () => {
                     </TD>
                     <TD>{d.status ? "true" : "false"}</TD>
                     <TD>
-                      <img className="w-1/2 h-1/2" src={d.logo_img}></img>
+                      <img
+                        className="w-1/2 h-1/2"
+                        src={
+                          d.logo_img ||
+                          "https://images.freeimages.com/images/previews/09e/moon-art-1641879.png"
+                        }
+                        alt="Shop Logo"
+                      ></img>
                     </TD>
                     <TD>
                       <div className="w-full h-full flex items-center justify-center gap-4">
