@@ -10,10 +10,12 @@
   },
   "dependencies": {
     "@heroicons/react": "^1.0.6",
+    "@react-google-maps/api": "^2.18.1",
     "axios": "^1.2.1",
     "email-validator": "^2.0.4",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-google-autocomplete": "^2.7.3",
     "react-icons": "^4.7.1",
     "react-image-crop": "9.1.1",
     "react-router-dom": "^6.4.5",
