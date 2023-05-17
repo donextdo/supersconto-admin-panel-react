@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {useLocation} from 'react-router-dom';
+import {useLocation, useNavigate} from 'react-router-dom';
 import {Link} from 'react-router-dom';
 import Navbar from '../components/shared/Navbar';
 import Sidebar from '../components/shared/Sidebar';
@@ -14,7 +14,7 @@ import {FaAngleLeft} from 'react-icons/fa'
 import image from '../assets/flyer_1.jpg'
 
 
-const PageItems = () => {
+const PageItems = (props) => {
 
     const location = useLocation();
     const query = new URLSearchParams(location.search);
@@ -39,7 +39,7 @@ const PageItems = () => {
         product_image:  image, //SET THIS IN IMAGE PROCESSOR
         coordinates: null
     })
-
+    const navigate = useNavigate();
     useEffect(() => {
         console.log('api-call')
         fetchData(page).then(res => {
@@ -122,9 +122,8 @@ const PageItems = () => {
             {/* <Navbar screen/>
             <Sidebar minimize/> */}
 
-            <Link to="/catelog/pages">
-                    <button className="text-4xl pl-20 fixed z-50 left-6 top-4"><FaAngleLeft /></button>
-            </Link>
+            <button className="text-4xl pl-20 fixed z-50 left-6 top-4" onClick={() =>  navigate(-1)}><FaAngleLeft /></button>
+
 
             {pageData && <div>
 

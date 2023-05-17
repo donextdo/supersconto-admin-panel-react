@@ -2,6 +2,7 @@ import React, {useEffect, useRef, useState} from 'react';
 import ReactCrop from "react-image-crop";
 import CroppedItemsPreview from "./CroppedItemsPreview.jsx";
 import SingleItemPreview from "./SingleItemPreview.jsx";
+import {FaRegCheckCircle} from "react-icons/fa";
 
 function App({imgSrc, onClick, exCoordinates}) {
     const [src, setSrc] = useState(null)
@@ -12,11 +13,11 @@ function App({imgSrc, onClick, exCoordinates}) {
     const [croppedImages, setCroppedImages] = useState([])
     const [strokeImageUrl, setStrokeImageUrl] = useState("")
     const [coordinates, setCoordinates] = useState([])
+    const [showButton, setShowButton] = useState(false)
     const imageRef = useRef()
 
     useEffect(() => {
         if (imageRef.current) {
-            console.log("generate stroke", {coordinates})
             getStrokeImg(
                 imageRef.current,
                 coordinates,
@@ -24,7 +25,6 @@ function App({imgSrc, onClick, exCoordinates}) {
             ).then(value => {
                 setStrokeImageUrl(value);
             })
-
         }
     }, [coordinates, imageRef.current])
 
@@ -33,30 +33,18 @@ function App({imgSrc, onClick, exCoordinates}) {
         setCroppedImages([])
 
         if (imageRef.current) {
-/*
-            const blah = () => {
-                exCoordinates.map(async crop => {
-                    await onCropComplete(crop)
-                })
-            }
-            blah()*/
-
             const asyncTasks = exCoordinates.map(async (item, index) => {
                 // perform async task and return result
-                return await makeClientCrop2(item, generateUUID());
+                return await loadPreviousData(item, generateUUID());
             });
-
             Promise.all(asyncTasks)
                 .then((results) => {
                     console.log({results})
                     setCoordinates(results)
                 })
                 .catch((error) => console.error(error));
-
         }
-        console.log('exCoordinates-effect', imageRef.current)
     }, [exCoordinates, imageRef.current])
-
 
     useEffect(() => {
         if (imgSrc) {
@@ -79,19 +67,15 @@ function App({imgSrc, onClick, exCoordinates}) {
     }
 
     const onImageLoaded = (image) => {
-        console.log("image load call on rerender check")
         imageRef.current = image;
     };
 
-    const onCropComplete = async (crop) => {
-        const index = generateUUID()
-        await makeClientCrop(crop, index);
+    const onCropComplete = async () => {
+        await makeClientCrop(crop, generateUUID());
     };
 
     const makeClientCrop = async (crop, index) => {
-        console.log('makeClientCrop', {crop, coordinates})
         if (crop.x === 0 && crop.y === 0) return
-        // setCoordinates(prevState => [...prevState, {...crop}])
 
         if (imageRef.current && crop.width && crop.height) {
             const croppedImageUrl = await getCroppedImg(
@@ -99,16 +83,13 @@ function App({imgSrc, onClick, exCoordinates}) {
                 crop,
                 'newFile.jpeg'
             );
-
-            setCoordinates(prevState => [...prevState, {...crop, croppedImageUrl, index}])
+            setCoordinates(prevState => [...prevState, {...crop, index}])
             setCroppedImages(prevState => ([...prevState, {croppedImageUrl, index}]));
-
         }
     }
-    const makeClientCrop2 = async (crop, index) => {
-        console.log('makeClientCrop', {crop, coordinates})
+
+    const loadPreviousData = async (crop, index) => {
         if (crop.x === 0 && crop.y === 0) return
-        // setCoordinates(prevState => [...prevState, {...crop}])
 
         if (imageRef.current && crop.width && crop.height) {
             const croppedImageUrl = await getCroppedImg(
@@ -117,7 +98,6 @@ function App({imgSrc, onClick, exCoordinates}) {
                 'newFile.jpeg'
             );
 
-            // setCoordinates(prevState => [...prevState, {...crop, croppedImageUrl}])
             setCroppedImages(prevState => ([...prevState, {croppedImageUrl,index}] ));
             return {...crop, croppedImageUrl, index}
 
@@ -125,13 +105,11 @@ function App({imgSrc, onClick, exCoordinates}) {
     }
 
     const onCropChange = (crop, percentCrop) => {
-        // You could also use percentCrop:
-        // this.setState({ crop: percentCrop });
+        setShowButton(false)
         setCrop(crop);
     };
 
     const getCroppedImg = (image, crop, fileName) => {
-        // console.log(image, crop, fileName)
         const canvas = document.createElement('canvas');
         const pixelRatio = window.devicePixelRatio;
         const scaleX = image.naturalWidth / image.width;
@@ -143,8 +121,6 @@ function App({imgSrc, onClick, exCoordinates}) {
 
         ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
         ctx.imageSmoothingQuality = 'high';
-        // console.log({scaleX, scaleY, h: image.width, w: image.height})
-
 
         ctx.drawImage(
             image,
@@ -179,7 +155,6 @@ function App({imgSrc, onClick, exCoordinates}) {
     }
 
     const getStrokeImg = (image, coordinates, fileName) => {
-        // console.log(image, crop, fileName)
         const canvas = document.createElement('canvas');
         const pixelRatio = window.devicePixelRatio;
         const scaleX = image.naturalWidth / image.width;
@@ -191,13 +166,10 @@ function App({imgSrc, onClick, exCoordinates}) {
 
         ctx.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
         ctx.imageSmoothingQuality = 'high';
+        ctx.setLineDash([20, 10]);
+        ctx.lineWidth = 5;
+        ctx.strokeStyle = "#3b82f6";
 
-        ctx.setLineDash([10, 10]);
-        ctx.strokeStyle = "blue";
-
-        ctx.lineWidth = 10;
-
-        // console.log({pixelRatio, scaleX, scaleY, h: image.width, w: image.height})
         ctx.drawImage(
             image
             , 0, 0,
@@ -216,7 +188,6 @@ function App({imgSrc, onClick, exCoordinates}) {
                 crop.height * scaleY,
             );
         })
-
 
         return new Promise((resolve, reject) => {
             canvas.toBlob(
@@ -238,22 +209,15 @@ function App({imgSrc, onClick, exCoordinates}) {
         });
     }
 
-
     const handleRemove = (index) => {
         const cloneCo = [...coordinates].filter(co => co.index !== index)
         const clonePrev = [...croppedImages].filter(co => co.index !== index)
 
         setCoordinates(cloneCo)
         setCroppedImages(clonePrev)
-
     }
 
-    const handleItemSelection = (data) => {
-        console.log(data, croppedImages[data.index])
-        console.log(croppedImages)
-    }
-
-    function generateUUID() {
+    const generateUUID = () => {
         let d = new Date().getTime();
         if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
             d += performance.now(); //use high-precision timer if available
@@ -265,11 +229,10 @@ function App({imgSrc, onClick, exCoordinates}) {
         });
     }
 
-    console.log('image-processor-rendered', {croppedImages,coordinates, exCoordinates})
-
+    console.log('image-processor-rendered', {croppedImages,coordinates,crop, exCoordinates})
 
     return (
-        <>
+        <div className="min-h-screen max-w-[1440px] mx-auto">
             <div className="image-processor">
                 <div className="cropper">
 
@@ -279,34 +242,31 @@ function App({imgSrc, onClick, exCoordinates}) {
                             crop={crop}
                             ruleOfThirds
                             onImageLoaded={onImageLoaded}
-                            onComplete={onCropComplete}
                             onChange={onCropChange}
-                            // maxWidth={500}
-                            // maxHeight={500}
+                            onComplete={() => setShowButton(true)}
                         />
                     )}
+
+                    {showButton && crop.width > 0 && <FaRegCheckCircle className="crop-save" style={{top: `${crop.y - 10}px`, left: `${crop.x + crop.width - 10}px`}}
+                             onClick={onCropComplete}></FaRegCheckCircle>}
                 </div>
 
-                <CroppedItemsPreview cropImageUrl={croppedImages} handleRemove={handleRemove}/>
+
 
                 {/*<StrokeImagePreview strokeImageUrl={strokeImageUrl}/>*/}
 
                 <SingleItemPreview coordinates={coordinates} strokeImageUrl={strokeImageUrl}
                                    height={imageRef.current?.height} width={imageRef.current?.width}
                                    handleSelection={({crop, index}) => {
-                                       console.log(index);
                                        onClick({crop})
-                                       // setCoordinates([])
                                    }}
-                                   imageHeight={imageRef.current?.height} imageWidth={imageRef.current?.width}/>
-
-
+                                   imageHeight={imageRef.current?.height} imageWidth={imageRef.current?.width}
+                />
             </div>
-            {/* <div>
-                <input type="file" accept="image/*" onChange={onSelectFile}/>
-            </div>*/}
+            <CroppedItemsPreview cropImageUrl={croppedImages} handleRemove={handleRemove}/>
 
-        </>
+
+        </div>
     );
 }
 
