@@ -38,14 +38,15 @@ const Dashboard = () => {
   }
 
   const onCancel = () => {
-    alert('oncancel clicked')
+    setModal(!modal)
   }
   return (
     <div>
-        <Sidebar />
+        {/* <Sidebar />
         <Navbar />
 
-        <Content>
+        <Content> */}
+        <>
           
           {modal && 
             <Modal 
@@ -70,7 +71,7 @@ const Dashboard = () => {
                   <span>Add</span>
                 </ButtonNormal>
 
-                <ButtonSuccess >
+                {/* <ButtonSuccess >
                   Button Success
                 </ButtonSuccess>
 
@@ -84,7 +85,7 @@ const Dashboard = () => {
 
                 <ButtonDanger >
                   Button Danger
-                </ButtonDanger>
+                </ButtonDanger> */}
 
           </div>
             <Table>
@@ -130,8 +131,8 @@ const Dashboard = () => {
             </Table>
 
           </Card>
-
-        </Content>
+        </>
+        {/* </Content> */}
     </div>
   )
 }

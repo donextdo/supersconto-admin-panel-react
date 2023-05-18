@@ -33,15 +33,15 @@ const Users = () => {
   };
 
   const onCancel = () => {
-    alert("oncancel clicked");
+    setModal(!modal);
   };
 
   return (
     <div>
-      <Sidebar />
+      {/* <Sidebar />
       <Navbar />
 
-      <Content>
+      <Content> */}
         <Card>
           <Table>
             <THead>
@@ -74,7 +74,7 @@ const Users = () => {
             </TBody>
           </Table>
         </Card>
-      </Content>
+      {/* </Content> */}
     </div>
   );
 };

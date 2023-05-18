@@ -38,7 +38,7 @@ return (
             options={options}
             defaultValue={defaultValue}
             styles={customStyles}
-            className='w-full'
+            className='w-full text-black'
         />
 
     {error && 

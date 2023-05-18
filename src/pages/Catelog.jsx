@@ -1,7 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import { Content, Card } from '../components/shared/Utils'
-import Navbar from '../components/shared/Navbar'
-import Sidebar from '../components/shared/Sidebar'
 import { Table, THead, TBody, TH, Row, TD } from '../components/shared/Table'
 import { FaTrash } from 'react-icons/fa'
 import { PencilAltIcon } from '@heroicons/react/solid'
@@ -13,13 +11,15 @@ import Modal from '../components/shared/Modal'
 import Form from '../components/catelog/Form'
 import { normalizeDate } from '../utils/functions'
 import { Link } from 'react-router-dom'
-import baseUrl from '../utils/baseUrl'
-
+import baseUrl, {clientAppUrl} from '../utils/baseUrl'
+import { ToastContainer, toast } from 'react-toastify';
 const Catalog = () => {
 
   const [data, setData] =useState([])
   const [modal, setModal] = useState(false)
+  const [updateMode, setUpdateMode] = useState(false)
   const [catelog, setCatelog] = useState({
+    _id: '',
     shop_id: '',
     title: '',
     description: '',
@@ -41,17 +41,32 @@ const Catalog = () => {
   
   const toggleModal = () => {
     setModal(!modal)
+    setCatelog({
+      _id: '',
+      shop_id: '',
+      title: '',
+      description: '',
+      expiredate: ''
+    })
+    setUpdateMode(false)
   }
 
   const onSave = async () => {
     try {
 
-      const res = await axios.post(`${baseUrl}/catelog/book`, catelog)
-      console.log(res.data)
+      const { _id, ...catalogData } = catelog
 
+      if(!updateMode) {
+        await axios.post(`${baseUrl}/catelog/book`, catalogData)
+      }
+      else {
+        await axios.patch(`${baseUrl}/catelog/book/${catelog._id}`, catalogData)
+      }
+      
       fetchData()
 
       setCatelog({
+        _id: '',
         shop_id: '',
         title: '',
         description: '',
@@ -59,9 +74,11 @@ const Catalog = () => {
       })
 
       setModal(!modal)
+      return toast.success('Data saved successfully')
 
     } catch (error) {
       console.log(error)
+      toast.error(error.message)
     }
   }
 
@@ -76,20 +93,38 @@ const Catalog = () => {
       console.log(res.data)
 
       fetchData()
+      return toast.success('Data deleted successfully')
+
 
     } catch (error) {
-      console.log(error)
+      toast.error(error.message)
     }
   }
 
+  const onUpdate = async (d) => {
+    setModal(true)
+    setCatelog({
+      _id: d._id,
+      shop_id: d.shop_id._id,
+      title: d.title,
+      description: d.description,
+      expiredate: d.expiredate
+    })
+    setUpdateMode(true)
+    console.log(d)
+    console.log(catelog)
+  }
+  
 
   return (
     <div>
-        <Sidebar />
+        {/* <Sidebar />
         <Navbar />
 
-        <Content>
+        <Content> */}
+        <>
 
+        <ToastContainer/>
         {modal && 
             <Modal 
             onClose={toggleModal}
@@ -129,9 +164,9 @@ const Catalog = () => {
 
                 {data.map(d => {
                   return (
-                    <Row key={d._id}>
+                    <Row key={d?._id}>
                       <TD>
-                        { d._id }
+                        { d?._id }
                       </TD>
                       <TD>
                         { d.title }
@@ -143,12 +178,14 @@ const Catalog = () => {
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
 
-                          <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id._id}&catelog=${d._id}` }}>
+                          <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id?._id}&catelog=${d?._id}` }}>
                             <RiPagesFill className='w-4 h-4 fill-emerald-500 cursor-pointer'/>
                           </Link>
-                          <MdPreview className='w-4 h-4 fill-green-500 cursor-pointer'/>
-                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
-                          <PencilAltIcon className='w-4 h-4 fill-blue-500 cursor-pointer'/>
+                          <a href={`${clientAppUrl}/catalog-preview/${d?._id}`} target="_blank" rel="noopener noreferrer">
+                            <MdPreview className='w-4 h-4 fill-green-500 cursor-pointer'/>
+                          </a>
+                          <FaTrash onClick={() => onDelete(d?._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
+                          <PencilAltIcon onClick={() => onUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
 
                         </div>  
                       </TD>
@@ -163,8 +200,8 @@ const Catalog = () => {
             </Table>
 
           </Card>
-
-        </Content>
+        </>
+        {/* </Content> */}
     </div>
   )
 }

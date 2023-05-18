@@ -32,10 +32,12 @@ return (
             {label}
         </label>
     }
-             <Switch 
-             checked={value}
-             className={`${Styles ? Styles : 'text-sm font-medium bg-white'} w-full px-6 py-2 focus:outline-none ${border && 'border'} ${border && error ? 'border-red-600': borderColor} `}
-             onChange={onChange} />
+    
+        <label className="switch">
+            <input type="checkbox"              className={`${Styles ? Styles : 'text-sm font-medium bg-white'} w-full px-6 py-2 focus:outline-none ${border && 'border'} ${border && error ? 'border-red-600': borderColor} `}
+            onChange={onChange} checked={value}/>
+            <span className="slider round"></span>
+        </label>
     {error && 
         <small className="text-xs text-red-600">
             { errorMessage }
