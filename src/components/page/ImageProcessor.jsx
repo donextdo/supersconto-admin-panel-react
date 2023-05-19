@@ -83,7 +83,8 @@ function App({imgSrc, onClick, exCoordinates}) {
                 crop,
                 'newFile.jpeg'
             );
-            setCoordinates(prevState => [...prevState, {...crop, index}])
+
+            setCoordinates(prevState => [...prevState, {...crop, croppedImageUrl, index}])
             setCroppedImages(prevState => ([...prevState, {croppedImageUrl, index}]));
         }
     }
