@@ -17,8 +17,7 @@ const Form = ({catelog, setCatelog}) => {
                 const shopData = res.data.map(d => {
                     return {
                         value: d._id,
-                        label: d.shop_name+' - '+d.address.address_line1+' '+d.address.address_line2+' '+d.address.address_line3+
-                        ' '+d.address.city+' '+d.address.postal_code
+                        label: d.shop_name+' - '+d.address.address+' '+d.address.state+' '+d.address.postal_code,
                     }
                 })
                 setShops(shopData);
