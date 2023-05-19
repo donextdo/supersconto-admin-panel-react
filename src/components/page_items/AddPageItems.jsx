@@ -1,10 +1,10 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import TextInput from '../shared/TextInput'
 import Dropdown from '../shared/Dropdown'
 import Textarea from '../shared/Textarea'
 
-const Form = ({pageItem, setPageItem}) => {
+const Form = ({ pageItem, setPageItem }) => {
 
     const [selectedOption, setSelectedOption] = useState(null);
 
@@ -47,7 +47,7 @@ const Form = ({pageItem, setPageItem}) => {
             online_sell: event.target.checked
         })
     }
-    console.log("add", {pageItem})
+    console.log("add", { pageItem })
     return (
 
         <div className='grid grid-cols-2 gap-6'>
@@ -98,6 +98,91 @@ const Form = ({pageItem, setPageItem}) => {
                     onChange={handleChange}
                 />
 
+              
+                <TextInput
+                    label='brand'
+                    border
+                    borderColor='border-gray-600'
+                    name='brand'
+                    value={pageItem.brand}
+                    onChange={handleChange}
+                />
+
+                <TextInput
+                    label='skuNumber'
+                    border
+                    borderColor='border-gray-600'
+                    name='skuNumber'
+                    value={pageItem.skuNumber}
+                    onChange={handleChange}
+                />
+
+                <TextInput
+                    label='type'
+                    border
+                    borderColor='border-gray-600'
+                    name='type'
+                    value={pageItem.type}
+                    onChange={handleChange}
+                />
+
+                <TextInput
+                    label='mfgDate'
+                    border
+                    borderColor='border-gray-600'
+                    name='mfgDate'
+                    value={pageItem.mfgDate}
+                    onChange={handleChange}
+                />
+
+                <TextInput
+                    label='expDate'
+                    border
+                    borderColor='border-gray-600'
+                    name='expDate'
+                    value={pageItem.expDate}
+                    onChange={handleChange}
+                />
+
+                <TextInput
+                    label='discount'
+                    type='number'
+                    border
+                    borderColor='border-gray-600'
+                    name='discount'
+                    value={pageItem.discount}
+                    onChange={handleChange}
+                />
+
+                <TextInput
+                    label='review'
+                    type='number'
+                    border
+                    borderColor='border-gray-600'
+                    name='review'
+                    value={pageItem.review}
+                    onChange={handleChange}
+                />
+
+                <TextInput
+                    label='life'
+                    border
+                    borderColor='border-gray-600'
+                    name='life'
+                    value={pageItem.life}
+                    onChange={handleChange}
+                />
+
+                <TextInput
+                    label='popularity'
+                    type='number'
+                    border
+                    borderColor='border-gray-600'
+                    name='popularity'
+                    value={pageItem.popularity}
+                    onChange={handleChange}
+                />
+
                 <div className='flex items-center justify-start gap-2'>
 
                     <label htmlFor="checkbox" className='text-sm font-medium text-gray-900'>Selling online</label>
@@ -114,7 +199,7 @@ const Form = ({pageItem, setPageItem}) => {
             </div>
 
             <div>
-                <img src={pageItem.product_image} alt="" className='w-full h-full object-contain'/>
+                <img src={pageItem.product_image} alt="" className='w-full h-full object-contain' />
             </div>
         </div>
 

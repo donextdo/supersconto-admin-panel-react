@@ -72,7 +72,18 @@ const PageItems = (props) => {
         toggleModal()
     }
 
-   
+    const handleSaveProduct = async (rest) => {
+        try {
+
+            const res = await axios.post(`${baseUrl}/product/insert`,rest)
+            console.log(res.data)
+
+      
+          } catch (error) {
+            console.log(error)
+          }
+
+    }
 
     const onSave = async () => {
         try {
@@ -136,6 +147,7 @@ const PageItems = (props) => {
                 {modal &&
                     <Modal
                         width='w-[60vw]'
+                        height='h-[40vw]'
                         onClose={toggleModal}
                         onCancel={onCancel}
                         onSave={onSave}
