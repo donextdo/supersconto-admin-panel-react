@@ -72,6 +72,8 @@ const PageItems = (props) => {
         toggleModal()
     }
 
+   
+
     const onSave = async () => {
         try {
             const {product_image, ...rest} = pageItem
@@ -79,6 +81,8 @@ const PageItems = (props) => {
             formData.append('product_image', await blobToFile(product_image, `${pageItem.product_name}.jpeg`))
             formData.append('data', JSON.stringify(rest))
             console.log({formData, product_image, rest})
+
+            handleSaveProduct(rest)
 
             axios.post(`${baseUrl}/catelog/item`, formData).then(() => {
                 fetchData(page).then(res => {
@@ -91,7 +95,9 @@ const PageItems = (props) => {
                     // TODO
                     console.log(error)
                 })
-            }).catch(error => {
+            })
+
+            .catch(error => {
                 // TODO
                 console.log(error)
             })
