@@ -98,7 +98,7 @@ const Form = ({ pageItem, setPageItem }) => {
                     onChange={handleChange}
                 />
 
-              
+         
                 <TextInput
                     label='brand'
                     border
