@@ -76,6 +76,10 @@ const Form = ({ pageItem, setPageItem }) => {
     console.log("selectedOption: ", selectOption);
   };
 
+  useEffect(() => {
+    console.log("page item : ", pageItem);
+  }, [pageItem]);
+
   const handleCheck = (event) => {
     setPageItem({
       ...pageItem,
