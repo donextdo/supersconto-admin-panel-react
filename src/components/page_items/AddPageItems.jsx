@@ -262,7 +262,7 @@ const Form = ({ pageItem, setPageItem }) => {
         <img
           src={pageItem.product_image}
           alt=""
-          className="w-full h-full object-contain"
+          className="w-[80vw] object-contain"
         />
       </div>
     </div>
