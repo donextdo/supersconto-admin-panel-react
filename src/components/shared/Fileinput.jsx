@@ -12,6 +12,12 @@ const Fileinput = ({
   onChange,
 }) => {
   const [url, setUrl] = useState();
+  useEffect(() => {
+      if (value && typeof value === 'string'){
+          setUrl(value)
+      }
+  }, [value])
+
 
   return (
     <div className="flex flex-wrap gap-2 items-start">
