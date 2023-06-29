@@ -20,7 +20,7 @@ const Form = ({ pageItem, setPageItem }) => {
       setviewSubCategory(response.data.subCategories);
     };
     fetchData();
-  }, [viewCategory, viewSubCategory]);
+  }, []);
 
   const categories = [
     {
