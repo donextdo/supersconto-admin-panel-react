@@ -120,6 +120,8 @@ const Order = () => {
     renderShopTables(groupedItemsData); // Render shop tables
   };
 
+  const updateStatus = () => {};
+
   const getShopName = async (shopId) => {
     try {
       const response = await axios.get(`${baseUrl}/shop/find/${shopId}`);
@@ -304,6 +306,9 @@ const Order = () => {
                 </div>
               </div>
               {shopTables}
+              <div>
+                <button>Confirm Order</button>
+              </div>
               {/* <Card>
           <div className="w-full py-4 flex gap-6"></div>
 
