@@ -54,34 +54,34 @@ const Catalog = () => {
 
   const onSave = async () => {
     console.log(catelog)
-    // try {
+    try {
 
-    //   const { _id, ...catalogData } = catelog
+      const { _id, ...catalogData } = catelog
 
-    //   if(!updateMode) {
-    //     await axios.post(`${baseUrl}/catelog/book`, catalogData)
-    //   }
-    //   else {
-    //     await axios.patch(`${baseUrl}/catelog/book/${catelog._id}`, catalogData)
-    //   }
+      if(!updateMode) {
+        await axios.post(`${baseUrl}/catelog/book`, catalogData)
+      }
+      else {
+        await axios.patch(`${baseUrl}/catelog/book/${catelog._id}`, catalogData)
+      }
       
-    //   fetchData()
+      fetchData()
 
-    //   setCatelog({
-    //     _id: '',
-    //     shop_id: '',
-    //     title: '',
-    //     description: '',
-    //     expiredate: ''
-    //   })
+      setCatelog({
+        _id: '',
+        shop_id: '',
+        title: '',
+        description: '',
+        expiredate: ''
+      })
 
-    //   setModal(!modal)
-    //   return toast.success('Data saved successfully')
+      setModal(!modal)
+      return toast.success('Data saved successfully')
 
-    // } catch (error) {
-    //   console.log(error)
-    //   toast.error(error.message)
-    // }
+    } catch (error) {
+      console.log(error)
+      toast.error(error.message)
+    }
   }
 
   const onCancel = () => {

@@ -24,7 +24,7 @@ return (
 
     <input
         type={type ? type : 'text'}
-        value={value}
+        value={value ?? undefined}
         name={name}
         className={`${Styles ? Styles : 'text-sm font-medium bg-white'} w-full h-10 bg-gray-100 rounded-md px-6 focus:outline-none shadow-xs ${border && 'border border-gray-300'} ${border && error ? 'border-red-600': borderColor} `}
         placeholder={placeholder}
