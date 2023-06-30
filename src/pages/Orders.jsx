@@ -38,8 +38,9 @@ const Order = () => {
 
   async function fetchData() {
     try {
-      const { data } = await axios.get(`${baseUrl}/order`);
+      const { data } = await axios.get(`${baseUrl}/neworder`);
       setOrderData(data);
+      console.log("status : ", data);
     } catch (error) {
       console.log(error);
     }
@@ -94,6 +95,9 @@ const Order = () => {
   const [groupedItems, setGroupedItems] = useState({}); // Define groupedItems state
   const [shopTables, setShopTables] = useState([]); // Define shopTables state
   const [user, setUser] = useState("");
+  const [orderId, setOrderId] = useState("");
+  const [status, setStatus] = useState("");
+
   const statusOptions = [
     { value: "new", label: "New" },
     { value: "processing", label: "Processing" },
@@ -104,6 +108,8 @@ const Order = () => {
   const toView = async (order) => {
     setOpenViewModal(true);
     setUser(order.billingAddress);
+    setOrderId(order._id);
+    setSelected({ value: order.status, label: order.status });
 
     const groupedItemsData = order.items.reduce((acc, item) => {
       const shopId = item.shopId;
@@ -120,7 +126,35 @@ const Order = () => {
     renderShopTables(groupedItemsData); // Render shop tables
   };
 
-  const updateStatus = () => {};
+  const updateStatus = async () => {
+    try {
+      const response = await axios.put(`${baseUrl}/neworder/${orderId}`, {
+        status: selected.value, // Assuming the selected value represents the new status
+      });
+      // if (response && selected.value === "delivered") {
+      //   console.log("dgyagu");
+      //   console.log("dgyaguyyyyyyyyyyyyyyyyyyy");
+      //   const payload = Object.values(groupedItems).flatMap((items) =>
+      //     items.map((item) => ({
+      //       productId: item.productId,
+      //       orderquantity: item.orderquantity,
+      //     }))
+      //   );
+      //   console.log("payload : ", payload);
+      //   const updateResponse = await axios.patch(
+      //     `${baseUrl}/catelog/item/update/quentity`,
+      //     payload
+      //   );
+      //   console.log("updateResponse:", updateResponse);
+      //   setOpenViewModal(false);
+      //   window.location.reload();
+      // }
+      setOpenViewModal(false);
+      window.location.reload();
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   const getShopName = async (shopId) => {
     try {
@@ -248,7 +282,7 @@ const Order = () => {
                   </TD>
 
                   <TD>CASH ON DELIVERY</TD>
-                  <TD>{order.status == 0 ? "pending" : "shipped"}</TD>
+                  <TD>{order.status}</TD>
                   <TD>{order.totalprice}</TD>
 
                   {/* <TD>{order.paymentMethod}</TD> */}
@@ -290,7 +324,8 @@ const Order = () => {
                 <div className="w-[250px]">
                   <Select
                     options={statusOptions}
-                    defaultValue={statusOptions[0]}
+                    value={selected}
+                    onChange={updateSelect}
                   />
                 </div>
                 <div className="w-[100px] h-[100px] ">
@@ -306,35 +341,14 @@ const Order = () => {
                 </div>
               </div>
               {shopTables}
-              <div>
-                <button>Confirm Order</button>
+              <div className="bg-green-700 w-[200px] h-[50px] ml-6 mt-6 flex justify-items-center rounded-full">
+                <button
+                  className="text-white font-semibold text-[20px] ml-8"
+                  onClick={updateStatus}
+                >
+                  Confirm Order
+                </button>
               </div>
-              {/* <Card>
-          <div className="w-full py-4 flex gap-6"></div>
-
-          <Table>
-            <THead>
-              <TH title={"Shop Id"} />
-              <TH title={"Shop Name"} />
-              <TH title={"Product Name"} />
-              <TH title={"Quantity"} />
-              <TH title={"Payment method"} />
-              <TH title={"Status"} />
-              <TH title={"Total Price"} />
-              <TH title={"Actions"} />
-            </THead>
-
-            <TBody>
-              {items.map((order, index) => {
-                return (
-                  <Row key={index}>
-                    <TD>{order.shopId}</TD>
-                  </Row>
-                );
-              })}
-            </TBody>
-          </Table>
-        </Card> */}
             </div>
           </div>
         </div>
