@@ -1,11 +1,12 @@
-import React, {useEffect, useState} from 'react'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios'
 import TextInput from '../shared/TextInput'
 import Dropdown from '../shared/Dropdown'
 import Textarea from '../shared/Textarea'
+import MySwitch from '../shared/Switch'
 import baseUrl from '../../utils/baseUrl'
 
-const Form = ({catelog, setCatelog}) => {
+const Form = ({ catelog, setCatelog }) => {
 
     const [shops, setShops] = useState([])
     const [defaultValue, setDefaultValue] = useState(null)
@@ -17,7 +18,7 @@ const Form = ({catelog, setCatelog}) => {
                 const shopData = res.data.map(d => {
                     return {
                         value: d._id,
-                        label: d.shop_name+' - '+d.address.address+' '+d.address.state+' '+d.address.postal_code,
+                        label: d.shop_name + ' - ' + d.address.address + ' ' + d.address.state + ' ' + d.address.postal_code,
                     }
                 })
                 setShops(shopData);
@@ -81,6 +82,15 @@ const Form = ({catelog, setCatelog}) => {
                 value={catelog.expiredate.substring(0, 10)}
                 onChange={handleChange}
             />
+
+            {/* <MySwitch
+                label="Featured Flyer"
+                border
+                value={catelog.flyer}
+                onChange={handleChange}
+                borderColor="border-gray-600"
+            /> */}
+
 
         </div>
     )

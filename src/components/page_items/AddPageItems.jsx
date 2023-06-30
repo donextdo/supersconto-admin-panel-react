@@ -157,6 +157,7 @@ const Form = ({ pageItem, setPageItem }) => {
                 <TextInput
                     label='review'
                     type='number'
+                    max={5}
                     border
                     borderColor='border-gray-600'
                     name='review'

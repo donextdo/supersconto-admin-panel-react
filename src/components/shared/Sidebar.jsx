@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import logo from '../../assets/logo.jpg'
+import logo from '../../assets/logo.png'
 import { Link, useLocation } from 'react-router-dom'
 import {ChartPieIcon } from '@heroicons/react/solid'
 import { FaShopify,FaFirstOrder,FaList } from "react-icons/fa";
@@ -32,9 +32,9 @@ useEffect(() => {
 }, [pathname])
 
   return (
-    <div className={`${ minimize ? 'w-16' : 'w-56'} fixed left-0 top-0 bottom-0 h-screen bg-slate-900 flex flex-col gap-10 text-white`}>
+    <div className={`${ minimize ? 'w-16' : 'w-56'} fixed left-0 top-0 bottom-0 h-screen bg-green-900 flex flex-col gap-10 text-white`}>
     
-        <div className="w-full h-20 border-b border-slate-700 flex items-center px-4 py-3">
+        <div className="w-full h-20 border-b border-slate-700 flex items-center px-4 py-3 bg-white">
 
             <img src={logo} alt="" />
 

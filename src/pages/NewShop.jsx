@@ -32,6 +32,9 @@ const NewShop = () => {
   const [selectedPlace, setSelectedPlace] = useState(null);
   const [location, setLocation] = useState(null);
   const [hide, setHide] = useState(false);
+  const [shopNameError, setShopNameError] = useState('');
+  const [addressError, setAddressError] = useState('');
+
 
   const [isEdit, setIsEdit] = useState(false);
   async function fetchData() {
@@ -122,24 +125,27 @@ const NewShop = () => {
     setbodyFormData(formData);
     console.log("ggggg : ", formData);
 
-    await axios({
-      method: "post",
-      url: `${baseUrl}/shop`,
-      data: bodyFormData,
-      headers: { "Content-Type": "multipart/form-data" },
-    })
-      .then((response) => {
-        setAlertError(false);
-
-        console.log(response.data);
-        fetchData();
-        return toast.success("Data inserted successfully");
+      await axios({
+        method: "post",
+        url: `${baseUrl}/shop`,
+        data: bodyFormData,
+        headers: { "Content-Type": "multipart/form-data" },
       })
-      .catch(function (error) {
-        console.log(" error", error);
-        return toast.error(error.message);
-      });
-    toggleModal();
+        .then((response) => {
+          setAlertError(false);
+  
+          console.log(response.data);
+          fetchData();
+          return toast.success("Data inserted successfully");
+        })
+        .catch(function (error) {
+          console.log(" error", error);
+          return toast.error(error.message);
+        });
+      toggleModal();
+    
+
+    
   };
 
   const CurrentData = (data) => {
@@ -238,7 +244,25 @@ const NewShop = () => {
       setFormData((prevState) => {
         return { ...prevState, [name]: e.target.value };
       });
+
+      if (e.target.value === '') {
+        if(name === 'shop_name'){
+          setShopNameError('Shop name cannot be empty');
+        }
+        if ( name === 'address') {
+          setAddressError('Shop name cannot be empty');
+        } 
+        
+      } else {
+        if(name === 'shop_name') {
+          setShopNameError('');
+        } 
+        if ( name === 'address')  {
+          setAddressError('');
+        }
+      }
   };
+
   const updateImg = (name, e) => {
     setFormData((prevState) => {
       return { ...prevState, [name]: e.target.files[0] };
@@ -323,13 +347,17 @@ const NewShop = () => {
               <div className="flex-1">
                 <TextInput
                   label="Shop Name"
-                  border
+                  border="border-green-600"
                   value={formData.shop_name}
                   onChange={(e) => update("shop_name", e)}
                   borderColor="border-gray-600"
+                  required
                 />
+
               </div>
             </div>
+            {shopNameError && <div className='text-red-500'>{shopNameError}</div>}
+
             <div className="flex gap-4">
               <div className="flex-1">
                 <TextInput
@@ -352,6 +380,7 @@ const NewShop = () => {
                   }}
                   border
                   borderColor="border-gray-600"
+                  required
                 />
                 {predictions.length > 0 && !hide && (
                   <ul className="mb-4">

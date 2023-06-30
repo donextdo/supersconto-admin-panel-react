@@ -53,8 +53,8 @@ export const ButtonSuccess = ({disabled, children, padding, wfull, id, type, onC
         <button 
           className={`${padding ? padding : 'py-2 px-6'} 
           ${wfull && 'w-full'} 
-          bg-green-600 text-white text-sm font-medium flex items-center justify-center gap-3
-          hover:bg-green-800`} 
+          bg-blue-500 text-white text-sm font-medium flex items-center justify-center gap-3 rounded-md
+          hover:bg-blue-700`} 
           id={id} 
           type={type ? type : "button"} 
           onClick={onClick}
@@ -71,8 +71,8 @@ export const ButtonSuccess = ({disabled, children, padding, wfull, id, type, onC
         <button 
           className={`${padding ? padding : 'py-2 px-6'} 
           ${wfull && 'w-full'} 
-          bg-gray-600 text-white text-sm font-medium flex items-center justify-center gap-3
-          hover:bg-gray-900`} 
+          bg-[#7d829c] text-white text-sm font-medium flex items-center justify-center gap-3 rounded-md
+          hover:bg-[#5b5e6d]`} 
           id={id} 
           type={type ? type : "button"} 
           onClick={onClick}

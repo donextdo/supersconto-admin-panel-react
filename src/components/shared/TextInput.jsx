@@ -9,7 +9,9 @@ const TextInput = ({
     border, 
     borderColor, 
     placeholder, 
-    onChange
+    onChange,
+    required,
+    max
 }) => {
 return (
 <div className='flex flex-col gap-2 items-start'>
@@ -24,9 +26,11 @@ return (
         type={type ? type : 'text'}
         value={value}
         name={name}
-        className={`${Styles ? Styles : 'text-sm font-medium bg-white'} w-full px-6 py-2 focus:outline-none ${border && 'border'} ${border && error ? 'border-red-600': borderColor} `}
+        className={`${Styles ? Styles : 'text-sm font-medium bg-white'} w-full h-10 bg-gray-100 rounded-md px-6 focus:outline-none shadow-xs ${border && 'border border-gray-300'} ${border && error ? 'border-red-600': borderColor} `}
         placeholder={placeholder}
         onChange={onChange}
+        required = {required}
+        max={max}
     />
 
     {error && 
