@@ -8,7 +8,7 @@ import { ButtonSuccess, ButtonNormal } from "../components/shared/Button";
 import { FcClearFilters } from "react-icons/fc";
 import baseUrl from "../utils/baseUrl";
 import Dropdown from "../components/shared/Dropdown";
-import { FaTrash } from "react-icons/fa";
+import { FaTrash,FaSearch } from "react-icons/fa";
 import { PencilAltIcon } from "@heroicons/react/solid";
 import { FaRegHandPointRight } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
@@ -157,6 +157,7 @@ const Order = () => {
   };
 
   const getShopName = async (shopId) => {
+    console.log(shopId)
     try {
       const response = await axios.get(`${baseUrl}/shop/find/${shopId}`);
       return response.data.shop_name;
@@ -164,6 +165,17 @@ const Order = () => {
       console.log(error);
     }
   };
+
+  const getShopAddress = async (shopId) => {
+    console.log(shopId)
+    try {
+      const response = await axios.get(`${baseUrl}/shop/find/${shopId}`);
+      return response.data.address.address;
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
 
   const getProductName = async (prodId) => {
     try {
@@ -200,7 +212,9 @@ const Order = () => {
   const renderShopTables = async (groupedItemsData) => {
     const tables = await Promise.all(
       Object.entries(groupedItemsData).map(async ([shopId, items]) => {
+        console.log(items)
         const shopName = await getShopName(shopId);
+        const shopAddress = await getShopAddress(shopId);
         const productPromises = items.map(async (order) => {
           const productName = await getProductName(order.productId);
           const categoryName = await getCategoryName(
@@ -213,12 +227,15 @@ const Order = () => {
         });
         const products = await Promise.all(productPromises);
 
+
+       
+
         return (
           <Card key={shopId}>
             <div className="w-full py-4 flex gap-6"></div>
             {/* <h3>Shop ID: {shopId}</h3> */}
             <h3 className="text-white text-2xl font-bold p-2 border border-green-500 bg-green-500">
-              {shopName}
+              {shopName} - {shopAddress}
             </h3>
             <Table>
               <THead>
@@ -249,64 +266,81 @@ const Order = () => {
   const handleclose = () => {
     setOpenViewModal(false);
   };
+  const categorizedData = orderData.reduce((acc, order) => {
+    const OrderName = order.billingAddress.billingFirstName + ", " + `${order.billingAddress.apartment}, ${order.billingAddress.street}, ${order.billingAddress.state}, ${order.billingAddress.town}`
 
+    // If the shop category doesn't exist, create a new array for it
+    if (!acc[OrderName]) {
+      acc[OrderName] = [];
+    }
+
+    // Push the order item into the corresponding shop category array
+    acc[OrderName].push(order);
+
+    return acc;
+  }, {});
   return (
     <div>
       <Card>
         <div className="w-full py-4 flex gap-6"></div>
 
-        <Table>
-          <THead>
-            <TH title={"Order Id"} />
-            <TH title={"Date"} />
-            <TH title={"Customer Name"} />
+        {Object.entries(categorizedData).map(([OrderName, orders]) => (
+          <div key={OrderName}>
+            <h3 className="h-10 w-full bg-green-100 mt-4 p-1">{OrderName}</h3>
+            <Table>
+              <THead>
+                <TH title={"Order Id"} />
+                <TH title={"Date"} />
+                <TH title={"Customer Name"} />
 
-            <TH title={"Billing Address"} />
-            <TH title={"Payment method"} />
-            <TH title={"Status"} />
-            <TH title={"Total Price"} />
-            <TH title={"Actions"} />
-          </THead>
+                <TH title={"Billing Address"} />
+                <TH title={"Payment method"} />
+                <TH title={"Status"} />
+                <TH title={"Total Price"} />
+                <TH title={"Actions"} />
+              </THead>
 
-          <TBody>
-            {orderData.map((order) => {
-              return (
-                <Row key={order._id}>
-                  <TD>{order.orderNumber}</TD>
-                  <TD>{order.date}</TD>
+              <TBody>
+                {orders.map((order) => {
+                  return (
+                    <Row key={order._id}>
+                      <TD>{order.orderNumber}</TD>
+                      <TD>{order.date}</TD>
 
-                  <TD>{order.billingAddress.billingFirstName}</TD>
+                      <TD>{order.billingAddress.billingFirstName}</TD>
 
-                  <TD>
-                    {`${order.billingAddress.apartment}, ${order.billingAddress.street}, ${order.billingAddress.state}, ${order.billingAddress.town}`}
-                  </TD>
+                      <TD>
+                        {`${order.billingAddress.apartment}, ${order.billingAddress.street}, ${order.billingAddress.state}, ${order.billingAddress.town}`}
+                      </TD>
 
-                  <TD>CASH ON DELIVERY</TD>
-                  <TD>{order.status}</TD>
-                  <TD>{order.totalprice}</TD>
+                      <TD>CASH ON DELIVERY</TD>
+                      <TD>{order.status}</TD>
+                      <TD>{order.totalprice}</TD>
 
-                  {/* <TD>{order.paymentMethod}</TD> */}
-                  <TD>
-                    <div className="w-full h-full flex items-center justify-center gap-4">
-                      <FaRegHandPointRight
-                        onClick={() => toView(order)}
-                        className="w-4 h-4 fill-green-500 cursor-pointer"
-                      />
-                      <PencilAltIcon
-                        onClick={() => toUpdate(order)}
-                        className="w-4 h-4 fill-blue-500 cursor-pointer"
-                      />
-                      <FaTrash
-                        onClick={() => onDelete(order._id)}
-                        className="w-3 h-3 fill-red-500 cursor-pointer"
-                      />
-                    </div>
-                  </TD>
-                </Row>
-              );
-            })}
-          </TBody>
-        </Table>
+                      {/* <TD>{order.paymentMethod}</TD> */}
+                      <TD>
+                        <div className="w-full h-full flex items-center justify-center gap-4">
+                          <FaSearch
+                            onClick={() => toView(order)}
+                            className="w-4 h-4 fill-green-500 cursor-pointer"
+                          />
+                          {/* <PencilAltIcon
+                            onClick={() => toUpdate(order)}
+                            className="w-4 h-4 fill-blue-500 cursor-pointer"
+                          />
+                          <FaTrash
+                            onClick={() => onDelete(order._id)}
+                            className="w-3 h-3 fill-red-500 cursor-pointer"
+                          /> */}
+                        </div>
+                      </TD>
+                    </Row>
+                  );
+                })}
+              </TBody>
+            </Table>
+          </div>
+        ))}
       </Card>
       {openViewModal && (
         <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900 bg-opacity-50">
@@ -328,16 +362,20 @@ const Order = () => {
                     onChange={updateSelect}
                   />
                 </div>
-                <div className="w-[100px] h-[100px] ">
-                  {user.billingFirstName}
-                  <br />
-                  {user.apartment}
-                  <br />
-                  {user.state}
-                  <br />
-                  {user.street}
-                  <br />
-                  {user.town}
+                <div>
+                  <p className="text-gray-500 font-semibold text-lg">Customer Address</p>
+                  <div className="w-[100px] h-[100px] ">
+
+                    {user.billingFirstName}
+                    <br />
+                    {user.apartment}
+                    <br />
+                    {user.state}
+                    <br />
+                    {user.street}
+                    <br />
+                    {user.town}
+                  </div>
                 </div>
               </div>
               {shopTables}
