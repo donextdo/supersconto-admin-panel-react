@@ -303,6 +303,7 @@ const Shop = () => {
                   value={formData.shop_name}
                   onChange={(e) => update("shop_name", e)}
                   borderColor="border-gray-600"
+                  
                 />
               </div>
               {/* <div className="flex-1">

@@ -13,7 +13,7 @@ function CroppedItemsPreview({cropImageUrl, handleRemove}) {
     };
 
     return (
-        <div className="previewer">
+        <div className="previewer flex flex-col justify-end">
             {cropImageUrl.length > 0 ?
                 <Slider {...settings}>
                     {

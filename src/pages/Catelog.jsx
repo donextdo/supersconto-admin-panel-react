@@ -23,7 +23,8 @@ const Catalog = () => {
     shop_id: '',
     title: '',
     description: '',
-    expiredate: ''
+    expiredate: '',
+    // flyer: false
   })
     
   useEffect( () => {
@@ -52,6 +53,7 @@ const Catalog = () => {
   }
 
   const onSave = async () => {
+    console.log(catelog)
     try {
 
       const { _id, ...catalogData } = catelog

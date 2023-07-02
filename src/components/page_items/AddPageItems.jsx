@@ -1,272 +1,248 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import TextInput from "../shared/TextInput";
-import Dropdown from "../shared/Dropdown";
-import Textarea from "../shared/Textarea";
-import baseUrl from "../../utils/baseUrl";
+import React, {useEffect, useRef, useState} from 'react'
+import axios from 'axios'
+import TextInput from '../shared/TextInput'
+import Dropdown from '../shared/Dropdown'
+import Textarea from '../shared/Textarea'
+import baseUrl from "../../utils/baseUrl.js";
 
-const Form = ({ pageItem, setPageItem }) => {
-  const [selectedOption, setSelectedOption] = useState(null);
-  const [viewCategory, setviewCategory] = useState([]);
-  const [viewSubCategory, setviewSubCategory] = useState([]);
-  const [viewSubCategoryList, setviewSubCategoryList] = useState([]);
-  const [selectedCategory, setSelectedCategory] = useState(null);
-  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+const Form = ({pageItem, setPageItem}) => {
 
-  useEffect(() => {
-    const fetchData = async () => {
-      const response = await axios.get(`${baseUrl}/category/categories`);
-      setviewCategory(response.data.mainCategories);
-      setviewSubCategory(response.data.subCategories);
-    };
-    fetchData();
-  }, [viewCategory, viewSubCategory]);
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [categories, setCategories] = useState([])
+    const subList = useRef([])
+    const [subCategories, setSubCategories] = useState([])
 
-  const categories = [
-    {
-      label: "Foods",
-      value: "foods",
-    },
-    {
-      label: "Clothes",
-      value: "clothes",
-    },
-    {
-      label: "Gifts",
-      value: "gifts",
-    },
-    {
-      label: "Electronics",
-      value: "electronics",
-    },
-  ];
+    useEffect(() => {
+        axios
+            .get(`${baseUrl}/category/categories`)
+            .then((res) => {
+                setCategories(categoryMapper(res.data?.mainCategories) ?? [])
+                setSubCategories(categoryMapper(res.data?.subCategories) ?? [])
+                subList.current = categoryMapper(res.data?.subCategories) ?? []
 
-  const handleChange = (e) => {
-    setPageItem({
-      ...pageItem,
-      [e.target.name]: e.target.value,
-    });
-  };
+            })
+            .catch((error) => {
+                // TODO
+                console.log(error);
+            });
+    }, [])
 
-  const handleDropDownChange = (selectedOption) => {
-    setSelectedCategory(selectedOption);
-    setPageItem({
-      ...pageItem,
-      product_category: selectedOption.value,
-    });
+    useEffect(() => {
+        const filteredSubCats = subList.current.filter(sub => sub.mainCategoryId === pageItem.product_category) ?? []
+        setSubCategories(filteredSubCats)
+        console.log("eff", {pageItem, filteredSubCats, ref: subList.current})
 
-    const filterSubCat = viewSubCategory.filter(
-      (category) => category.mainCategoryId === selectedOption.value
-    );
-    if (filterSubCat && filterSubCat.length > 0) {
-      setviewSubCategoryList(filterSubCat);
-      console.log("sub sub sub : ", viewSubCategoryList);
-    } else {
-      setviewSubCategoryList([]);
+    }, [pageItem])
+
+    const categoryMapper = (array = []) => {
+        if (array.length > 0) {
+            return array.map((cat) => {
+                const data = {value: cat._id, label: cat.name}
+                if (cat.mainCategoryId) {
+                    data.mainCategoryId = cat.mainCategoryId
+                }
+                return data
+            })
+        }
+        return []
     }
-  };
 
-  const handleDropDownChangeSubCat = (selectOption) => {
-    setSelectedSubCategory(selectOption);
-    setPageItem({
-      ...pageItem,
-      product_sub_category: selectOption.value,
-    });
+    const handleChange = (e) => {
+        setPageItem({
+            ...pageItem,
+            [e.target.name]: e.target.value
+        })
+    }
 
-    console.log("selectedOption: ", selectOption);
-  };
+    const handleDropDownChange = (selectedOption) => {
+        setPageItem({
+            ...pageItem,
+            product_category: selectedOption.value
+        })
+    }
 
-  useEffect(() => {
-    console.log("page item : ", pageItem);
-  }, [pageItem]);
+    const handleDropDownSubChange = (selectedOption) => {
+        setPageItem({
+            ...pageItem,
+            product_sub_category: selectedOption.value
+        })
+    }
 
-  const handleCheck = (event) => {
-    setPageItem({
-      ...pageItem,
-      online_sell: event.target.checked,
-    });
-  };
-  return (
-    <div className="grid grid-cols-2 gap-6">
-      <div className="flex flex-col gap-4">
-        <TextInput
-          label="Product Name"
-          border
-          borderColor="border-gray-600"
-          name={"product_name"}
-          value={pageItem.product_name}
-          onChange={handleChange}
-        />
+    const handleCheck = (event) => {
+        setPageItem({
+            ...pageItem,
+            online_sell: event.target.checked
+        })
+    }
 
-        <Dropdown
-          label="Select category"
-          //   value={viewCategory.find(
-          //     (cat) => cat.name === pageItem.product_category
-          //   )}
-          //   options={viewCategory}
-          //   onChange={handleDropDownChange}
-          value={selectedCategory}
-          options={viewCategory.map((category) => ({
-            value: category._id,
-            label: category.name,
-          }))}
-          onChange={handleDropDownChange}
-        />
+    console.log("render", {pageItem})
+    return (
 
-        <Dropdown
-          label="Select Sub category"
-          //   value={viewCategory.find(
-          //     (cat) => cat.name === pageItem.product_category
-          //   )}
-          //   options={viewCategory}
-          //   onChange={handleDropDownChange}
-          value={selectedSubCategory}
-          options={viewSubCategoryList.map((category) => ({
-            value: category._id,
-            label: category.name,
-          }))}
-          onChange={handleDropDownChangeSubCat}
-        />
+        <div className='grid grid-cols-2 gap-6'>
+            <div className='flex flex-col gap-4'>
 
-        <Textarea
-          label="Description"
-          border
-          borderColor="border-gray-600"
-          name={"product_description"}
-          value={pageItem.product_description}
-          onChange={handleChange}
-        />
+                <TextInput
+                    label='Product Name'
+                    border
+                    borderColor='border-gray-600'
+                    name={'product_name'}
+                    value={pageItem.product_name}
+                    onChange={handleChange}
+                />
 
-        <TextInput
-          label="Quantity"
-          type={"number"}
-          border
-          borderColor="border-gray-600"
-          name={"quantity"}
-          value={pageItem.quantity}
-          onChange={handleChange}
-        />
+                <Dropdown
+                    label='Select Main category'
+                    defaultValue={categories.find(cat => cat.value === pageItem.product_category)}
+                    value={categories.find(cat => cat.value === pageItem.product_category)}
+                    options={categories}
+                    onChange={handleDropDownChange}
+                />
 
-        <TextInput
-          label="Unit price"
-          type={"number"}
-          border
-          borderColor="border-gray-600"
-          name={"unit_price"}
-          value={pageItem.unit_price}
-          onChange={handleChange}
-        />
+                <Dropdown
+                    label='Select sub category'
+                    defaultValue={subCategories.find(cat => cat.value === pageItem.product_sub_category)}
+                    value={subCategories.find(cat => cat.value === pageItem.product_sub_category)}
+                    options={subCategories}
+                    onChange={handleDropDownSubChange}
+                />
 
-        <TextInput
-          label="brand"
-          border
-          borderColor="border-gray-600"
-          name="brand"
-          value={pageItem.brand}
-          onChange={handleChange}
-        />
+                <Textarea
+                    label='Description'
+                    border
+                    borderColor='border-gray-600'
+                    name={'product_description'}
+                    value={pageItem.product_description}
+                    onChange={handleChange}
+                />
 
-        <TextInput
-          label="skuNumber"
-          border
-          borderColor="border-gray-600"
-          name="skuNumber"
-          value={pageItem.skuNumber}
-          onChange={handleChange}
-        />
+                <TextInput
+                    label='Quantity'
+                    type={'number'}
+                    border
+                    borderColor='border-gray-600'
+                    name={'quantity'}
+                    value={pageItem.quantity}
+                    onChange={handleChange}
+                />
 
-        <TextInput
-          label="type"
-          border
-          borderColor="border-gray-600"
-          name="type"
-          value={pageItem.type}
-          onChange={handleChange}
-        />
+                <TextInput
+                    label='Unit price'
+                    type={'number'}
+                    border
+                    borderColor='border-gray-600'
+                    name={'unit_price'}
+                    value={pageItem.unit_price}
+                    onChange={handleChange}
+                />
 
-        <TextInput
-          label="mfgDate"
-          border
-          borderColor="border-gray-600"
-          name="mfgDate"
-          value={pageItem.mfgDate}
-          onChange={handleChange}
-        />
 
-        <TextInput
-          label="expDate"
-          border
-          borderColor="border-gray-600"
-          name="expDate"
-          value={pageItem.expDate}
-          onChange={handleChange}
-        />
+                <TextInput
+                    label='brand'
+                    border
+                    borderColor='border-gray-600'
+                    name='brand'
+                    value={pageItem.brand}
+                    onChange={handleChange}
+                />
 
-        <TextInput
-          label="discount"
-          type="number"
-          border
-          borderColor="border-gray-600"
-          name="discount"
-          value={pageItem.discount}
-          onChange={handleChange}
-        />
+                <TextInput
+                    label='skuNumber'
+                    border
+                    borderColor='border-gray-600'
+                    name='skuNumber'
+                    value={pageItem.skuNumber}
+                    onChange={handleChange}
+                />
 
-        <TextInput
-          label="review"
-          type="number"
-          border
-          borderColor="border-gray-600"
-          name="review"
-          value={pageItem.review}
-          onChange={handleChange}
-        />
+                <TextInput
+                    label='type'
+                    border
+                    borderColor='border-gray-600'
+                    name='type'
+                    value={pageItem.type}
+                    onChange={handleChange}
+                />
 
-        <TextInput
-          label="life"
-          border
-          borderColor="border-gray-600"
-          name="life"
-          value={pageItem.life}
-          onChange={handleChange}
-        />
+                <TextInput
+                    label='mfgDate'
+                    border
+                    borderColor='border-gray-600'
+                    name='mfgDate'
+                    value={pageItem.mfgDate}
+                    onChange={handleChange}
+                />
 
-        <TextInput
-          label="popularity"
-          type="number"
-          border
-          borderColor="border-gray-600"
-          name="popularity"
-          value={pageItem.popularity}
-          onChange={handleChange}
-        />
+                <TextInput
+                    label='expDate'
+                    border
+                    borderColor='border-gray-600'
+                    name='expDate'
+                    value={pageItem.expDate}
+                    onChange={handleChange}
+                />
 
-        <div className="flex items-center justify-start gap-2">
-          <label
-            htmlFor="checkbox"
-            className="text-sm font-medium text-gray-900"
-          >
-            Selling online
-          </label>
+                <TextInput
+                    label='discount'
+                    type='number'
+                    border
+                    borderColor='border-gray-600'
+                    name='discount'
+                    value={pageItem.discount}
+                    onChange={handleChange}
+                />
 
-          <input
-            id="checkbox"
-            type="checkbox"
-            checked={pageItem.online_sell}
-            onChange={handleCheck}
-          />
+                <TextInput
+                    label='review'
+                    type='number'
+                    max={5}
+                    border
+                    borderColor='border-gray-600'
+                    name='review'
+                    value={pageItem.review}
+                    onChange={handleChange}
+                />
+
+                <TextInput
+                    label='life'
+                    border
+                    borderColor='border-gray-600'
+                    name='life'
+                    value={pageItem.life}
+                    onChange={handleChange}
+                />
+
+                <TextInput
+                    label='popularity'
+                    type='number'
+                    border
+                    borderColor='border-gray-600'
+                    name='popularity'
+                    value={pageItem.popularity}
+                    onChange={handleChange}
+                />
+
+                <div className='flex items-center justify-start gap-2'>
+
+                    <label htmlFor="checkbox" className='text-sm font-medium text-gray-900'>Selling online</label>
+
+                    <input
+                        id='checkbox'
+                        type="checkbox"
+                        checked={pageItem.online_sell}
+                        onChange={handleCheck}
+                    />
+
+                </div>
+
+            </div>
+
+            <div>
+                <img src={pageItem.product_image} alt="" className='w-full h-full object-contain'/>
+            </div>
         </div>
-      </div>
 
-      <div>
-        <img
-          src={pageItem.product_image}
-          alt=""
-          className="w-[80vw] object-contain"
-        />
-      </div>
-    </div>
-  );
-};
 
-export default Form;
+    )
+}
+
+export default Form

@@ -23,9 +23,9 @@ const Fileinput = ({
     <div className="flex flex-wrap gap-2 items-start">
       <label
         htmlFor="fileinput"
-        className={`px-4 py-3 my-5  flex items-center gap-2 text-white text-sm font-medium ${
+        className={`px-4 py-3 my-5 rounded-md flex items-center gap-2 text-white text-sm font-medium ${
           rounded && rounded
-        } ${color ? color : "bg-blue-500"} cursor-pointer`}
+        } ${color ? color : "bg-green-700"} cursor-pointer`}
       >
         <RiFileAddFill className="w-4 h-4 fill-white" />
         <span>{label}</span>
