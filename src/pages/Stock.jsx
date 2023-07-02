@@ -76,6 +76,20 @@ const Stocks = () => {
     setModal(false);
   };
 
+  const categorizedData = stockData.reduce((acc, stock) => {
+    const shopName = stock.shop_id?.shop_name + ", " + stock.shop_id?.address.address;
+    
+    // If the shop category doesn't exist, create a new array for it
+    if (!acc[shopName]) {
+      acc[shopName] = [];
+    }
+
+    // Push the stock item into the corresponding shop category array
+    acc[shopName].push(stock);
+
+    return acc;
+  }, {});
+
   return (
     <div>
       {/* <Sidebar />
@@ -100,7 +114,9 @@ const Stocks = () => {
             <span>Clear Filter</span>
           </ButtonNormal>
         </div>
-
+        {Object.entries(categorizedData).map(([shopName, stocks]) => (
+        <div key={shopName}>
+          <h3 className="h-10 w-full bg-green-100 mt-4 p-1">{shopName}</h3>
         <Table>
           <THead>
             <TH title={"ID"} />
@@ -114,7 +130,7 @@ const Stocks = () => {
           </THead>
 
           <TBody>
-            {stockData.map((stock) => {
+            {stocks.map((stock) => {
               return (
                 <Row key={stock._id}>
                   <TD>{stock._id}</TD>
@@ -132,6 +148,8 @@ const Stocks = () => {
             })}
           </TBody>
         </Table>
+        </div>
+      ))}
       </Card>
 
       {/* </Content> */}
