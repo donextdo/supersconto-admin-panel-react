@@ -59,6 +59,7 @@ const Pages = () => {
         const files = event.target.files;
         const newImages = [];
 
+        console.log(files)
         for (let i = 0; i < files.length; i++) {
 
             const file = files[i];
@@ -83,14 +84,16 @@ const Pages = () => {
             console.log({pl: pages.length})
             imagePreviews.map(async (img, index) => {
 
+                const dimensions = await getImageDimensions(img)
                 const page_no = currentPageNo + 1 + index
-                console.log({currentPageNo, page_no})
+                console.log({dimensions, currentPageNo, page_no})
 
                 const pageDto = new FormData()
                 console.log(shop)
                 pageDto.append('shop_id', shop)
                 pageDto.append('catelog_book_id', catelog)
                 pageDto.append('page_no', page_no)
+                pageDto.append('dimensions', JSON.stringify(dimensions))
                 pageDto.append('page_image', dataURLtoFile(img, 'page_1'))
 
 
@@ -133,7 +136,27 @@ const Pages = () => {
             console.log(error)
         }
     }
-    console.log("render pages", {pages})
+
+    const getImageDimensions = (url) => {
+        return new Promise((resolve, reject) => {
+            const img = new Image();
+
+            img.onload = function() {
+                const width = img.width;
+                const height = img.height;
+
+                resolve({ width, height });
+            };
+
+            img.onerror = function() {
+                reject(new Error('Failed to load image'));
+            };
+
+            img.src = url;
+        });
+    };
+
+    console.log("render pages", {pages, imagePreviews})
     return (
         <div>
             {/* <Navbar screen/>
@@ -234,7 +257,7 @@ const Pages = () => {
                                                     </Link>
                                                     <FaTrash onClick={() => onDelete(page._id)}
                                                              className='w-3 h-3 fill-red-500 cursor-pointer'/>
-                                                    {/* <PencilAltIcon className='w-4 h-4 fill-blue-500 cursor-pointer'/> */}
+                                                     <PencilAltIcon className='w-4 h-4 fill-blue-500 cursor-pointer'/>
 
                                                 </div>
                                             </TD>
@@ -261,10 +284,10 @@ const Pages = () => {
                                         <img src={page.page_image} alt={page._id}
                                              className='w-full h-full object-contain'/>
                                         </Link>
-                                        {/* <div className='bg-white w-6 h-6 shadow-lg top-4 right-4'> */}
+                                         <div className='bg-white w-6 h-6 shadow-lg top-4 right-4'>
                                         <FaTrash onClick={() => onDelete(page._id)}
                                                  className='w-5 h-5 fill-red-500 cursor-pointer absolute top-4 right-4 m-1 bg-white p-1 rounded-full'/>
-                                        {/* </div> */}
+                                         </div>
                                         <Link to={{
                                             pathname: '/catelog/pages/items',
                                             search: `shop=${page.shop_id}&catelog=${page.catelog_book_id}&page=${page._id}`

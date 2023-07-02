@@ -230,7 +230,7 @@ function App({imgSrc, onClick, exCoordinates}) {
         });
     }
 
-    console.log('image-processor-rendered', {croppedImages,coordinates,crop, exCoordinates})
+    console.log('image-processor-rendered', {croppedImages,coordinates,crop, exCoordinates,imageHeight: imageRef.current?.height, imageWidth:imageRef.current?.width})
 
     return (
         <div className="min-h-screen max-w-[1440px] mx-auto">
