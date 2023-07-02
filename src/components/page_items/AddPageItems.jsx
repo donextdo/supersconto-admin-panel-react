@@ -1,31 +1,51 @@
-import React, { useEffect, useState } from 'react'
+import React, {useEffect, useRef, useState} from 'react'
 import axios from 'axios'
 import TextInput from '../shared/TextInput'
 import Dropdown from '../shared/Dropdown'
 import Textarea from '../shared/Textarea'
+import baseUrl from "../../utils/baseUrl.js";
 
-const Form = ({ pageItem, setPageItem }) => {
+const Form = ({pageItem, setPageItem}) => {
 
     const [selectedOption, setSelectedOption] = useState(null);
+    const [categories, setCategories] = useState([])
+    const subList = useRef([])
+    const [subCategories, setSubCategories] = useState([])
 
-    const categories = [
-        {
-            label: 'Foods',
-            value: 'foods'
-        },
-        {
-            label: 'Clothes',
-            value: 'clothes'
-        },
-        {
-            label: 'Gifts',
-            value: 'gifts',
-        },
-        {
-            label: 'Electronics',
-            value: 'electronics'
+    useEffect(() => {
+        axios
+            .get(`${baseUrl}/category/categories`)
+            .then((res) => {
+                setCategories(categoryMapper(res.data?.mainCategories) ?? [])
+                setSubCategories(categoryMapper(res.data?.subCategories) ?? [])
+                subList.current = categoryMapper(res.data?.subCategories) ?? []
+
+            })
+            .catch((error) => {
+                // TODO
+                console.log(error);
+            });
+    }, [])
+
+    useEffect(() => {
+        const filteredSubCats = subList.current.filter(sub => sub.mainCategoryId === pageItem.product_category) ?? []
+        setSubCategories(filteredSubCats)
+        console.log("eff", {pageItem, filteredSubCats, ref: subList.current})
+
+    }, [pageItem])
+
+    const categoryMapper = (array = []) => {
+        if (array.length > 0) {
+            return array.map((cat) => {
+                const data = {value: cat._id, label: cat.name}
+                if (cat.mainCategoryId) {
+                    data.mainCategoryId = cat.mainCategoryId
+                }
+                return data
+            })
         }
-    ]
+        return []
+    }
 
     const handleChange = (e) => {
         setPageItem({
@@ -41,13 +61,21 @@ const Form = ({ pageItem, setPageItem }) => {
         })
     }
 
+    const handleDropDownSubChange = (selectedOption) => {
+        setPageItem({
+            ...pageItem,
+            product_sub_category: selectedOption.value
+        })
+    }
+
     const handleCheck = (event) => {
         setPageItem({
             ...pageItem,
             online_sell: event.target.checked
         })
     }
-    console.log("add", { pageItem })
+
+    console.log("render", {pageItem})
     return (
 
         <div className='grid grid-cols-2 gap-6'>
@@ -63,10 +91,19 @@ const Form = ({ pageItem, setPageItem }) => {
                 />
 
                 <Dropdown
-                    label='Select category'
+                    label='Select Main category'
+                    defaultValue={categories.find(cat => cat.value === pageItem.product_category)}
                     value={categories.find(cat => cat.value === pageItem.product_category)}
                     options={categories}
                     onChange={handleDropDownChange}
+                />
+
+                <Dropdown
+                    label='Select sub category'
+                    defaultValue={subCategories.find(cat => cat.value === pageItem.product_sub_category)}
+                    value={subCategories.find(cat => cat.value === pageItem.product_sub_category)}
+                    options={subCategories}
+                    onChange={handleDropDownSubChange}
                 />
 
                 <Textarea
@@ -98,7 +135,7 @@ const Form = ({ pageItem, setPageItem }) => {
                     onChange={handleChange}
                 />
 
-         
+
                 <TextInput
                     label='brand'
                     border
@@ -200,7 +237,7 @@ const Form = ({ pageItem, setPageItem }) => {
             </div>
 
             <div>
-                <img src={pageItem.product_image} alt="" className='w-full h-full object-contain' />
+                <img src={pageItem.product_image} alt="" className='w-full h-full object-contain'/>
             </div>
         </div>
 

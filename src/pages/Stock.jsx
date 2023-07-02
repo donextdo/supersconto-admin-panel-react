@@ -38,7 +38,7 @@ const Stocks = () => {
       const shopData = res?.data.map((d) => {
         return {
           value: d._id,
-          label: `${d.shop_name} - ${d.address.address_line1}, ${d.address.city}`,
+          label: `${d.shop_name} - ${d.address.address}`,
         };
       });
       setShops(shopData);
@@ -106,7 +106,6 @@ const Stocks = () => {
             <TH title={"ID"} />
             <TH title={"Item Name"} />
             <TH title={"Shop Name"} />
-            <TH title={"Shop City"} />
             <TH title={"Shop Address"} />
             <TH title={"Unit Price"} />
             <TH title={"Total QTY"} />
@@ -122,7 +121,6 @@ const Stocks = () => {
                   <TD>{stock.product_name}</TD>
 
                   <TD>{stock.shop_id?.shop_name}</TD>
-                  <TD>{stock?.shop_id?.address.city}</TD>
                   <TD>{`${stock.shop_id?.address.address}`}</TD>
                   <TD>{stock.unit_price}</TD>
                   <TD>{stock.quantity}</TD>

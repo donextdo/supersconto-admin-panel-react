@@ -1,35 +1,43 @@
-import React, { useEffect } from 'react'
+import React, {useEffect, useState} from 'react'
 import {Outlet, useLocation, useNavigate} from 'react-router-dom'
-import { Content, Card } from '../components/shared/Utils'
+import {Content, Card} from '../components/shared/Utils'
 import Navbar from '../components/shared/Navbar'
 import Sidebar from '../components/shared/Sidebar'
 
 const Main = (props) => {
 
-const location = useLocation()
-const navigate = useNavigate()
+    const location = useLocation()
+    const navigate = useNavigate()
+    const [isLoggedIn, setIsLoggedIn] = useState(false)
 
-useEffect(() => {
-    console.log(location.pathname)
-    const token = localStorage.getItem('token')
-    if (!token) {
-        navigate('/', { replace: true })
-    }
-}, [])
+    useEffect(() => {
+        console.log(location.pathname)
+        const token = localStorage.getItem('token')
+        if (!token) {
+            setIsLoggedIn(false)
+            navigate('/login')
 
-  return (
-    
-    <>
-        <Sidebar />
-        <Navbar />
+        } else {
+            setIsLoggedIn(true)
+        }
+    }, [])
 
-        <Content>
-            <Outlet/>
-        </Content>
-        
-    </>
-    
-  )
+    return (
+
+        <>{isLoggedIn ?
+            <>
+                <Sidebar/>
+                <Navbar/>
+
+                <Content>
+                    <Outlet/>
+                </Content>
+            </> : <>
+            </>}
+
+        </>
+
+    )
 }
 
 export default Main

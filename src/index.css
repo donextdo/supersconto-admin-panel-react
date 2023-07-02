@@ -41,7 +41,6 @@
 /*apply tailwind styles*/
 .image-processor {
   display: flex;
-  align-items: center;
   justify-content: space-between;
 }
 
