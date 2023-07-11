@@ -24,8 +24,10 @@ const Catalog = () => {
     title: '',
     description: '',
     expiredate: '',
-    // flyer: false
+    flyer: false,
   })
+  const [formError, setFormError] = useState('');
+
     
   useEffect( () => {
       fetchData();
@@ -47,13 +49,21 @@ const Catalog = () => {
       shop_id: '',
       title: '',
       description: '',
-      expiredate: ''
+      expiredate: '',
+      flyer: false
+
     })
     setUpdateMode(false)
   }
 
   const onSave = async () => {
     console.log(catelog)
+    if (catelog.shop_id=="" || catelog.title =='' ) {
+      setFormError('Please fill in the required field marked with an asterisk (*).');
+  }else{
+    
+    setFormError('');
+
     try {
 
       const { _id, ...catalogData } = catelog
@@ -72,7 +82,9 @@ const Catalog = () => {
         shop_id: '',
         title: '',
         description: '',
-        expiredate: ''
+        expiredate: '',
+        flyer: false
+
       })
 
       setModal(!modal)
@@ -82,6 +94,9 @@ const Catalog = () => {
       console.log(error)
       toast.error(error.message)
     }
+  }
+    
+   
   }
 
   const onCancel = () => {
@@ -138,6 +153,7 @@ const Catalog = () => {
                 catelog={catelog}
                 setCatelog={setCatelog}
               />
+                                        {formError && <div className='text-red-500'>{formError}</div>}
 
             </Modal>
           }

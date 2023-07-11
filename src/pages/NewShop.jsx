@@ -1,21 +1,21 @@
 import axios from "axios";
-import {RiAddCircleLine} from "react-icons/ri";
-import {ButtonNormal} from "../components/shared/Button";
+import { RiAddCircleLine } from "react-icons/ri";
+import { ButtonNormal } from "../components/shared/Button";
 import Modal from "../components/shared/Modal";
 import TextInput from "../components/shared/TextInput";
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import Navbar from "../components/shared/Navbar";
 import Sidebar from "../components/shared/Sidebar";
-import {Content, Card} from "../components/shared/Utils";
+import { Content, Card } from "../components/shared/Utils";
 import Fileinput from "../components/shared/Fileinput";
-import {Table, THead, TBody, TH, Row, TD} from "../components/shared/Table";
-import {FaTrash} from "react-icons/fa";
-import {PencilAltIcon} from "@heroicons/react/solid";
+import { Table, THead, TBody, TH, Row, TD } from "../components/shared/Table";
+import { FaTrash } from "react-icons/fa";
+import { PencilAltIcon } from "@heroicons/react/solid";
 import baseUrl from "../utils/baseUrl.js";
 import Alert from "../components/shared/Alert";
 import MySwitch from "../components/shared/Switch";
 import Confirm from "../components/shared/Confirm";
-import {ToastContainer, toast} from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 
 const NewShop = () => {
     const [confirm, setConfirm] = useState(false);
@@ -29,6 +29,12 @@ const NewShop = () => {
     const [formatAddress, setFormatAddress] = useState(null);
     const [predictions, setPredictions] = useState([]);
     const [hide, setHide] = useState(false);
+
+    const [shopNameError, setShopNameError] = useState('')
+    const [formError, setFormError] = useState('');
+
+
+
 
     const [isEdit, setIsEdit] = useState(false);
 
@@ -120,24 +126,32 @@ const NewShop = () => {
     const onSave = async () => {
         console.log("ggggg : ", formData);
 
-        await axios({
-            method: "post",
-            url: `${baseUrl}/shop`,
-            data: setBodyFormData(formData),
-            headers: {"Content-Type": "multipart/form-data"},
-        })
-            .then((response) => {
-                setAlertError(false);
+        if (formData.address == "" || formData.shop_name == "" || formData.logo_img == '') {
+            setFormError('Please fill in the required field marked with an asterisk (*).');
+        } else {
+            setFormError('');
 
-                console.log(response.data);
-                fetchData();
-                return toast.success("Data inserted successfully");
+            await axios({
+                method: "post",
+                url: `${baseUrl}/shop`,
+                data: setBodyFormData(formData),
+                headers: { "Content-Type": "multipart/form-data" },
             })
-            .catch(function (error) {
-                console.log(" error", error);
-                return toast.error(error.message);
-            });
-        toggleModal();
+                .then((response) => {
+                    setAlertError(false);
+
+                    console.log(response.data);
+                    fetchData();
+                    return toast.success("Data inserted successfully");
+                })
+                .catch(function (error) {
+                    console.log(" error", error);
+                    return toast.error(error.message);
+                });
+            toggleModal();
+
+        }
+
     };
 
     const CurrentData = (data) => {
@@ -201,13 +215,14 @@ const NewShop = () => {
     const onClose = () => {
         toggleModal();
     };
+
     const onUpdate = async () => {
         console.log(formData);
         await axios({
             method: "patch",
             url: `${baseUrl}/shop/${sessionStorage.getItem("id")}`,
             data: setBodyFormData(formData),
-            headers: {"Content-Type": "multipart/form-data"},
+            headers: { "Content-Type": "multipart/form-data" },
         })
             .then((response) => {
                 setAlertError(false);
@@ -226,19 +241,31 @@ const NewShop = () => {
     const onCancel = () => {
         setModal(false);
     };
+
     const update = (name, e) => {
         if (name == "is_online_selling") {
             setFormData((prevState) => {
-                return {...prevState, [name]: !prevState.is_online_selling};
+                return { ...prevState, [name]: !prevState.is_online_selling };
             });
         } else
             setFormData((prevState) => {
-                return {...prevState, [name]: e.target.value};
+                return { ...prevState, [name]: e.target.value };
             });
+
+        // if(name=="shop_name"){
+        //     const shopName = e.target.value;
+        //     if (shopName === '') {
+        //         setShopNameError('First name cannot be empty');
+        //     } else {
+        //         setShopNameError('');
+        //     }
+        // }
+
     };
+
     const updateImg = (name, e) => {
         setFormData((prevState) => {
-            return {...prevState, [name]: e.target.files[0]};
+            return { ...prevState, [name]: e.target.files[0] };
         });
     };
 
@@ -252,7 +279,7 @@ const NewShop = () => {
 
         // Call the getPlacePredictions method to fetch location suggestions
         autocompleteService.getPlacePredictions(
-            {input: inputValue},
+            { input: inputValue },
             (predictions, status) => {
                 if (status === window.google.maps.places.PlacesServiceStatus.OK) {
                     setPredictions(predictions);
@@ -269,7 +296,7 @@ const NewShop = () => {
         );
         console.log("placeService: ", placeService);
         placeService.getDetails(
-            {placeId: place_id},
+            { placeId: place_id },
             (placeResult, placeStatus) => {
                 console.log("placeResult: ", placeResult);
 
@@ -282,7 +309,7 @@ const NewShop = () => {
                     const formattedAddress = placeResult.formatted_address;
 
                     setFormData((prevState) => {
-                        return {...prevState, address: formattedAddress,latitude:lat,longitude:lng};
+                        return { ...prevState, address: formattedAddress, latitude: lat, longitude: lng };
                     })
                     setHide(true);
                     console.log("Formatted Address: ", formattedAddress);
@@ -298,7 +325,7 @@ const NewShop = () => {
     return (
         <div>
             <>
-                <ToastContainer/>
+                <ToastContainer />
                 {confirm && (
                     <Confirm
                         onSave={med == "delete" ? toDelete : onUpdate}
@@ -321,14 +348,18 @@ const NewShop = () => {
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <TextInput
-                                    label="Shop Name"
+                                    label="Shop Name *"
                                     border
                                     value={formData.shop_name}
                                     onChange={(e) => update("shop_name", e)}
                                     borderColor="border-gray-600"
+                                    
                                 />
                             </div>
+
                         </div>
+                        {shopNameError && <div className='text-red-500'>{shopNameError}</div>}
+
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <TextInput
@@ -343,7 +374,7 @@ const NewShop = () => {
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <TextInput
-                                    label="Address"
+                                    label="Address *"
                                     value={formData.address}
                                     onChange={(e) => {
                                         update("address", e);
@@ -351,6 +382,7 @@ const NewShop = () => {
                                     }}
                                     border
                                     borderColor="border-gray-600"
+                                    
                                 />
                                 {predictions.length > 0 && !hide && (
                                     <ul className="mb-4">
@@ -369,6 +401,8 @@ const NewShop = () => {
                                 )}
                             </div>
                         </div>
+
+
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <TextInput
@@ -394,10 +428,11 @@ const NewShop = () => {
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <Fileinput
-                                    label={"Logo Image"}
+                                    label={"Logo Image *"}
                                     onChange={(e) => updateImg("logo_img", e)}
                                     value={formData.logo_img}
                                 />
+
                             </div>
                             <div className="flex-1">
                                 <MySwitch
@@ -429,24 +464,26 @@ const NewShop = () => {
                                 />
                             </div>
                         </div>
+                        {formError && <div className='text-red-500'>{formError}</div>}
+
                     </Modal>
                 )}
                 <Card>
                     <div className="w-full py-4 flex gap-6">
                         <ButtonNormal onClick={toggleModal}>
-                            <RiAddCircleLine className="w-5 h-5"/>
+                            <RiAddCircleLine className="w-5 h-5" />
                             <span>Add</span>
                         </ButtonNormal>
                     </div>
                     <Table>
                         <THead>
-                            <TH title={"Id"}/>
-                            <TH title={"Shop Name"}/>
-                            <TH title={"Contact"}/>
-                            <TH title={"Address"}/>
-                            <TH title={"Status"}/>
-                            <TH title={"Logo"}/>
-                            <TH title={"Actions"}/>
+                            <TH title={"Id"} />
+                            <TH title={"Shop Name"} />
+                            <TH title={"Contact"} />
+                            <TH title={"Address"} />
+                            <TH title={"Status"} />
+                            <TH title={"Logo"} />
+                            <TH title={"Actions"} />
                         </THead>
 
                         <TBody>

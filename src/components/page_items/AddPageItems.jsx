@@ -82,7 +82,7 @@ const Form = ({pageItem, setPageItem}) => {
             <div className='flex flex-col gap-4'>
 
                 <TextInput
-                    label='Product Name'
+                    label='Product Name *'
                     border
                     borderColor='border-gray-600'
                     name={'product_name'}
@@ -116,7 +116,7 @@ const Form = ({pageItem, setPageItem}) => {
                 />
 
                 <TextInput
-                    label='Quantity'
+                    label='Quantity *'
                     type={'number'}
                     border
                     borderColor='border-gray-600'
@@ -126,7 +126,7 @@ const Form = ({pageItem, setPageItem}) => {
                 />
 
                 <TextInput
-                    label='Unit price'
+                    label='Unit price *'
                     type={'number'}
                     border
                     borderColor='border-gray-600'

@@ -38,6 +38,13 @@ const Form = ({ catelog, setCatelog }) => {
         })
     }
 
+    const handleTrueFlase = (e) => {
+        setCatelog(prevCatelog => ({
+            ...prevCatelog,
+            flyer: !prevCatelog.flyer,
+          }));
+    }
+
     const handleDropDownChange = (selectedOption) => {
         setCatelog({
             ...catelog,
@@ -49,14 +56,14 @@ const Form = ({ catelog, setCatelog }) => {
         <div className='flex flex-col gap-4'>
 
             <Dropdown
-                label='Select Shop'
+                label='Select Shop *'
                 value={shops.find(shop => shop.value === catelog.shop_id)}
                 options={shops}
                 onChange={handleDropDownChange}
             />
 
             <TextInput
-                label='Title'
+                label='Title *'
                 border
                 borderColor='border-gray-600'
                 name={'title'}
@@ -83,13 +90,14 @@ const Form = ({ catelog, setCatelog }) => {
                 onChange={handleChange}
             />
 
-            {/* <MySwitch
+            <MySwitch
                 label="Featured Flyer"
                 border
                 value={catelog.flyer}
-                onChange={handleChange}
+                onChange={handleTrueFlase}
                 borderColor="border-gray-600"
-            /> */}
+            />
+    
 
 
         </div>

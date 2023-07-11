@@ -38,6 +38,9 @@ const PageItems = (props) => {
         product_image: image, //SET THIS IN IMAGE PROCESSOR
         coordinates: null,
     });
+    const [formError, setFormError] = useState('');
+
+
     const navigate = useNavigate();
     useEffect(() => {
         console.log("api-call");
@@ -92,76 +95,82 @@ const PageItems = (props) => {
     };
 
     const onSave = async () => {
-        try {
-            const {product_image, ...rest} = pageItem;
-            const formData = new FormData();
-            formData.append(
-                "product_image",
-                await blobToFile(product_image, `${pageItem.product_name}.jpeg`)
-            );
-            formData.append("data", JSON.stringify(rest));
-            console.log({formData, product_image, rest});
-
-            handleSaveProduct(rest);
-
-            if (!rest.id) {
-                axios
-                    .post(`${baseUrl}/catelog/item`, formData)
-                    .then(() => {
-                        fetchData(page)
-                            .then((res) => {
-                                setPageData(res?.data);
-                                setExCoordinates(
-                                    res?.data?.items
-                                        .map((it) => ({
-                                            ...it.coordinates,
-                                            id: it._id,
-                                        }))
-                                        .flatMap((a) => a) ?? []
-                                );
-                            })
-                            .catch((error) => {
-                                // TODO
-                                console.log(error);
-                            });
-                    })
-
-                    .catch((error) => {
-                        // TODO
-                        console.log(error);
-                    });
-            } else {
-                axios
-                    .patch(`${baseUrl}/catelog/item/${rest.id}`, rest)
-                    .then(() => {
-                        fetchData(page)
-                            .then((res) => {
-                                setPageData(res?.data);
-                                setExCoordinates(
-                                    res?.data?.items
-                                        .map((it) => ({
-                                            ...it.coordinates,
-                                            id: it._id,
-                                        }))
-                                        .flatMap((a) => a) ?? []
-                                );
-                            })
-                            .catch((error) => {
-                                // TODO
-                                console.log(error);
-                            });
-                    })
-
-                    .catch((error) => {
-                        // TODO
-                        console.log(error);
-                    });
+        if (pageItem.product_name=="" || pageItem.unit_price ==0 || pageItem.quantity==0) {
+            setFormError('Please fill in the required field marked with an asterisk (*).');
+        }else{
+            setFormError('');
+            try {
+                const {product_image, ...rest} = pageItem;
+                const formData = new FormData();
+                formData.append(
+                    "product_image",
+                    await blobToFile(product_image, `${pageItem.product_name}.jpeg`)
+                );
+                formData.append("data", JSON.stringify(rest));
+                console.log({formData, product_image, rest});
+    
+                handleSaveProduct(rest);
+    
+                if (!rest.id) {
+                    axios
+                        .post(`${baseUrl}/catelog/item`, formData)
+                        .then(() => {
+                            fetchData(page)
+                                .then((res) => {
+                                    setPageData(res?.data);
+                                    setExCoordinates(
+                                        res?.data?.items
+                                            .map((it) => ({
+                                                ...it.coordinates,
+                                                id: it._id,
+                                            }))
+                                            .flatMap((a) => a) ?? []
+                                    );
+                                })
+                                .catch((error) => {
+                                    // TODO
+                                    console.log(error);
+                                });
+                        })
+    
+                        .catch((error) => {
+                            // TODO
+                            console.log(error);
+                        });
+                } else {
+                    axios
+                        .patch(`${baseUrl}/catelog/item/${rest.id}`, rest)
+                        .then(() => {
+                            fetchData(page)
+                                .then((res) => {
+                                    setPageData(res?.data);
+                                    setExCoordinates(
+                                        res?.data?.items
+                                            .map((it) => ({
+                                                ...it.coordinates,
+                                                id: it._id,
+                                            }))
+                                            .flatMap((a) => a) ?? []
+                                    );
+                                })
+                                .catch((error) => {
+                                    // TODO
+                                    console.log(error);
+                                });
+                        })
+    
+                        .catch((error) => {
+                            // TODO
+                            console.log(error);
+                        });
+                }
+    
+                toggleModal();
+            } catch (error) {
+                console.log(error);
             }
-
-            toggleModal();
-        } catch (error) {
-            console.log(error);
         }
+        
     };
 
     async function blobToFile(theBlob, fileName) {
@@ -200,6 +209,9 @@ const PageItems = (props) => {
                             title="Add page product"
                         >
                             <AddPageItems pageItem={pageItem} setPageItem={setPageItem}/>
+
+                            {formError && <div className='text-red-500'>{formError}</div>}
+
                         </Modal>
                     )}
 

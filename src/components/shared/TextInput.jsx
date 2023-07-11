@@ -10,8 +10,8 @@ const TextInput = ({
     borderColor, 
     placeholder, 
     onChange,
+    max,
     required,
-    max
 }) => {
 return (
 <div className='flex flex-col gap-2 items-start'>
