@@ -43,8 +43,9 @@ const Login = () => {
                 role
             })
 
+            console.log({data})
             localStorage.setItem('token', data.token)
-            sessionStorage.setItem('user', data.user)
+            sessionStorage.setItem('user', btoa(JSON.stringify(data.user)))
             navigate('/')
 
         } catch (error) {

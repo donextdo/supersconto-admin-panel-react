@@ -31,10 +31,28 @@ const NewShop = () => {
     const [hide, setHide] = useState(false);
 
     const [isEdit, setIsEdit] = useState(false);
+    const userData = sessionStorage.getItem("user") ? JSON.parse(atob(sessionStorage.getItem("user"))) : null
+    const token = localStorage.getItem("token") ? localStorage.getItem("token") : null
+    console.log({userData})
 
     async function fetchData() {
         try {
-            const res = await axios.get(`${baseUrl}/shop`);
+            let res = []
+
+            if (userData){
+                if (userData?.userType === 0) {
+                    res = await axios.get(`${baseUrl}/shop`);
+                } else {
+                    res = await axios.get(`${baseUrl}/shop/by-vendor/${userData?._id}`, {
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Access-Control-Allow-Origin': '*',
+                            'Authorization': `Bearer ${token}`,
+                            'Accept': "application/json"
+                        }
+                    });
+                }
+            }
             setData(res.data);
             console.log("data : ", data);
         } catch (err) {
@@ -62,7 +80,6 @@ const NewShop = () => {
         is_online_selling: false,
         province: "",
         municipality: "",
-
         telephone: "",
     });
 
@@ -113,12 +130,14 @@ const NewShop = () => {
         bodyFormData.append("shop_category", formData.shop_category);
         bodyFormData.append("is_online_selling", formData.is_online_selling);
         bodyFormData.append("telephone", formData.telephone);
+        bodyFormData.append("role", userData.userType === 0 ? 'Admin' : 'Vendor');
+        bodyFormData.append("vendor", userData._id);
 
         return bodyFormData
     };
 
     const onSave = async () => {
-        console.log("ggggg : ", formData);
+        console.log("ggggg : ", formData,setBodyFormData(formData));
 
         await axios({
             method: "post",

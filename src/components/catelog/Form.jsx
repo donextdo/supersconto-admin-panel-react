@@ -10,11 +10,29 @@ const Form = ({ catelog, setCatelog }) => {
 
     const [shops, setShops] = useState([])
     const [defaultValue, setDefaultValue] = useState(null)
+    const userData = sessionStorage.getItem("user") ? JSON.parse(atob(sessionStorage.getItem("user"))) : null
+    const token = localStorage.getItem("token") ? localStorage.getItem("token") : null
 
     useEffect(() => {
+
         async function fetchData() {
             try {
-                const res = await axios.get(`${baseUrl}/shop`);
+                let res = []
+
+                if (userData){
+                    if (userData?.userType === 0) {
+                        res = await axios.get(`${baseUrl}/shop`);
+                    } else {
+                        res = await axios.get(`${baseUrl}/shop/by-vendor/${userData?._id}`, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Access-Control-Allow-Origin': '*',
+                                'Authorization': `Bearer ${token}`,
+                                'Accept': "application/json"
+                            }
+                        });
+                    }
+                }
                 const shopData = res.data.map(d => {
                     return {
                         value: d._id,
@@ -22,7 +40,6 @@ const Form = ({ catelog, setCatelog }) => {
                     }
                 })
                 setShops(shopData);
-
             } catch (err) {
                 console.log(err);
             }

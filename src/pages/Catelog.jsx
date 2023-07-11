@@ -26,20 +26,39 @@ const Catalog = () => {
     expiredate: '',
     // flyer: false
   })
-    
+  const userData = sessionStorage.getItem("user") ? JSON.parse(atob(sessionStorage.getItem("user"))) : null
+  const token = localStorage.getItem("token") ? localStorage.getItem("token") : null
+
   useEffect( () => {
       fetchData();
   }, []);
 
   async function fetchData() {
     try {
-        const res = await axios.get(`${baseUrl}/catelog/book`); 
-        setData(res.data);
+      let res = []
+      if (userData){
+        if (userData?.userType === 0) {
+          console.log("fetching admin")
+          res = await axios.get(`${baseUrl}/catelog/book`);
+        } else {
+          console.log("fetching vendor")
+          res = await axios.get(`${baseUrl}/catelog/book/by-vendor/${userData?._id}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Authorization': `Bearer ${token}`,
+              'Accept': "application/json"
+            }
+          });
+        }
+      }
+      setData(res.data);
+      console.log("data : ", res.data);
     } catch (err) {
-        console.log(err);
+      console.log(err);
     }
   }
-  
+
   const toggleModal = () => {
     setModal(!modal)
     setCatelog({
@@ -64,7 +83,7 @@ const Catalog = () => {
       else {
         await axios.patch(`${baseUrl}/catelog/book/${catelog._id}`, catalogData)
       }
-      
+
       fetchData()
 
       setCatelog({
@@ -116,7 +135,7 @@ const Catalog = () => {
     console.log(d)
     console.log(catelog)
   }
-  
+
 
   return (
     <div>
@@ -127,23 +146,23 @@ const Catalog = () => {
         <>
 
         <ToastContainer/>
-        {modal && 
-            <Modal 
+        {modal &&
+            <Modal
             onClose={toggleModal}
             onCancel={onCancel}
             onSave={onSave}
-            title='Add catelog'> 
-              
-              <Form 
+            title='Add catelog'>
+
+              <Form
                 catelog={catelog}
                 setCatelog={setCatelog}
               />
 
             </Modal>
           }
-          
+
           <Card>
-            
+
             <div className='w-full py-4 flex gap-6'>
 
               <ButtonSuccess onClick={toggleModal}>
@@ -189,7 +208,7 @@ const Catalog = () => {
                           <FaTrash onClick={() => onDelete(d?._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
                           <PencilAltIcon onClick={() => onUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
 
-                        </div>  
+                        </div>
                       </TD>
                     </Row>
                   )
