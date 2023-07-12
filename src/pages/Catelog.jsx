@@ -145,7 +145,8 @@ const Catalog = () => {
       shop_id: d.shop_id._id,
       title: d.title,
       description: d.description,
-      expiredate: d.expiredate
+      expiredate: d.expiredate,
+      flyer: d.flyer
     })
     setUpdateMode(true)
     console.log(d)
