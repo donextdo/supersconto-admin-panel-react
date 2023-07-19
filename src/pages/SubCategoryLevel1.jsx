@@ -88,7 +88,29 @@ const SubCategoryLevel1 = () => {
       };
     });
   };
-  const onUpdate = async () => {};
+  const onUpdate = async () => {
+    await axios({
+      method: "put",
+      url: `${baseUrl}/category/categories/${sessionStorage.getItem("id")}`,
+      data: formData,
+    })
+      .then((response) => {
+        console.log(response.data);
+        setAlertError(false);
+        fetchData();
+        return toast.success("Data Updated Successfully");
+      })
+      .catch(function (error) {
+        console.log(error);
+        setAlertError(true);
+        console.log(error);
+        return toast.error("Something went Wrong");
+      });
+    toggleModal();
+    //  toggleAlert('Data inserted Successfully')
+    setIsEdit(false);
+    setFormData({});
+  };
 
   const toUpdate = (data) => {
     setIsEdit(true);
@@ -130,13 +152,34 @@ const SubCategoryLevel1 = () => {
     });
   }, [selected, categoryId]);
 
+  const toDelete = async (id) => {
+    await axios({
+      method: "delete",
+      url: `${baseUrl}/category/categories/${sessionStorage.getItem("id")}`,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then((response) => {
+        console.log(response.data);
+        setAlertError(false);
+        fetchData();
+        return toast.success("Data Deleted Successfully");
+      })
+      .catch(function (error) {
+        console.log(error);
+        setAlertError(true);
+        console.log(error);
+        return toast.error(error.message);
+      });
+    setConfirm(false);
+  };
+
   return (
     <div>
       <>
         <ToastContainer />
         {confirm && (
           <Confirm
-            // onSave={toDelete}
+            onSave={toDelete}
             onCancel={() => setConfirm(false)}
             onClose={() => setConfirm(false)}
           ></Confirm>
@@ -165,7 +208,7 @@ const SubCategoryLevel1 = () => {
             <div className="flex gap-4">
               <div className="flex-1">
                 <TextInput
-                  label="Sub Category/Category Name"
+                  label="Sub Category Name"
                   border
                   borderColor="border-gray-600"
                   value={formData.name}
