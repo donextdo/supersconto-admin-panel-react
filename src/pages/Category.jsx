@@ -43,19 +43,19 @@ const Category = () => {
       const res = await axios.get(baseUrl + "/category/categories");
       console.log("category List:", res);
       setOptions([{ value: "none", label: "none" }]);
-      res.data.mainCategories.forEach(assign);
-      res.data.subCategories.forEach(assign);
-      setData(categories);
-      function assign(val) {
-        categories.push(val);
+      // res.data.mainCategories.forEach(assign);
+      // res.data.subCategories.forEach(assign);
+      setData(res.data.mainCategories);
+      // function assign(val) {
+      //   categories.push(val);
 
-        if (!options.includes({ value: val.name, label: val.name })) {
-          setOptions((prevItems) => [
-            ...prevItems,
-            { value: val.name, label: val.name },
-          ]);
-        }
-      }
+      //   if (!options.includes({ value: val.name, label: val.name })) {
+      //     setOptions((prevItems) => [
+      //       ...prevItems,
+      //       { value: val.name, label: val.name },
+      //     ]);
+      //   }
+      // }
 
       console.log(options);
     } catch (err) {
@@ -96,10 +96,7 @@ const Category = () => {
       console.log("null");
     }
   };
-  // const updateSelect = (option) => {
-  //   setSelected(option);
-  //   console.log("selected main category: ", selected);
-  // };
+
   const onSave = async () => {
     console.log("while saving:", formData);
     if (selected.value == "none" || !selected.value) {
@@ -230,7 +227,7 @@ const Category = () => {
                 <Dropdown
                   label="Main Category"
                   border
-                  value={selected ? selected : options[0]}
+                  value={options[0]}
                   borderColor="border-gray-600"
                   options={options}
                   onChange={updateSelect}
@@ -240,7 +237,7 @@ const Category = () => {
             <div className="flex gap-4">
               <div className="flex-1">
                 <TextInput
-                  label="Sub Category/Category Name"
+                  label="Category Name"
                   border
                   borderColor="border-gray-600"
                   value={formData.name}
