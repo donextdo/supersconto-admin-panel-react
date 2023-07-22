@@ -30,6 +30,9 @@ const Pages = () => {
     const [imagePreviews, setImagePreviews] = useState([]);
     const [showImagePreview, setShowImagePreview] = useState(false)
     const [showModal, setShowModal] = useState(false)
+    const [progress, setProgress] = useState(0);
+    const [progressImage, setProgressImage] = useState(0)
+    const [progressImageLength, setProgressImageLength] = useState(0)
 
 
     useEffect(() => {
@@ -69,6 +72,9 @@ const Pages = () => {
                 newImages.push(reader.result);
                 if (newImages.length === files.length) {
                     setImagePreviews(newImages);
+                    setProgressImageLength(newImages.length)
+                    setProgressImage(0)
+                    setProgress(0);
                 }
             }
             reader.readAsDataURL(file);
@@ -81,7 +87,7 @@ const Pages = () => {
     const onUpload = async () => {
         try {
             const currentPageNo = pages.length > 0 ? pages.length : 0
-            console.log({pl: pages.length})
+            console.log({pl: pages.length, ipl: imagePreviews.length})
             imagePreviews.map(async (img, index) => {
 
                 const dimensions = await getImageDimensions(img)
@@ -97,8 +103,16 @@ const Pages = () => {
                 pageDto.append('page_image', dataURLtoFile(img, 'page_1'))
 
 
-                axios.post(`${baseUrl}/catelog/page`, pageDto).then(res => {
+                axios.post(`${baseUrl}/catelog/page`, pageDto, {
+                    onUploadProgress: progressEvent => {
+                        console.log(progressEvent);
+                        const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+                        setProgress(progress);
+                    }
+                }).then(res => {
                     console.log({add: res})
+                    // setProgress(0);
+                    setProgressImage(prevState => prevState + 1)
                     fetchData(catelog).then(res => {
                         setPages(res?.data)
                         console.log({pages: res})
@@ -141,14 +155,14 @@ const Pages = () => {
         return new Promise((resolve, reject) => {
             const img = new Image();
 
-            img.onload = function() {
+            img.onload = function () {
                 const width = img.width;
                 const height = img.height;
 
-                resolve({ width, height });
+                resolve({width, height});
             };
 
-            img.onerror = function() {
+            img.onerror = function () {
                 reject(new Error('Failed to load image'));
             };
 
@@ -163,8 +177,14 @@ const Pages = () => {
             <Sidebar minimize/> */}
 
             <Link to="/catelog">
-                    <button className="text-4xl pl-20 fixed z-50 left-6 top-4"><FaAngleLeft /></button>
+                <button className="text-4xl pl-20 fixed z-50 left-6 top-4"><FaAngleLeft/></button>
             </Link>
+
+            {progressImageLength > 0 && <div className="flex justify-between items-center gap-2">
+                <progress value={progress} max="100" className="flex-1"/>
+                <div>{progress}%</div>
+                <div>{progressImage}/{progressImageLength}</div>
+            </div>}
 
             {/* <Content expand> */}
             <>
@@ -257,7 +277,7 @@ const Pages = () => {
                                                     </Link>
                                                     <FaTrash onClick={() => onDelete(page._id)}
                                                              className='w-3 h-3 fill-red-500 cursor-pointer'/>
-                                                     <PencilAltIcon className='w-4 h-4 fill-blue-500 cursor-pointer'/>
+                                                    <PencilAltIcon className='w-4 h-4 fill-blue-500 cursor-pointer'/>
 
                                                 </div>
                                             </TD>
@@ -277,17 +297,17 @@ const Pages = () => {
                             {
                                 pages.map((page) => (
                                     <div key={page._id} className='w-full aspect-square bg-gray-200 relative'>
-                                       <Link to={{
+                                        <Link to={{
                                             pathname: '/catelog/pages/items',
                                             search: `shop=${page.shop_id}&catelog=${page.catelog_book_id}&page=${page._id}`
                                         }}>
-                                        <img src={page.page_image} alt={page._id}
-                                             className='w-full h-full object-contain'/>
+                                            <img src={page.page_image} alt={page._id}
+                                                 className='w-full h-full object-contain'/>
                                         </Link>
-                                         <div className='bg-white w-6 h-6 shadow-lg top-4 right-4'>
-                                        <FaTrash onClick={() => onDelete(page._id)}
-                                                 className='w-5 h-5 fill-red-500 cursor-pointer absolute top-4 right-4 m-1 bg-white p-1 rounded-full'/>
-                                         </div>
+                                        <div className='bg-white w-6 h-6 shadow-lg top-4 right-4'>
+                                            <FaTrash onClick={() => onDelete(page._id)}
+                                                     className='w-5 h-5 fill-red-500 cursor-pointer absolute top-4 right-4 m-1 bg-white p-1 rounded-full'/>
+                                        </div>
                                         <Link to={{
                                             pathname: '/catelog/pages/items',
                                             search: `shop=${page.shop_id}&catelog=${page.catelog_book_id}&page=${page._id}`

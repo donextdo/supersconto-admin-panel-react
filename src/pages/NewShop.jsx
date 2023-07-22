@@ -16,6 +16,7 @@ import Alert from "../components/shared/Alert";
 import MySwitch from "../components/shared/Switch";
 import Confirm from "../components/shared/Confirm";
 import { ToastContainer, toast } from "react-toastify";
+import Dropdown from "../components/shared/Dropdown.jsx";
 
 const NewShop = () => {
     const [confirm, setConfirm] = useState(false);
@@ -32,21 +33,41 @@ const NewShop = () => {
 
     const [shopNameError, setShopNameError] = useState('')
     const [formError, setFormError] = useState('');
+    const [vendors, setVendors] = useState([])
+    const [formData, setFormData] = useState({
+        shop_name: "",
+        description: "",
+        address: "",
+        state: "",
+        postal_code: "",
+        shop_unique_id: "",
+        owner_name: "",
+        status: true,
+        logo_img: "",
+        latitude: "",
+        longitude: "",
+        shop_category: "",
+        is_online_selling: false,
+        province: "",
+        municipality: "",
+        telephone: "",
+        vendor: "",
+        role: "",
 
-
-
+    });
 
     const [isEdit, setIsEdit] = useState(false);
     const userData = sessionStorage.getItem("user") ? JSON.parse(atob(sessionStorage.getItem("user"))) : null
     const token = localStorage.getItem("token") ? localStorage.getItem("token") : null
     console.log({userData})
+    const isAdmin = userData?.userType === 0;
 
     async function fetchData() {
         try {
             let res = []
 
             if (userData){
-                if (userData?.userType === 0) {
+                if (isAdmin) {
                     res = await axios.get(`${baseUrl}/shop`);
                 } else {
                     res = await axios.get(`${baseUrl}/shop/by-vendor/${userData?._id}`, {
@@ -66,28 +87,26 @@ const NewShop = () => {
         }
     }
 
+    async function fetchVendorData() {
+        try {
+            const res = await axios.get(`${baseUrl}/vendor`);
+            console.log(res)
+            const vendorsList = res.data.map(vendor => ({value: vendor._id, label: vendor.username, role: "Vendor"}))
+            vendorsList.push({value: userData._id, label: userData.username, role: "Admin"})
+            setVendors(vendorsList);
+        } catch (err) {
+            console.log(err);
+        }
+    }
+
     useEffect(() => {
         fetchData();
+        if (isAdmin) {
+            fetchVendorData()
+        }
     }, []);
 
-    const [formData, setFormData] = useState({
-        shop_name: "",
-        description: "",
-        address: "",
-        state: "",
-        postal_code: "",
-        shop_unique_id: "",
-        owner_name: "",
-        status: true,
-        logo_img: "",
-        latitude: "",
-        longitude: "",
-        shop_category: "",
-        is_online_selling: false,
-        province: "",
-        municipality: "",
-        telephone: "",
-    });
+
 
     const onDelete = (id) => {
         sessionStorage.setItem("id", id);
@@ -96,6 +115,9 @@ const NewShop = () => {
     };
     const toggleModal = () => {
         setModal(!modal);
+        const role = isAdmin ? "Admin" : "Vendor"
+        const vendor = userData._id
+
         setFormData({
             shop_name: "",
             description: "",
@@ -114,6 +136,9 @@ const NewShop = () => {
             municipality: "",
             // region: "",
             telephone: "",
+            role: role,
+            vendor: vendor,
+
         });
     };
     const [alertTitle, setAlertTitle] = useState(null);
@@ -122,6 +147,14 @@ const NewShop = () => {
     const setBodyFormData = (formData) => {
         const bodyFormData = new FormData();
 
+        let role, vendor
+        if(isAdmin) {
+            role = formData.role
+            vendor = formData.vendor
+        } else {
+            role = "Vendor"
+            vendor = userData._id
+        }
         bodyFormData.append("shop_name", formData.shop_name);
         bodyFormData.append("description", formData.description);
         bodyFormData.append("address[address]", formData.address);
@@ -136,8 +169,8 @@ const NewShop = () => {
         bodyFormData.append("shop_category", formData.shop_category);
         bodyFormData.append("is_online_selling", formData.is_online_selling);
         bodyFormData.append("telephone", formData.telephone);
-        bodyFormData.append("role", userData.userType === 0 ? 'Admin' : 'Vendor');
-        bodyFormData.append("vendor", userData._id);
+        bodyFormData.append("role", role);
+        bodyFormData.append("vendor", vendor);
 
         return bodyFormData
     };
@@ -150,7 +183,7 @@ const NewShop = () => {
         } else {
             setFormError('');
 
-            await axios({
+            /*await axios({
                 method: "post",
                 url: `${baseUrl}/shop`,
                 data: setBodyFormData(formData),
@@ -167,7 +200,7 @@ const NewShop = () => {
                     console.log(" error", error);
                     return toast.error(error.message);
                 });
-            toggleModal();
+            toggleModal();*/
 
         }
 
@@ -262,7 +295,8 @@ const NewShop = () => {
     };
 
     const update = (name, e) => {
-        if (name == "is_online_selling") {
+        console.log({name, e})
+        if (name === "is_online_selling") {
             setFormData((prevState) => {
                 return { ...prevState, [name]: !prevState.is_online_selling };
             });
@@ -378,6 +412,31 @@ const NewShop = () => {
 
                         </div>
                         {shopNameError && <div className='text-red-500'>{shopNameError}</div>}
+
+                        {
+                            isAdmin && <Dropdown
+                                label="Select vendor"
+                                defaultValue={vendors.find(
+                                    (vendor) => vendor.value === formData.vendor
+                                )}
+                                value={vendors.find(
+                                    (vendor) => vendor.value === formData.vendor
+                                )}
+                                options={vendors}
+                                onChange={(e) => {
+                                    update("vendor", {
+                                        target: {
+                                            value : e.value
+                                        }
+                                    })
+                                    update("role", {
+                                        target: {
+                                            value : e.role
+                                        }
+                                    })
+                                }}
+                            />
+                        }
 
                         <div className="flex gap-4">
                             <div className="flex-1">
