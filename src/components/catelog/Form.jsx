@@ -95,6 +95,7 @@ const Form = ({ catelog, setCatelog }) => {
                 name={'description'}
                 value={catelog.description}
                 onChange={handleChange}
+                maxlength="200"
             />
 
             <TextInput

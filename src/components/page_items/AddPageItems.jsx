@@ -113,6 +113,7 @@ const Form = ({pageItem, setPageItem}) => {
                     name={'product_description'}
                     value={pageItem.product_description}
                     onChange={handleChange}
+                    maxlength="200"
                 />
 
                 <TextInput
