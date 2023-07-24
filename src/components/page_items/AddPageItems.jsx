@@ -9,6 +9,10 @@ const Form = ({ pageItem, setPageItem }) => {
   const [selectedOption, setSelectedOption] = useState(null);
   const [categories, setCategories] = useState([]);
   const subList = useRef([]);
+  const [amount, setAmount] = useState(0);
+  const [discount, setDiscount] = useState(0); // Default discount of 10%
+  const [price, setPrice] = useState(0);
+
   const subListLevelTwo = useRef([]);
   const subListLevelThree = useRef([]);
   const subListLevelFour = useRef([]);
@@ -130,11 +134,49 @@ const Form = ({ pageItem, setPageItem }) => {
       product_description_level_four: selectedOption.value,
     });
   };
+
   const handleCheck = (event) => {
     setPageItem({
       ...pageItem,
       online_sell: event.target.checked,
     });
+  };
+
+  const handleDiscountChange = (event) => {
+    const discountamount = event.target.value
+    setDiscount(discountamount)
+    setPageItem({
+      ...pageItem,
+      discount: event.target.value,
+    });
+  }
+  
+  const handleUnitPrice = (event) => {
+    
+      const enteredAmount = (event.target.value);
+    setAmount(enteredAmount);
+    const calculatedPrice = enteredAmount - (enteredAmount*discount/100);
+    setPrice(calculatedPrice);
+    setPageItem({
+      ...pageItem,
+      unit_price: enteredAmount,
+      discounted_price: calculatedPrice,
+    });
+    
+    
+  };
+
+  const handleDiscountPrice = (event) => {
+    const enteredPrice = (event.target.value);
+    setPrice(enteredPrice);
+    const calculatedAmount = (enteredPrice * 100)/(100-discount);
+    setAmount(calculatedAmount);
+    setPageItem({
+      ...pageItem,
+      discounted_price: event.target.value,
+      unit_price: calculatedAmount,
+    });
+    
   };
 
   console.log("render", { pageItem });
@@ -236,8 +278,28 @@ const Form = ({ pageItem, setPageItem }) => {
           border
           borderColor="border-gray-600"
           name={"unit_price"}
-          value={pageItem.unit_price}
-          onChange={handleChange}
+          value={amount}
+          onChange={handleUnitPrice}
+        />
+
+        <TextInput
+          label="discount"
+          type="number"
+          border
+          borderColor="border-gray-600"
+          name="discount"
+          value={pageItem.discount}
+          onChange={handleDiscountChange}
+        />
+
+        <TextInput
+          label="Discount price"
+          type={"number"}
+          border
+          borderColor="border-gray-600"
+          name={"discount_price"}
+          value={price}
+          onChange={handleDiscountPrice}
         />
 
         <TextInput
@@ -285,15 +347,7 @@ const Form = ({ pageItem, setPageItem }) => {
           onChange={handleChange}
         />
 
-        <TextInput
-          label="discount"
-          type="number"
-          border
-          borderColor="border-gray-600"
-          name="discount"
-          value={pageItem.discount}
-          onChange={handleChange}
-        />
+
 
         <TextInput
           label="review"

@@ -36,6 +36,7 @@ const NewShop = () => {
     const [vendors, setVendors] = useState([])
     const [formData, setFormData] = useState({
         shop_name: "",
+        customized_shop_name:"",
         description: "",
         address: "",
         state: "",
@@ -120,6 +121,7 @@ const NewShop = () => {
 
         setFormData({
             shop_name: "",
+            customized_shop_name:"",
             description: "",
             address: "",
             state: "",
@@ -156,6 +158,7 @@ const NewShop = () => {
             vendor = userData._id
         }
         bodyFormData.append("shop_name", formData.shop_name);
+        bodyFormData.append("customized_shop_name", formData.customized_shop_name);
         bodyFormData.append("description", formData.description);
         bodyFormData.append("address[address]", formData.address);
         bodyFormData.append("address[state]", formData.state);
@@ -183,7 +186,7 @@ const NewShop = () => {
         } else {
             setFormError('');
 
-            /*await axios({
+            await axios({
                 method: "post",
                 url: `${baseUrl}/shop`,
                 data: setBodyFormData(formData),
@@ -200,7 +203,7 @@ const NewShop = () => {
                     console.log(" error", error);
                     return toast.error(error.message);
                 });
-            toggleModal();*/
+            toggleModal();
 
         }
 
@@ -229,6 +232,7 @@ const NewShop = () => {
         sessionStorage.setItem("id", data._id);
         setFormData({
             shop_name: data.shop_name,
+            customized_shop_name:data.customized_shop_name,
             description: data.description,
             address: data.address.address,
             state: data.address.state,
@@ -360,9 +364,10 @@ const NewShop = () => {
                     const lat = placeResult.geometry?.location?.lat();
                     const lng = placeResult.geometry?.location?.lng();
                     const formattedAddress = placeResult.formatted_address;
+                    const sName = placeResult.name;
 
                     setFormData((prevState) => {
-                        return { ...prevState, address: formattedAddress, latitude: lat, longitude: lng };
+                        return { ...prevState, address: formattedAddress, latitude: lat, longitude: lng , shop_name:sName};
                     })
                     setHide(true);
                     console.log("Formatted Address: ", formattedAddress);
@@ -373,7 +378,7 @@ const NewShop = () => {
         );
     }
 
-    console.log(formData)
+    console.log("formData", formData)
 
     return (
         <div>
@@ -401,6 +406,37 @@ const NewShop = () => {
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <TextInput
+                                    label="Address *"
+                                    value={formData.address}
+                                    onChange={(e) => {
+                                        update("address", e);
+                                        handleInputChange(e);
+                                    }}
+                                    border
+                                    borderColor="border-gray-600"
+                                    
+                                />
+                                {predictions.length > 0 && !hide && (
+                                    <ul className="mb-4">
+                                        {predictions.map((prediction) => (
+                                            <li
+                                                key={prediction.place_id}
+                                                onClick={() =>
+                                                    handlePlaceSelection(prediction.place_id)
+                                                }
+                                                className="cursor-pointer p-2 border hover:bg-gray-100"
+                                            >
+                                                {prediction.description}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TextInput
                                     label="Shop Name *"
                                     border
                                     value={formData.shop_name}
@@ -412,6 +448,18 @@ const NewShop = () => {
 
                         </div>
                         {shopNameError && <div className='text-red-500'>{shopNameError}</div>}
+
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TextInput
+                                    label="Customized Shop Name"
+                                    value={formData.customized_shop_name}
+                                    onChange={(e) => update("customized_shop_name", e)}
+                                    border
+                                    borderColor="border-gray-600"
+                                />
+                            </div>
+                        </div>
 
                         {
                             isAdmin && <Dropdown
@@ -449,38 +497,7 @@ const NewShop = () => {
                                 />
                             </div>
                         </div>
-                        <div className="flex gap-4">
-                            <div className="flex-1">
-                                <TextInput
-                                    label="Address *"
-                                    value={formData.address}
-                                    onChange={(e) => {
-                                        update("address", e);
-                                        handleInputChange(e);
-                                    }}
-                                    border
-                                    borderColor="border-gray-600"
-                                    
-                                />
-                                {predictions.length > 0 && !hide && (
-                                    <ul className="mb-4">
-                                        {predictions.map((prediction) => (
-                                            <li
-                                                key={prediction.place_id}
-                                                onClick={() =>
-                                                    handlePlaceSelection(prediction.place_id)
-                                                }
-                                                className="cursor-pointer p-2 border hover:bg-gray-100"
-                                            >
-                                                {prediction.description}
-                                            </li>
-                                        ))}
-                                    </ul>
-                                )}
-                            </div>
-                        </div>
-
-
+                        
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <TextInput

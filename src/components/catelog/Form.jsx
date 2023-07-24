@@ -19,7 +19,7 @@ const Form = ({ catelog, setCatelog }) => {
             try {
                 let res = []
 
-                if (userData){
+                if (userData) {
                     if (userData?.userType === 0) {
                         res = await axios.get(`${baseUrl}/shop`);
                     } else {
@@ -59,8 +59,16 @@ const Form = ({ catelog, setCatelog }) => {
         setCatelog(prevCatelog => ({
             ...prevCatelog,
             flyer: !prevCatelog.flyer,
-          }));
+        }));
     }
+
+    const activeTrueFlase = (e) => {
+        setCatelog(prevCatelog => ({
+            ...prevCatelog,
+            active: !prevCatelog.active,
+        }));
+    }
+
 
     const handleDropDownChange = (selectedOption) => {
         setCatelog({
@@ -115,7 +123,14 @@ const Form = ({ catelog, setCatelog }) => {
                 onChange={handleTrueFlase}
                 borderColor="border-gray-600"
             />
-    
+
+            <MySwitch
+                label="Active"
+                border
+                value={catelog.active}
+                onChange={activeTrueFlase}
+                borderColor="border-gray-600"
+            />
 
 
         </div>

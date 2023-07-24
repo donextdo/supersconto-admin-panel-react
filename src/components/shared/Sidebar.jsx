@@ -79,10 +79,8 @@ const Sidebar = () => {
           >
             <FaList className="w-5 h-5" />
             {!minimize && <span>Category</span>}
-            {icon === "arrow-forward" ? (
+            {icon === "arrow-forward" && !minimize && (
               <MdKeyboardArrowRight className="w-5 h-5 ml-16" />
-            ) : (
-              <MdKeyboardArrowDown className="w-5 h-5 ml-16" />
             )}
           </Link>
         </li>

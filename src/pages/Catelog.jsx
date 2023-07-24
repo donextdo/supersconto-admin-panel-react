@@ -25,6 +25,7 @@ const Catalog = () => {
     description: '',
     expiredate: '',
     flyer: false,
+    active: false,
   })
   const [formError, setFormError] = useState('');
 
@@ -70,7 +71,9 @@ const Catalog = () => {
       title: '',
       description: '',
       expiredate: '',
-      flyer: false
+      flyer: false,
+    active: false
+
 
     })
     setUpdateMode(false)
@@ -103,7 +106,9 @@ const Catalog = () => {
         title: '',
         description: '',
         expiredate: '',
-        flyer: false
+        flyer: false,
+    active: false
+
 
       })
 
@@ -146,7 +151,9 @@ const Catalog = () => {
       title: d.title,
       description: d.description,
       expiredate: d.expiredate,
-      flyer: d.flyer
+      flyer: d.flyer,
+    active: d.active,
+
     })
     setUpdateMode(true)
     console.log(d)
