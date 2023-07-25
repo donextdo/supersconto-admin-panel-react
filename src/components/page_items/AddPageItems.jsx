@@ -278,7 +278,7 @@ const Form = ({ pageItem, setPageItem }) => {
           border
           borderColor="border-gray-600"
           name={"unit_price"}
-          value={amount}
+          value={pageItem.unit_price}
           onChange={handleUnitPrice}
         />
 
@@ -298,7 +298,7 @@ const Form = ({ pageItem, setPageItem }) => {
           border
           borderColor="border-gray-600"
           name={"discount_price"}
-          value={price}
+          value={pageItem.discounted_price}
           onChange={handleDiscountPrice}
         />
 
