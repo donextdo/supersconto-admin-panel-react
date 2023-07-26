@@ -4,8 +4,11 @@ import TextInput from "../shared/TextInput";
 import Dropdown from "../shared/Dropdown";
 import Textarea from "../shared/Textarea";
 import baseUrl from "../../utils/baseUrl.js";
+import {useLocation} from "react-router-dom";
 
 const Form = ({ pageItem, setPageItem }) => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
   const [selectedOption, setSelectedOption] = useState(null);
   const [categories, setCategories] = useState([]);
   const subList = useRef([]);
@@ -22,6 +25,12 @@ const Form = ({ pageItem, setPageItem }) => {
   const [subCategoriesLevelFour, setSubCategoriesLevelFour] = useState([]);
 
   useEffect(() => {
+
+    setPageItem({
+      ...pageItem,
+      catelog_book_id: queryParams.get('catelog'),
+    });
+
     axios
       .get(`${baseUrl}/category/categories`)
       .then((res) => {
@@ -179,7 +188,7 @@ const Form = ({ pageItem, setPageItem }) => {
 
   };
 
-  console.log("render", { pageItem });
+  console.log("render", { pageItem },queryParams.get('catelog'));
   return (
     <div className="grid grid-cols-2 gap-6">
       <div className="flex flex-col gap-4">
