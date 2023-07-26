@@ -8,11 +8,13 @@ import { ButtonSuccess, ButtonNormal } from "../components/shared/Button";
 import { FcClearFilters } from "react-icons/fc";
 import baseUrl from "../utils/baseUrl";
 import Dropdown from "../components/shared/Dropdown";
-import { FaTrash,FaSearch } from "react-icons/fa";
+import { FaTrash, FaSearch } from "react-icons/fa";
 import { PencilAltIcon } from "@heroicons/react/solid";
 import { FaRegHandPointRight } from "react-icons/fa";
 import { IoClose } from "react-icons/io5";
 import Select from "react-select";
+import TextInput from "../components/shared/TextInput"
+import Textarea from "../components/shared/Textarea";
 
 const Order = () => {
   const [selected, setSelected] = useState([]);
@@ -20,12 +22,15 @@ const Order = () => {
   const [modal, setModal] = useState(false);
   const [shops, setShops] = useState([]);
   const [filter, setFilter] = useState(null);
+  const [showProduct, setShowProduct] = useState(false);
+  const [pId, setPId] = useState('');
   let [options, setOptions] = useState([
     { value: "Processing", label: "Processing" },
     { value: "New", label: "New" },
     { value: "Delivered", label: "Delivered" },
     { value: "Rejected", label: "Rejected" },
   ]);
+  const [productArray, setProductArray] = useState([])
 
   useEffect(() => {
     fetchData();
@@ -43,6 +48,21 @@ const Order = () => {
       console.log("status : ", data);
     } catch (error) {
       console.log(error);
+    }
+  }
+
+  useEffect(() => {
+    fetchDataProduct()
+  }, [pId])
+
+  async function fetchDataProduct() {
+    try {
+      const res = await axios.get(`${baseUrl}/catelog/item/find/${pId}`)
+      console.log(res.data)
+      const data = res.data;
+      setProductArray(data)
+    } catch (error) {
+      console.log(error)
     }
   }
 
@@ -228,35 +248,54 @@ const Order = () => {
         const products = await Promise.all(productPromises);
 
 
-       
+        console.log(products)
+
+        const productViewmodal = (id) => {
+          setShowProduct(!showProduct)
+          console.log(id)
+          setPId(id)
+        }
 
         return (
-          <Card key={shopId}>
-            <div className="w-full py-4 flex gap-6"></div>
-            {/* <h3>Shop ID: {shopId}</h3> */}
-            <h3 className="text-white text-2xl font-bold p-2 border border-green-500 bg-green-500">
-              {shopName} - {shopAddress}
-            </h3>
-            <Table>
-              <THead>
-                <TH title={"Product Name"} />
-                <TH title={"Quantity"} />
-                <TH title={"Catergory"} />
-                <TH title={"Sub-Catergory"} />
-              </THead>
-              <TBody>
-                {products.map((order) => (
-                  <Row key={order.productId}>
-                    <TD>{order.productName.product_name}</TD>
-                    <TD>{order.orderquantity}</TD>
-                    <TD>{order.categoryName}</TD>
+          <div>
+            <Card key={shopId}>
+              <div className="w-full py-4 flex gap-6"></div>
+              {/* <h3>Shop ID: {shopId}</h3> */}
+              <h3 className="text-white text-2xl font-bold p-2 border border-green-500 bg-green-500">
+                {shopName} - {shopAddress}
+              </h3>
+              <Table>
+                <THead>
+                  <TH title={"Product Name"} />
+                  <TH title={"Quantity"} />
+                  <TH title={"Catergory"} />
+                  <TH title={"Sub-Catergory"} />
+                  <TH title={"View"} />
+                </THead>
+                <TBody>
+                  {products.map((order) => (
+                    <Row key={order.productId}>
+                      <TD>{order.productName.product_name}</TD>
+                      <TD>{order.orderquantity}</TD>
+                      <TD>{order.categoryName}</TD>
 
-                    <TD>{order.subCategoryName}</TD>
-                  </Row>
-                ))}
-              </TBody>
-            </Table>
-          </Card>
+                      <TD>{order.subCategoryName}</TD>
+                      <TD>
+                        <div className="w-full h-full flex items-center justify-center gap-4">
+                          <FaSearch
+                            onClick={() => productViewmodal(order.productId)}
+                            className="w-4 h-4 fill-green-500 cursor-pointer"
+                          />
+                        </div>
+                      </TD>
+                    </Row>
+                  ))}
+                </TBody>
+              </Table>
+            </Card>
+
+
+          </div>
         );
       })
     );
@@ -279,6 +318,12 @@ const Order = () => {
 
     return acc;
   }, {});
+
+  const handleCloseProduct = () => {
+    setShowProduct(!showProduct)
+  }
+
+
   return (
     <div>
       <Card>
@@ -386,6 +431,157 @@ const Order = () => {
                 >
                   Confirm Order
                 </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showProduct && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-slate-900 bg-opacity-50">
+          <div className="flex gap-6 flex-col relative rounded-md w-full lg:w-[1024px] h-[700px] bg-white overflow-y-auto">
+
+            <div className="flex justify-end px-2">
+              <button
+                onClick={handleCloseProduct}
+                className="w-8 h-8 flex justify-center items-center"
+              >
+                <IoClose className="text-black mt-3" />
+              </button>
+            </div>
+
+            <div className="grid grid-cols-2 gap-6 px-4 pb-4">
+              <div className="flex flex-col gap-4">
+                <TextInput
+                  label="Product Name"
+                  border
+                  borderColor="border-gray-600"
+                  name={"product_name"}
+                  value={productArray.product_name}
+                />
+                <TextInput
+                  label="Main category"
+                  border
+                  borderColor="border-gray-600"
+                  name={"quantity"}
+                  value={productArray.product_category}
+                />
+                <TextInput
+                  label="sub category"
+                  border
+                  borderColor="border-gray-600"
+                  name={"quantity"}
+                  value={productArray.product_sub_category}
+                />
+                <TextInput
+                  label="Sub category Level Two"
+                  border
+                  borderColor="border-gray-600"
+                  name={"quantity"}
+                  value={productArray.product_sub_category_level_two}
+                />
+                <TextInput
+                  label="Sub category Level Three"
+                  border
+                  borderColor="border-gray-600"
+                  name={"quantity"}
+                  value={productArray.product_sub_category_level_three}
+                />
+                <TextInput
+                  label="Quantity"
+                  border
+                  borderColor="border-gray-600"
+                  name={"quantity"}
+                  value={productArray.quantity}
+                />
+                <Textarea
+                  label="Description"
+                  border
+                  borderColor="border-gray-600"
+                  name={"product_description"}
+                  value={productArray.product_description}
+                />
+
+                <TextInput
+                  label="Quantity"
+                  type={"number"}
+                  border
+                  borderColor="border-gray-600"
+                  name={"quantity"}
+                  value={productArray.quantity}
+                />
+
+                <TextInput
+                  label="Unit price"
+                  border
+                  borderColor="border-gray-600"
+                  name={"unit_price"}
+                  value={productArray.unit_price}
+                />
+
+                <TextInput
+                  label="discount"
+                  border
+                  borderColor="border-gray-600"
+                  name="discount"
+                  value={productArray.discount}
+                />
+                <TextInput
+                  label="Discount price"
+                  border
+                  borderColor="border-gray-600"
+                  name={"discount_price"}
+                  value={productArray.discounted_price}
+                />
+                <TextInput
+                  label="brand"
+                  border
+                  borderColor="border-gray-600"
+                  name="brand"
+                  value={productArray.brand}
+                />
+
+                <TextInput
+                  label="skuNumber"
+                  border
+                  borderColor="border-gray-600"
+                  name="skuNumber"
+                  value={productArray.skuNumber}
+                />
+
+                <TextInput
+                  label="type"
+                  border
+                  borderColor="border-gray-600"
+                  name="type"
+                  value={productArray.type}
+                />
+
+                <TextInput
+                  label="mfgDate"
+                  border
+                  borderColor="border-gray-600"
+                  name="mfgDate"
+                  value={productArray.mfgDate}
+                />
+
+                <TextInput
+                  label="expDate"
+                  border
+                  borderColor="border-gray-600"
+                  name="expDate"
+                  value={productArray.expDate}
+                />
+
+                <TextInput
+                  label="review"
+                  type="number"
+                  border
+                  borderColor="border-gray-600"
+                  name="review"
+                  value={productArray.review}
+                />
+
               </div>
             </div>
           </div>

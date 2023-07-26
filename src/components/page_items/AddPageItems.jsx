@@ -150,33 +150,33 @@ const Form = ({ pageItem, setPageItem }) => {
       discount: event.target.value,
     });
   }
-  
+
   const handleUnitPrice = (event) => {
-    
-      const enteredAmount = (event.target.value);
+
+    const enteredAmount = (event.target.value);
     setAmount(enteredAmount);
-    const calculatedPrice = enteredAmount - (enteredAmount*discount/100);
+    const calculatedPrice = enteredAmount - (enteredAmount * discount / 100);
     setPrice(calculatedPrice);
     setPageItem({
       ...pageItem,
       unit_price: enteredAmount,
       discounted_price: calculatedPrice,
     });
-    
-    
+
+
   };
 
   const handleDiscountPrice = (event) => {
     const enteredPrice = (event.target.value);
     setPrice(enteredPrice);
-    const calculatedAmount = (enteredPrice * 100)/(100-discount);
+    const calculatedAmount = (enteredPrice * 100) / (100 - discount);
     setAmount(calculatedAmount);
     setPageItem({
       ...pageItem,
       discounted_price: event.target.value,
       unit_price: calculatedAmount,
     });
-    
+
   };
 
   console.log("render", { pageItem });
@@ -273,6 +273,16 @@ const Form = ({ pageItem, setPageItem }) => {
         />
 
         <TextInput
+          label="discount"
+          type="number"
+          border
+          borderColor="border-gray-600"
+          name="discount"
+          value={pageItem.discount}
+          onChange={handleDiscountChange}
+        />
+
+        <TextInput
           label="Unit price"
           type={"number"}
           border
@@ -282,15 +292,7 @@ const Form = ({ pageItem, setPageItem }) => {
           onChange={handleUnitPrice}
         />
 
-        <TextInput
-          label="discount"
-          type="number"
-          border
-          borderColor="border-gray-600"
-          name="discount"
-          value={pageItem.discount}
-          onChange={handleDiscountChange}
-        />
+
 
         <TextInput
           label="Discount price"

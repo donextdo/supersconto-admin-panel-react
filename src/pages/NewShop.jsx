@@ -39,6 +39,7 @@ const NewShop = () => {
         customized_shop_name:"",
         description: "",
         address: "",
+        city: "",
         state: "",
         postal_code: "",
         shop_unique_id: "",
@@ -54,6 +55,7 @@ const NewShop = () => {
         telephone: "",
         vendor: "",
         role: "",
+        website:"",
 
     });
 
@@ -124,6 +126,7 @@ const NewShop = () => {
             customized_shop_name:"",
             description: "",
             address: "",
+            city: "",
             state: "",
             postal_code: "",
             shop_unique_id: "",
@@ -140,6 +143,7 @@ const NewShop = () => {
             telephone: "",
             role: role,
             vendor: vendor,
+            website:"",
 
         });
     };
@@ -174,6 +178,9 @@ const NewShop = () => {
         bodyFormData.append("telephone", formData.telephone);
         bodyFormData.append("role", role);
         bodyFormData.append("vendor", vendor);
+        bodyFormData.append("website", formData.website);
+        bodyFormData.append("city", formData.city);
+
 
         return bodyFormData
     };
@@ -246,6 +253,8 @@ const NewShop = () => {
             shop_category: data.shop_category,
             is_online_selling: data.is_online_selling,
             telephone: data.telephone,
+            website: data.website,
+            city: data.city
         });
         setModal(true);
     };
@@ -365,18 +374,38 @@ const NewShop = () => {
                     const lng = placeResult.geometry?.location?.lng();
                     const formattedAddress = placeResult.formatted_address;
                     const sName = placeResult.name;
+                    const formatted_phone_number = placeResult.formatted_phone_number;
+                    const website = placeResult.website;
+
+                    const addressComponents = placeResult.address_components;
+
+                    // Find the component that represents the city or administrative area level 1
+                    const cityComponent = addressComponents.find(
+                      (component) =>
+                        component.types.includes('locality') ||
+                        component.types.includes('administrative_area_level_1')
+                    );
+
+                    // Extract the city name from the cityComponent object
+                    const cityName = cityComponent ? cityComponent.long_name : 'City not found';
 
                     setFormData((prevState) => {
-                        return { ...prevState, address: formattedAddress, latitude: lat, longitude: lng , shop_name:sName};
+                        return { ...prevState, address: formattedAddress, latitude: lat, longitude: lng , shop_name:sName, telephone:formatted_phone_number, website:website, city:cityName};
                     })
                     setHide(true);
                     console.log("Formatted Address: ", formattedAddress);
                     console.log("Formatted lat: ", latitude);
                     console.log("Formatted lng: ", longitude);
+                    console.log('City:', cityName);
+
                 }
             }
         );
     }
+
+  
+
+
 
     console.log("formData", formData)
 
@@ -497,6 +526,18 @@ const NewShop = () => {
                                 />
                             </div>
                         </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TextInput
+                                    label="City"
+                                    border
+                                    value={formData.city}
+                                    onChange={(e) => update("city", e)}
+                                    borderColor="border-gray-600"
+                                />
+                            </div>
+                        </div>
                         
                         <div className="flex gap-4">
                             <div className="flex-1">
@@ -512,9 +553,9 @@ const NewShop = () => {
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <TextInput
-                                    value={formData.shop_unique_id}
+                                    value={formData.website}
                                     onChange={(e) => update("shop_unique_id", e)}
-                                    label="CAP"
+                                    label="Website"
                                     border
                                     borderColor="border-gray-600"
                                 />
