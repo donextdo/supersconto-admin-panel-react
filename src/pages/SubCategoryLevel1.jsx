@@ -173,6 +173,24 @@ const SubCategoryLevel1 = () => {
     setConfirm(false);
   };
 
+  function extractNames(obj) {
+    let names = [];
+  
+    function extract(obj) {
+      if (obj.hasOwnProperty("name")) {
+        names.push(obj.name);
+      }
+  
+      for (const key in obj) {
+        if (typeof obj[key] === "object" && obj[key] !== null) {
+          extract(obj[key]);
+        }
+      }
+    }
+  
+    extract(obj);
+    return names;
+  }
   return (
     <div>
       <>
@@ -235,7 +253,7 @@ const SubCategoryLevel1 = () => {
               {data.map((d) => {
                 return (
                   <Row key={d._id}>
-                    <TD>{d.name}</TD>
+                    <TD>{extractNames(d).reverse().join(" > ")}</TD>
                     <TD>
                       <div className="w-full h-full flex items-center justify-center gap-4">
                         <FaTrash

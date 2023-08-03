@@ -279,6 +279,7 @@ const Form = ({ pageItem, setPageItem }) => {
           name={"quantity"}
           value={pageItem.quantity}
           onChange={handleChange}
+          min={1}
         />
 
         <TextInput
@@ -289,6 +290,7 @@ const Form = ({ pageItem, setPageItem }) => {
           name="discount"
           value={pageItem.discount}
           onChange={handleDiscountChange}
+          min={1}
         />
 
         <TextInput
@@ -299,6 +301,7 @@ const Form = ({ pageItem, setPageItem }) => {
           name={"unit_price"}
           value={pageItem.unit_price}
           onChange={handleUnitPrice}
+          min={1}
         />
 
 
@@ -311,6 +314,7 @@ const Form = ({ pageItem, setPageItem }) => {
           name={"discount_price"}
           value={pageItem.discounted_price}
           onChange={handleDiscountPrice}
+          min={1}
         />
 
         <TextInput
@@ -342,6 +346,8 @@ const Form = ({ pageItem, setPageItem }) => {
 
         <TextInput
           label="mfgDate"
+          type={"date"}
+          max={new Date().toISOString().split("T")[0]}
           border
           borderColor="border-gray-600"
           name="mfgDate"
@@ -351,11 +357,13 @@ const Form = ({ pageItem, setPageItem }) => {
 
         <TextInput
           label="expDate"
+          type={"date"}
           border
           borderColor="border-gray-600"
           name="expDate"
           value={pageItem.expDate}
           onChange={handleChange}
+          min={new Date().toISOString().split("T")[0]}
         />
 
 
@@ -363,6 +371,7 @@ const Form = ({ pageItem, setPageItem }) => {
         <TextInput
           label="review"
           type="number"
+          min={1}
           max={5}
           border
           borderColor="border-gray-600"
@@ -388,6 +397,7 @@ const Form = ({ pageItem, setPageItem }) => {
           name="popularity"
           value={pageItem.popularity}
           onChange={handleChange}
+          min={1}
         />
 
         <div className="flex items-center justify-start gap-2">

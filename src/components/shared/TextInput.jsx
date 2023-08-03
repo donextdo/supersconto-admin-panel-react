@@ -11,6 +11,7 @@ const TextInput = ({
     placeholder, 
     onChange,
     max,
+    min,
     required,
 }) => {
 return (
@@ -31,6 +32,7 @@ return (
         onChange={onChange}
         required = {required}
         max={max}
+        min={min}
     />
 
     {error && 

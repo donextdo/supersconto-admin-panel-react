@@ -235,7 +235,7 @@ const NewShop = () => {
 
     const toUpdate = async (data) => {
         setIsEdit(true);
-        console.log();
+        console.log(data);
         sessionStorage.setItem("id", data._id);
         setFormData({
             shop_name: data.shop_name,
@@ -254,7 +254,9 @@ const NewShop = () => {
             is_online_selling: data.is_online_selling,
             telephone: data.telephone,
             website: data.website,
-            city: data.city
+            city: data.city,
+            vendor:data.vendor,
+            role:data.role
         });
         setModal(true);
     };
