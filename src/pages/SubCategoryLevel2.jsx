@@ -41,7 +41,7 @@ const SubCategoryLevel2 = () => {
     try {
       const categories = [];
       const res = await axios.get(baseUrl + "/category/categories");
-      console.log("res : ", res.data.subCategories);
+      console.log("res : ", res.data);
       setOptions([]);
       setData(res.data.subCategoriesLevelTwo);
       res.data.subCategories.forEach(assign);
@@ -175,6 +175,25 @@ const SubCategoryLevel2 = () => {
     setConfirm(false);
   };
 
+  function extractNames(obj) {
+    let names = [];
+  
+    function extract(obj) {
+      if (obj.hasOwnProperty("name")) {
+        names.push(obj.name);
+      }
+  
+      for (const key in obj) {
+        if (typeof obj[key] === "object" && obj[key] !== null) {
+          extract(obj[key]);
+        }
+      }
+    }
+  
+    extract(obj);
+    return names;
+  }
+
   return (
     <div>
       <>
@@ -237,7 +256,7 @@ const SubCategoryLevel2 = () => {
               {data.map((d) => {
                 return (
                   <Row key={d._id}>
-                    <TD>{d.name}</TD>
+                    <TD>{extractNames(d).reverse().join(" > ")}</TD>
                     <TD>
                       <div className="w-full h-full flex items-center justify-center gap-4">
                         <FaTrash

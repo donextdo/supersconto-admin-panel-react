@@ -23,7 +23,7 @@ const News = () => {
     title: '',
     expiredDate: '',
     content:'',
-    image:[],
+    image: '',
    
   })
 
@@ -45,12 +45,9 @@ const News = () => {
   useEffect(() => {
     fetchData();
   }, []);
+
   const setbodyFormData = (formData) => {
     var bodyFormData = new FormData();
-    if(formData.password && formData.password==formData.confirmpassword)
-    {
-      bodyFormData.append('password', formData.password);
-    }
     bodyFormData.append('title',formData.title);
     bodyFormData.append('expiredDate', formData.expiredDate);
     bodyFormData.append('status', true);
@@ -229,6 +226,7 @@ const toDelete = async (id) => {
                     type='date'
                     borderColor='border-gray-600'
                     value={formData.expiredDate} onChange={(e) => update("expiredDate", e)}
+                      min={new Date().toISOString().split("T")[0]}
 
                   />
                     <Textarea 
@@ -286,7 +284,7 @@ const toDelete = async (id) => {
                         { d.description }
                       </TD>
                       <TD>
-                        <img src={d.images} className='w-1/2 h-1/2'></img>
+                        <img src={d.image} className='w-1/2 h-1/2'></img>
                       </TD>
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
