@@ -17,6 +17,7 @@ import MySwitch from "../components/shared/Switch";
 import Confirm from "../components/shared/Confirm";
 import { ToastContainer, toast } from "react-toastify";
 import Dropdown from "../components/shared/Dropdown.jsx";
+import CustomTooltip from "../components/shared/Tooltip";
 
 const NewShop = () => {
     const [confirm, setConfirm] = useState(false);
@@ -651,15 +652,13 @@ const NewShop = () => {
                                             ></img>
                                         </TD>
                                         <TD>
-                                            <div className="w-full h-full flex items-center justify-center gap-4">
-                                                <FaTrash
-                                                    onClick={() => onDelete(d._id)}
-                                                    className="w-3 h-3 fill-red-500 cursor-pointer"
-                                                />
-                                                <PencilAltIcon
-                                                    onClick={() => toUpdate(d)}
-                                                    className="w-4 h-4 fill-blue-500 cursor-pointer"
-                                                />
+                                        <div className='w-full h-full flex items-center justify-center gap-4'>
+                        <CustomTooltip content="Delete">
+                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer' />
+                        </CustomTooltip>
+                        <CustomTooltip content="Edit">
+                        <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer' />
+                        </CustomTooltip>
                                             </div>
                                         </TD>
                                     </Row>
