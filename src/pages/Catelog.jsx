@@ -13,6 +13,7 @@ import { normalizeDate } from '../utils/functions'
 import { Link } from 'react-router-dom'
 import baseUrl, {clientAppUrl} from '../utils/baseUrl'
 import { ToastContainer, toast } from 'react-toastify';
+import CustomTooltip from '../components/shared/Tooltip'
 const Catalog = () => {
 
   const [data, setData] =useState([])
@@ -223,15 +224,22 @@ const Catalog = () => {
                       </TD>
                       <TD>
                         <div className='w-full h-full flex items-center justify-center gap-4'>
-
+                        <CustomTooltip content="Add Pages">
                           <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id?._id}&catelog=${d?._id}` }}>
                             <RiPagesFill className='w-4 h-4 fill-emerald-500 cursor-pointer'/>
                           </Link>
+                        </CustomTooltip>
+                          <CustomTooltip content="Preview">
                           <a href={`${clientAppUrl}/catalog-preview/${d?._id}`} target="_blank" rel="noopener noreferrer">
                             <MdPreview className='w-4 h-4 fill-green-500 cursor-pointer'/>
                           </a>
-                          <FaTrash onClick={() => onDelete(d?._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
-                          <PencilAltIcon onClick={() => onUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
+                        </CustomTooltip>
+                          <CustomTooltip content="Delete">
+                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer' />
+                        </CustomTooltip>
+                        <CustomTooltip content="Edit">
+                        <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer' />
+                        </CustomTooltip>
 
                         </div>
                       </TD>

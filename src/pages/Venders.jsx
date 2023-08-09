@@ -16,6 +16,7 @@ import baseUrl from '../utils/baseUrl'
 import Confirm from '../components/shared/Confirm'
 import Alert from '../components/shared/Alert'
 import { ToastContainer, toast } from 'react-toastify';
+import CustomTooltip from '../components/shared/Tooltip'
 
 const Vender = () => {
   const [alertTitle, setAlertTitle] = useState(null)
@@ -415,15 +416,19 @@ const toDelete = async () => {
                         { d.address.city }
                       </TD>
                       <TD>
-                        { d.address.postal_code }
+                        { d.address.postal_code !== undefined ? d.address.postal_code : 'N/A'}
                       </TD>
                       <TD>
                           <img className='w-1/2 h-1/2' src={d.profilePic}></img>
                       </TD>
                       <TD>
-                        <div className='w-full h-full flex items-center justify-center gap-4'>
-                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
-                          <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
+                      <div className='w-full h-full flex items-center justify-center gap-4'>
+                        <CustomTooltip content="Delete">
+                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer' />
+                        </CustomTooltip>
+                        <CustomTooltip content="Edit">
+                        <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer' />
+                        </CustomTooltip>
                         </div>  
                       </TD>
                     </Row>
