@@ -14,6 +14,8 @@ import { Link } from 'react-router-dom'
 import baseUrl, {clientAppUrl} from '../utils/baseUrl'
 import { ToastContainer, toast } from 'react-toastify';
 import CustomTooltip from '../components/shared/Tooltip'
+import Swal from "sweetalert2";
+
 const Catalog = () => {
 
   const [data, setData] =useState([])
@@ -131,12 +133,28 @@ const Catalog = () => {
 
   const onDelete = async (id) => {
     try {
+      Swal.fire({
+        title: 'Delete',
+        text: 'Are you sure you want to delete this catelog page?',
+        icon: 'warning',
+        showCancelButton: true, // Add this line to show the cancel button
+        confirmButtonText: 'Done',
+        cancelButtonText: 'Cancel', // Add this line to set the cancel button text
+        confirmButtonColor: '#8DC14F',
+    }).then(async (result) => {
+        if (result.isConfirmed) {
+          const res = await axios.delete(`${baseUrl}/catelog/book/${id}`)
+          console.log(res.data)
+    
+          fetchData()
+          toast.success('Data deleted successfully')
+        }
+    });
+      // const res = await axios.delete(`${baseUrl}/catelog/book/${id}`)
+      // console.log(res.data)
 
-      const res = await axios.delete(`${baseUrl}/catelog/book/${id}`)
-      console.log(res.data)
-
-      fetchData()
-      return toast.success('Data deleted successfully')
+      // fetchData()
+      // return toast.success('Data deleted successfully')
 
 
     } catch (error) {
@@ -238,7 +256,7 @@ const Catalog = () => {
                           <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer' />
                         </CustomTooltip>
                         <CustomTooltip content="Edit">
-                        <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer' />
+                        <PencilAltIcon onClick={() => onUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer' />
                         </CustomTooltip>
 
                         </div>
