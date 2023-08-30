@@ -268,7 +268,7 @@ const Form = ({ pageItem, setPageItem }) => {
           name={"product_description"}
           value={pageItem.product_description}
           onChange={handleChange}
-          maxlength="200"
+          maxLength="200"
         />
 
         <TextInput
@@ -417,11 +417,11 @@ const Form = ({ pageItem, setPageItem }) => {
         </div>
       </div>
 
-      <div className="h-[50vh]">
+      <div className="self-start sticky top-0">
         <img
           src={pageItem.product_image}
           alt=""
-          className="w-full h-full object-contain"
+          className="w-full h-full h-[30vw] object-contain"
         />
       </div>
     </div>

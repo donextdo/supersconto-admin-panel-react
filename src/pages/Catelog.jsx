@@ -274,7 +274,7 @@ const Catalog = () => {
             onClose={toggleModal}
             onCancel={onCancel}
             onSave={onSave}
-            title='Add catelog'>
+            title={updateMode ? "Update Catalog" : "Add Catalog"}>
 
             <Form
               catelog={catelog}
@@ -330,12 +330,13 @@ const Catalog = () => {
 
           <Table>
 
-            <THead>
-              <TH title={'Id'} />
-              <TH title={'Title'} />
-              <TH title={'Expired Date'} />
-              <TH title={'Actions'} />
-            </THead>
+              <THead>
+                <TH title={'Id'}/>
+                <TH title={'Title'}/>
+                <TH title={'Expired Date'}/>
+                <TH title={'Display Date'}/>
+                <TH title={'Actions'}/>
+              </THead>
 
             <TBody>
 
@@ -349,11 +350,14 @@ const Catalog = () => {
                       {d.title}
                     </TD>
 
-                    <TD>
-                      {normalizeDate(d.expiredate)}
-                    </TD>
-                    <TD>
-                      <div className='w-full h-full flex items-center justify-center gap-4'>
+                      <TD>
+                        { normalizeDate(d.expiredate) }
+                      </TD>
+                      <TD>
+                        { normalizeDate(d.createdAt) }
+                      </TD>
+                      <TD>
+                        <div className='w-full h-full flex items-center justify-center gap-4'>
                         <CustomTooltip content="Add Pages">
                           <Link to={{ pathname: '/catelog/pages', search: `shop=${d.shop_id?._id}&catelog=${d?._id}` }}>
                             <RiPagesFill className='w-4 h-4 fill-emerald-500 cursor-pointer' />
