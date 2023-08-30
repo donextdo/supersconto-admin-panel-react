@@ -416,7 +416,7 @@ const toDelete = async () => {
                         { d.address.city }
                       </TD>
                       <TD>
-                        { d.address.postal_code !== undefined ? d.address.postal_code : 'N/A'}
+                        { d.address.postal_code !== "undefined" ? d.address.postal_code : 'N/A'}
                       </TD>
                       <TD>
                           <img className='w-1/2 h-1/2' src={d.profilePic}></img>

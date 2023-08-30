@@ -417,7 +417,7 @@ const Form = ({ pageItem, setPageItem }) => {
         </div>
       </div>
 
-      <div>
+      <div className="h-[50vh]">
         <img
           src={pageItem.product_image}
           alt=""

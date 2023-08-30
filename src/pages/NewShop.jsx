@@ -18,6 +18,7 @@ import Confirm from "../components/shared/Confirm";
 import { ToastContainer, toast } from "react-toastify";
 import Dropdown from "../components/shared/Dropdown.jsx";
 import CustomTooltip from "../components/shared/Tooltip";
+import { MdArrowDropDown } from "react-icons/md";
 
 const NewShop = () => {
     const [confirm, setConfirm] = useState(false);
@@ -31,13 +32,17 @@ const NewShop = () => {
     const [formatAddress, setFormatAddress] = useState(null);
     const [predictions, setPredictions] = useState([]);
     const [hide, setHide] = useState(false);
+    const [search, setSearch] = useState('');
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
+    const [itemsPerPage, setItemsPerPage] = useState(10);
 
     const [shopNameError, setShopNameError] = useState('')
     const [formError, setFormError] = useState('');
     const [vendors, setVendors] = useState([])
     const [formData, setFormData] = useState({
         shop_name: "",
-        customized_shop_name:"",
+        customized_shop_name: "",
         description: "",
         address: "",
         city: "",
@@ -56,36 +61,60 @@ const NewShop = () => {
         telephone: "",
         vendor: "",
         role: "",
-        website:"",
+        website: "",
 
     });
 
     const [isEdit, setIsEdit] = useState(false);
     const userData = sessionStorage.getItem("user") ? JSON.parse(atob(sessionStorage.getItem("user"))) : null
     const token = localStorage.getItem("token") ? localStorage.getItem("token") : null
-    console.log({userData})
+    console.log({ userData })
     const isAdmin = userData?.userType === 0;
+
+    useEffect(() => {
+        if (isAdmin) {
+            fetchVendorData()
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [page, search, itemsPerPage]);
 
     async function fetchData() {
         try {
             let res = []
 
-            if (userData){
+            if (userData) {
                 if (isAdmin) {
-                    res = await axios.get(`${baseUrl}/shop`);
+                    res = await axios.get(`${baseUrl}/shop/allshops`, {
+                        params: {
+                            page,
+                            search,
+                            itemsPerPage,
+                        },
+                    });
                 } else {
-                    res = await axios.get(`${baseUrl}/shop/by-vendor/${userData?._id}`, {
+                    res = await axios.get(`${baseUrl}/shop/by-vendor-params/${userData?._id}`, {
                         headers: {
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*',
                             'Authorization': `Bearer ${token}`,
                             'Accept': "application/json"
                         }
-                    });
+                    },{
+                        params: {
+                            page,
+                            search,
+                            itemsPerPage,
+                        },
+                    }
+                    );
                 }
             }
-            setData(res.data);
-            console.log("data : ", data);
+            setData(res.data.shops);
+            setTotalPages(res.data.totalPages)
+            console.log("data : ", res.data);
         } catch (err) {
             console.log(err);
         }
@@ -95,21 +124,13 @@ const NewShop = () => {
         try {
             const res = await axios.get(`${baseUrl}/vendor`);
             console.log(res)
-            const vendorsList = res.data.map(vendor => ({value: vendor._id, label: vendor.username, role: "Vendor"}))
-            vendorsList.push({value: userData._id, label: userData.username, role: "Admin"})
+            const vendorsList = res.data.map(vendor => ({ value: vendor._id, label: vendor.username, role: "Vendor" }))
+            vendorsList.push({ value: userData._id, label: userData.username, role: "Admin" })
             setVendors(vendorsList);
         } catch (err) {
             console.log(err);
         }
     }
-
-    useEffect(() => {
-        fetchData();
-        if (isAdmin) {
-            fetchVendorData()
-        }
-    }, []);
-
 
 
     const onDelete = (id) => {
@@ -124,7 +145,7 @@ const NewShop = () => {
 
         setFormData({
             shop_name: "",
-            customized_shop_name:"",
+            customized_shop_name: "",
             description: "",
             address: "",
             city: "",
@@ -144,7 +165,7 @@ const NewShop = () => {
             telephone: "",
             role: role,
             vendor: vendor,
-            website:"",
+            website: "",
 
         });
     };
@@ -155,7 +176,7 @@ const NewShop = () => {
         const bodyFormData = new FormData();
 
         let role, vendor
-        if(isAdmin) {
+        if (isAdmin) {
             role = formData.role
             vendor = formData.vendor
         } else {
@@ -187,7 +208,7 @@ const NewShop = () => {
     };
 
     const onSave = async () => {
-        console.log("ggggg : ", formData,setBodyFormData(formData));
+        console.log("ggggg : ", formData, setBodyFormData(formData));
 
         if (formData.address == "" || formData.shop_name == "" || formData.logo_img == '') {
             setFormError('Please fill in the required field marked with an asterisk (*).');
@@ -240,7 +261,7 @@ const NewShop = () => {
         sessionStorage.setItem("id", data._id);
         setFormData({
             shop_name: data.shop_name,
-            customized_shop_name:data.customized_shop_name,
+            customized_shop_name: data.customized_shop_name,
             description: data.description,
             address: data.address.address,
             state: data.address.state,
@@ -256,8 +277,8 @@ const NewShop = () => {
             telephone: data.telephone,
             website: data.website,
             city: data.city,
-            vendor:data.vendor,
-            role:data.role
+            vendor: data.vendor,
+            role: data.role
         });
         setModal(true);
     };
@@ -311,7 +332,7 @@ const NewShop = () => {
     };
 
     const update = (name, e) => {
-        console.log({name, e})
+        console.log({ name, e })
         if (name === "is_online_selling") {
             setFormData((prevState) => {
                 return { ...prevState, [name]: !prevState.is_online_selling };
@@ -384,16 +405,16 @@ const NewShop = () => {
 
                     // Find the component that represents the city or administrative area level 1
                     const cityComponent = addressComponents.find(
-                      (component) =>
-                        component.types.includes('locality') ||
-                        component.types.includes('administrative_area_level_1')
+                        (component) =>
+                            component.types.includes('locality') ||
+                            component.types.includes('administrative_area_level_1')
                     );
 
                     // Extract the city name from the cityComponent object
                     const cityName = cityComponent ? cityComponent.long_name : 'City not found';
 
                     setFormData((prevState) => {
-                        return { ...prevState, address: formattedAddress, latitude: lat, longitude: lng , shop_name:sName, telephone:formatted_phone_number, website:website, city:cityName};
+                        return { ...prevState, address: formattedAddress, latitude: lat, longitude: lng, shop_name: sName, telephone: formatted_phone_number, website: website, city: cityName };
                     })
                     setHide(true);
                     console.log("Formatted Address: ", formattedAddress);
@@ -406,11 +427,78 @@ const NewShop = () => {
         );
     }
 
-  
 
+    const handleSearchChange = (event) => {
+        setSearch(event.target.value);
+    };
 
+    const handlePageChange = (newPage) => {
+        if (newPage >= 1 && newPage <= totalPages) {
+            setPage(newPage);
+        }
+    };
+
+    const renderPageButtons = () => {
+        const maxVisibleButtons = 5; // Adjust as needed
+        const buttons = [];
+
+        if (totalPages <= maxVisibleButtons) {
+            for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+                buttons.push(
+                    <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`py-1 px-2 text-white  ${page === pageNum ? 'border-2 border-black bg-gray-400' : 'bg-gray-400 border'}`}
+                    >
+                        {pageNum}
+                    </button>
+                );
+            }
+        } else {
+            const startPage = Math.max(1, page - Math.floor(maxVisibleButtons / 2));
+            const endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+
+            if (startPage > 1) {
+                buttons.push(
+                    <button key="1" onClick={() => handlePageChange(1)}>
+                        1
+                    </button>
+                );
+                if (startPage > 2) {
+                    buttons.push(<span key="ellipsis-start">...</span>);
+                }
+            }
+
+            for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
+                buttons.push(
+                    <button
+                        key={pageNum}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`py-1 px-2 text-white  ${page === pageNum ? 'border-2 border-black bg-gray-400' : 'bg-gray-400 border'}`}
+
+                    >
+                        {pageNum}
+                    </button>
+                );
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    buttons.push(<span key="ellipsis-end">...</span>);
+                }
+                buttons.push(
+                    <button key={totalPages} onClick={() => handlePageChange(totalPages)}>
+                        {totalPages}
+                    </button>
+                );
+            }
+        }
+
+        return buttons;
+    }
 
     console.log("formData", formData)
+    console.log("page", itemsPerPage)
 
     return (
         <div>
@@ -446,7 +534,7 @@ const NewShop = () => {
                                     }}
                                     border
                                     borderColor="border-gray-600"
-                                    
+
                                 />
                                 {predictions.length > 0 && !hide && (
                                     <ul className="mb-4">
@@ -474,7 +562,7 @@ const NewShop = () => {
                                     value={formData.shop_name}
                                     onChange={(e) => update("shop_name", e)}
                                     borderColor="border-gray-600"
-                                    
+
                                 />
                             </div>
 
@@ -494,7 +582,7 @@ const NewShop = () => {
                         </div>
 
                         {
-                            isAdmin && <Dropdown
+                            isAdmin && (<Dropdown
                                 label="Select vendor"
                                 defaultValue={vendors.find(
                                     (vendor) => vendor.value === formData.vendor
@@ -506,17 +594,19 @@ const NewShop = () => {
                                 onChange={(e) => {
                                     update("vendor", {
                                         target: {
-                                            value : e.value
+                                            value: e.value
                                         }
                                     })
                                     update("role", {
                                         target: {
-                                            value : e.role
+                                            value: e.role
                                         }
                                     })
                                 }}
-                            />
+                            />)
+
                         }
+                        {isAdmin && (<div className="text-gray-500 -mt-4">* Please select a vender</div>)}
 
                         <div className="flex gap-4">
                             <div className="flex-1">
@@ -541,7 +631,7 @@ const NewShop = () => {
                                 />
                             </div>
                         </div>
-                        
+
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <TextInput
@@ -608,11 +698,45 @@ const NewShop = () => {
                     </Modal>
                 )}
                 <Card>
-                    <div className="w-full py-4 flex gap-6">
-                        <ButtonNormal onClick={toggleModal}>
-                            <RiAddCircleLine className="w-5 h-5" />
-                            <span>Add</span>
-                        </ButtonNormal>
+                    <div className="w-full py-4 flex justify-between items-center">
+                        <div className="py-4 flex gap-6">
+                            <ButtonNormal onClick={toggleModal}>
+                                <RiAddCircleLine className="w-5 h-5" />
+                                <span>Add</span>
+                            </ButtonNormal>
+                            <div>
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={handleSearchChange}
+                                    placeholder="Search"
+                                    className="border py-2 px-4 rounded-md"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="relative">
+                            <select
+                                id="shop"
+                                value={itemsPerPage}
+                                onChange={(event) => setItemsPerPage(event.target.value)}
+                                className="w-20 px-6 py-2 border bg-white border-slate-400 text-gray-600 text-sm font-semibold focus:outline-none appearance-none"
+                            >
+
+                                {[
+                                    10,
+                                    25,
+                                    50,
+                                    100,
+                                ].map((option, index) => (
+                                    <option key={index} value={option} className="text-sm font-semibold text-gray-500 appearance-none">
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                            <MdArrowDropDown className="text-gray-600 text-lg absolute right-4 top-0 bottom-0 my-auto cursor-pointer pointer-events-none" />
+                        </div>
+
                     </div>
                     <Table>
                         <THead>
@@ -652,13 +776,13 @@ const NewShop = () => {
                                             ></img>
                                         </TD>
                                         <TD>
-                                        <div className='w-full h-full flex items-center justify-center gap-4'>
-                        <CustomTooltip content="Delete">
-                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer' />
-                        </CustomTooltip>
-                        <CustomTooltip content="Edit">
-                        <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer' />
-                        </CustomTooltip>
+                                            <div className='w-full h-full flex items-center justify-center gap-4'>
+                                                <CustomTooltip content="Delete">
+                                                    <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer' />
+                                                </CustomTooltip>
+                                                <CustomTooltip content="Edit">
+                                                    <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer' />
+                                                </CustomTooltip>
                                             </div>
                                         </TD>
                                     </Row>
@@ -666,6 +790,25 @@ const NewShop = () => {
                             })}
                         </TBody>
                     </Table>
+
+                    <div className="flex mt-2">
+                        <button
+                            disabled={page === 1}
+                            onClick={() => handlePageChange(page - 1)}
+                            className={`py-1 px-2  text-white ${page === 1?"bg-black opacity-10 text-gray-100":"bg-green-900"}`}
+                        >
+                            Previous
+                        </button>
+                        {renderPageButtons()}
+                        <button
+                            disabled={page === totalPages}
+                            onClick={() => handlePageChange(page + 1)}
+                            className={`py-1 px-2  text-white ${page === totalPages?"bg-black opacity-10 text-gray-100":"bg-green-900"}`}
+
+                        >
+                            Next
+                        </button>
+                    </div>
                 </Card>
             </>
             {/* </Content> */}
