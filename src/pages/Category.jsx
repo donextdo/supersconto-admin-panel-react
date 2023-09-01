@@ -24,6 +24,8 @@ const Category = () => {
   const [confirm, setConfirm] = useState(false);
   const [alertError, setAlertError] = useState(false);
   const [categoryId, setCategoryId] = useState();
+  const [search, setSearch] = useState('');
+
   const [formData, setFormData] = useState({
     name: null,
     mainCategoryName: null,
@@ -36,12 +38,16 @@ const Category = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [search]);
 
   const fetchData = async () => {
     try {
       const categories = [];
-      const res = await axios.get(baseUrl + "/category/categories");
+      const res = await axios.get(baseUrl + "/category/categories/getall",{
+        params: {
+            search,  
+        },
+    });
       console.log("category List:", res);
       setOptions([{ value: "none", label: "none" }]);
       // res.data.mainCategories.forEach(assign);
@@ -199,6 +205,11 @@ const Category = () => {
     setFormData({});
   };
   const nameRef = useRef();
+
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+};
+
   return (
     <div>
       {/* <Sidebar />
@@ -254,6 +265,15 @@ const Category = () => {
               <RiAddCircleLine className="w-5 h-5" />
               <span>Add</span>
             </ButtonNormal>
+            <div>
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={handleSearchChange}
+                                    placeholder="Search"
+                                    className="border py-2 px-4 rounded-md"
+                                />
+                            </div>
           </div>
           <Table>
             <THead>

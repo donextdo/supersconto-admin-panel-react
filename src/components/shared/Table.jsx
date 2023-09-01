@@ -15,7 +15,7 @@ export const Table = ({ children }) => {
 
 export const THead = ({ children }) => {
     return (
-        <thead className="text-xs text-gray-700 uppercase border border-gray-100 bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase border border-gray-100 bg-gray-100 dark:bg-gray-700 dark:text-gray-400 ">
               <tr>
                 { children }
               </tr>

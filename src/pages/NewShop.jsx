@@ -1,6 +1,6 @@
 import axios from "axios";
 import { RiAddCircleLine } from "react-icons/ri";
-import { ButtonNormal } from "../components/shared/Button";
+import { ButtonNormal, ButtonSuccess } from "../components/shared/Button";
 import Modal from "../components/shared/Modal";
 import TextInput from "../components/shared/TextInput";
 import React, { useEffect, useState } from "react";
@@ -19,6 +19,8 @@ import { ToastContainer, toast } from "react-toastify";
 import Dropdown from "../components/shared/Dropdown.jsx";
 import CustomTooltip from "../components/shared/Tooltip";
 import { MdArrowDropDown } from "react-icons/md";
+import Swal from "sweetalert2";
+
 
 const NewShop = () => {
     const [confirm, setConfirm] = useState(false);
@@ -26,6 +28,7 @@ const NewShop = () => {
     const [modal, setModal] = useState(false);
     const [alertMessage, setAlertMessage] = useState(false);
     const [alertError, setAlertError] = useState(false);
+    const [alertShopError, setAlertShopError] = useState(false);
     const [med, setMed] = useState("delete");
     const [latitude, setLatitude] = useState(null);
     const [longitude, setLongitude] = useState(null);
@@ -102,7 +105,7 @@ const NewShop = () => {
                             'Authorization': `Bearer ${token}`,
                             'Accept': "application/json"
                         }
-                    },{
+                    }, {
                         params: {
                             page,
                             search,
@@ -138,6 +141,7 @@ const NewShop = () => {
         setMed("delete");
         setConfirm(true);
     };
+    
     const toggleModal = () => {
         setModal(!modal);
         const role = isAdmin ? "Admin" : "Vendor"
@@ -215,28 +219,99 @@ const NewShop = () => {
         } else {
             setFormError('');
 
-            await axios({
-                method: "post",
-                url: `${baseUrl}/shop`,
-                data: setBodyFormData(formData),
-                headers: { "Content-Type": "multipart/form-data" },
-            })
-                .then((response) => {
-                    setAlertError(false);
+            handlecheckName()
 
-                    console.log(response.data);
-                    fetchData();
-                    return toast.success("Data inserted successfully");
-                })
-                .catch(function (error) {
-                    console.log(" error", error);
-                    return toast.error(error.message);
-                });
-            toggleModal();
+            // await axios({
+            //     method: "post",
+            //     url: `${baseUrl}/shop`,
+            //     data: setBodyFormData(formData),
+            //     headers: { "Content-Type": "multipart/form-data" },
+            // })
+            //     .then((response) => {
+            //         setAlertError(false);
+
+            //         console.log(response.data);
+            //         fetchData();
+            //         return toast.success("Data inserted successfully");
+            //     })
+            //     .catch(function (error) {
+            //         console.log(" error", error);
+            //         return toast.error(error.message);
+            //     });
+            // toggleModal();
 
         }
 
     };
+    const handlecheckName = async () => {
+        try {
+            const response = await fetch(`${baseUrl}/shop/check-name`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ shop_name: formData.shop_name }),
+            });
+
+            const data = await response.json();
+            console.log(response)
+
+            if (response.status == 200) {
+                await axios({
+                    method: "post",
+                    url: `${baseUrl}/shop`,
+                    data: setBodyFormData(formData),
+                    headers: { "Content-Type": "multipart/form-data" },
+                })
+                    .then((response) => {
+                        setAlertError(false);
+
+                        console.log(response.data);
+                        fetchData();
+                        return toast.success("Data inserted successfully");
+                    })
+                    .catch(function (error) {
+                        console.log(" error", error);
+                        return toast.error(error.message);
+                    });
+                toggleModal();
+            } else if (response.status == 400) {
+                Swal.fire({
+                    title: 'Shop name already exists',
+                    text: 'Are you sure you want to continue?',
+                    icon: 'warning',
+                    showCancelButton: true, // Add this line to show the cancel button
+                    confirmButtonText: 'OK',
+                    cancelButtonText: 'Cancel', // Add this line to set the cancel button text
+                    confirmButtonColor: '#8DC14F',
+                }).then(async (result) => {
+                    if (result.isConfirmed) {
+                        await axios({
+                            method: "post",
+                            url: `${baseUrl}/shop`,
+                            data: setBodyFormData(formData),
+                            headers: { "Content-Type": "multipart/form-data" },
+                        })
+                            .then((response) => {
+                                setAlertError(false);
+
+                                console.log(response.data);
+                                fetchData();
+                                return toast.success("Data inserted successfully");
+                            })
+                            .catch(function (error) {
+                                console.log(" error", error);
+                                return toast.error(error.message);
+                            });
+                        toggleModal();
+                    }
+                });
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
 
     const CurrentData = (data) => {
         setFormData((prevState) => {
@@ -560,7 +635,10 @@ const NewShop = () => {
                                     label="Shop Name *"
                                     border
                                     value={formData.shop_name}
-                                    onChange={(e) => update("shop_name", e)}
+                                    onChange={(e) => {
+                                        update("shop_name", e)
+
+                                    }}
                                     borderColor="border-gray-600"
 
                                 />
@@ -795,7 +873,7 @@ const NewShop = () => {
                         <button
                             disabled={page === 1}
                             onClick={() => handlePageChange(page - 1)}
-                            className={`py-1 px-2  text-white ${page === 1?"bg-black opacity-10 text-gray-100":"bg-green-900"}`}
+                            className={`py-1 px-2  text-white ${page === 1 ? "bg-black opacity-10 text-gray-100" : "bg-green-900"}`}
                         >
                             Previous
                         </button>
@@ -803,7 +881,7 @@ const NewShop = () => {
                         <button
                             disabled={page === totalPages}
                             onClick={() => handlePageChange(page + 1)}
-                            className={`py-1 px-2  text-white ${page === totalPages?"bg-black opacity-10 text-gray-100":"bg-green-900"}`}
+                            className={`py-1 px-2  text-white ${page === totalPages ? "bg-black opacity-10 text-gray-100" : "bg-green-900"}`}
 
                         >
                             Next
