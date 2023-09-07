@@ -116,6 +116,16 @@ const Form = ({ catelog, setCatelog }) => {
                 onChange={handleChange}
             />
 
+            <TextInput
+                label='Start Date *'
+                type={'date'}
+                border
+                borderColor='border-gray-600'
+                name={'startdate'}
+                value={catelog.startdate.substring(0, 10)}
+                onChange={handleChange}
+            />
+
             <MySwitch
                 label="Featured Flyer"
                 border

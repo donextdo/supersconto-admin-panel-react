@@ -49,6 +49,14 @@ const NewShop = () => {
         description: "",
         address: "",
         city: "",
+        cityCode: "",
+        country: "",
+        countryCode: "",
+        administrativeOne: "",
+        administrativeTwo: "",
+        administrativeThree: "",
+        street: "",
+        route: "",
         state: "",
         postal_code: "",
         shop_unique_id: "",
@@ -141,7 +149,7 @@ const NewShop = () => {
         setMed("delete");
         setConfirm(true);
     };
-    
+
     const toggleModal = () => {
         setModal(!modal);
         const role = isAdmin ? "Admin" : "Vendor"
@@ -153,6 +161,14 @@ const NewShop = () => {
             description: "",
             address: "",
             city: "",
+            cityCode: "",
+            country: "",
+            countryCode: "",
+            administrativeOne: "",
+            administrativeTwo: "",
+            administrativeThree: "",
+            street: "",
+            route: "",
             state: "",
             postal_code: "",
             shop_unique_id: "",
@@ -192,7 +208,7 @@ const NewShop = () => {
         bodyFormData.append("description", formData.description);
         bodyFormData.append("address[address]", formData.address);
         bodyFormData.append("address[state]", formData.state);
-        bodyFormData.append("address[postal_code]", formData.postal_code);
+        bodyFormData.append("postal_code", formData.postal_code);
         bodyFormData.append("shop_unique_id", formData.shop_unique_id);
         bodyFormData.append("owner_name", formData.owner_name);
         bodyFormData.append("status", true);
@@ -206,6 +222,16 @@ const NewShop = () => {
         bodyFormData.append("vendor", vendor);
         bodyFormData.append("website", formData.website);
         bodyFormData.append("city", formData.city);
+        bodyFormData.append("cityCode", formData.cityCode);
+        bodyFormData.append("country", formData.country);
+        bodyFormData.append("countryCode", formData.countryCode);
+        bodyFormData.append("administrativeOne", formData.administrativeOne);
+        bodyFormData.append("administrativeTwo", formData.administrativeTwo);
+        bodyFormData.append("administrativeThree", formData.administrativeThree);
+        bodyFormData.append("street", formData.street);
+        bodyFormData.append("route", formData.route);
+
+
 
 
         return bodyFormData
@@ -340,7 +366,7 @@ const NewShop = () => {
             description: data.description,
             address: data.address.address,
             state: data.address.state,
-            postal_code: data.address.postal_code,
+            postal_code: data.postal_code,
             shop_unique_id: data.shop_unique_id,
             owner_name: data.owner_name,
             status: data.status,
@@ -353,7 +379,18 @@ const NewShop = () => {
             website: data.website,
             city: data.city,
             vendor: data.vendor,
-            role: data.role
+            role: data.role,
+            city: data.city,
+            cityCode: data.cityCode,
+            country: data.country,
+            countryCode: data.countryCode,
+            administrativeOne: data.administrativeOne,
+            administrativeTwo: data.administrativeTwo,
+            administrativeThree: data.administrativeThree,
+            street: data.street,
+            route: data.route,
+
+
         });
         setModal(true);
     };
@@ -485,17 +522,68 @@ const NewShop = () => {
                             component.types.includes('administrative_area_level_1')
                     );
 
+
+
+                    const administrativeThreeObj = addressComponents.find(item =>
+                        item.types.includes('administrative_area_level_3') &&
+                        item.types.includes('political')
+                    );
+
+                    const cityObj = addressComponents.find(item =>
+                        item.types.includes('administrative_area_level_2') &&
+                        item.types.includes('political')
+                    );
+
+                    const administrativeOneObj = addressComponents.find(item =>
+                        item.types.includes('administrative_area_level_1') &&
+                        item.types.includes('political')
+                    );
+
+
+                    const countryObj = addressComponents.find(item =>
+                        item.types.includes('country') &&
+                        item.types.includes('political')
+                    );
+
+                    const streetObj = addressComponents.find(item =>
+                        item.types.includes('street_number')
+                    );
+
+                    const routeObj = addressComponents.find(item =>
+                        item.types.includes('route')
+                    );
+
+                    const postalObj = addressComponents.find(item =>
+                        item.types.includes('postal_code')
+                    )
+
+
                     // Extract the city name from the cityComponent object
                     const cityName = cityComponent ? cityComponent.long_name : 'City not found';
+                    const cityCode = cityObj ? cityObj.short_name : 'City Code not found';
+                    const countryName = countryObj ? countryObj.long_name : 'Country not found';
+                    const countryCode = countryObj ? countryObj.short_name : 'Country Code not found';
+                    const street = streetObj ? streetObj.long_name : 'Street not found';
+                    const route = routeObj ? routeObj.long_name : 'Route not found';
+                    const postal_code = postalObj ? postalObj.long_name : 'Route not found';
+                    const administrativeOne = administrativeOneObj ? administrativeOneObj.long_name : 'administrativeOne not found';
+                    const administrativeTwo = cityObj ? cityObj.long_name : 'administrativeTwo not found';
+                    const administrativeThree = administrativeThreeObj ? administrativeThreeObj.long_name : 'administrativeThree not found';
+
+
+
+
 
                     setFormData((prevState) => {
-                        return { ...prevState, address: formattedAddress, latitude: lat, longitude: lng, shop_name: sName, telephone: formatted_phone_number, website: website, city: cityName };
+                        return { ...prevState, address: formattedAddress, latitude: lat, longitude: lng, shop_name: sName, telephone: formatted_phone_number, website: website, city: cityName, cityCode: cityCode, country: countryName, countryCode: countryCode, administrativeOne: administrativeOne, administrativeTwo: administrativeTwo, administrativeThree: administrativeThree, street: street, route: route, postal_code: postal_code };
                     })
                     setHide(true);
                     console.log("Formatted Address: ", formattedAddress);
                     console.log("Formatted lat: ", latitude);
                     console.log("Formatted lng: ", longitude);
                     console.log('City:', cityName);
+                    console.log('Citycode:', street, route, postal_code, administrativeOne, administrativeTwo, administrativeThree);
+
 
                 }
             }
@@ -713,7 +801,96 @@ const NewShop = () => {
                         <div className="flex gap-4">
                             <div className="flex-1">
                                 <TextInput
-                                    label="Municipality"
+                                    label="City Code"
+                                    border
+                                    value={formData.cityCode}
+                                    onChange={(e) => update("cityCode", e)}
+                                    borderColor="border-gray-600"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TextInput
+                                    label="Country"
+                                    border
+                                    value={formData.country}
+                                    onChange={(e) => update("country", e)}
+                                    borderColor="border-gray-600"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TextInput
+                                    label="Country Code"
+                                    border
+                                    value={formData.countryCode}
+                                    onChange={(e) => update("countryCode", e)}
+                                    borderColor="border-gray-600"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TextInput
+                                    label="Administrative One"
+                                    border
+                                    value={formData.administrativeOne}
+                                    onChange={(e) => update("administrativeOne", e)}
+                                    borderColor="border-gray-600"
+                                />
+                            </div>
+                        </div>
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TextInput
+                                    label="Administrative Two"
+                                    border
+                                    value={formData.administrativeTwo}
+                                    onChange={(e) => update("administrativeTwo", e)}
+                                    borderColor="border-gray-600"
+                                />
+                            </div>
+                        </div>   <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TextInput
+                                    label="Administrative Three"
+                                    border
+                                    value={formData.administrativeThree}
+                                    onChange={(e) => update("administrativeThree", e)}
+                                    borderColor="border-gray-600"
+                                />
+                            </div>
+                        </div>   <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TextInput
+                                    label="Street"
+                                    border
+                                    value={formData.street}
+                                    onChange={(e) => update("street", e)}
+                                    borderColor="border-gray-600"
+                                />
+                            </div>
+                        </div>   <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TextInput
+                                    label="Route"
+                                    border
+                                    value={formData.route}
+                                    onChange={(e) => update("route", e)}
+                                    borderColor="border-gray-600"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="flex gap-4">
+                            <div className="flex-1">
+                                <TextInput
+                                    label="Postal Code"
                                     value={formData.postal_code}
                                     onChange={(e) => update("postal_code", e)}
                                     border
@@ -824,6 +1001,14 @@ const NewShop = () => {
                             <TH title={"Address"} />
                             <TH title={"Status"} />
                             <TH title={"Logo"} />
+                            <TH title={"City"} />
+                            <TH title={"City Code"} />
+                            <TH title={"Administrative One"} />
+                            <TH title={"Administrative Two"} />
+                            <TH title={"Administrative Three"} />
+                            <TH title={"Street"} />
+                            <TH title={"Route"} />
+                            <TH title={"Postal Codee"} />
                             <TH title={"Actions"} />
                         </THead>
 
@@ -853,6 +1038,16 @@ const NewShop = () => {
                                                 alt="Shop Logo"
                                             ></img>
                                         </TD>
+                                        <TD>{d.city}</TD>
+                                        <TD>{d.cityCode}</TD>
+                                        <TD>{d.administrativeOne}</TD>
+                                        <TD>{d.administrativeTwo}</TD>
+                                        <TD>{d.administrativeThree}</TD>
+                                        <TD>{d.street}</TD>
+                                        <TD>{d.route}</TD>
+                                        <TD>{d.postal_code}</TD>
+
+
                                         <TD>
                                             <div className='w-full h-full flex items-center justify-center gap-4'>
                                                 <CustomTooltip content="Delete">
