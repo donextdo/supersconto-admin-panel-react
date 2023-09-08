@@ -29,6 +29,7 @@ const Catalog = () => {
     title: '',
     description: '',
     expiredate: '',
+    startdate:'',
     flyer: false,
     active: false,
   })
@@ -86,6 +87,7 @@ const Catalog = () => {
       title: '',
       description: '',
       expiredate: '',
+      startdate:'',
       flyer: false,
       active: false
 
@@ -121,6 +123,7 @@ const Catalog = () => {
           title: '',
           description: '',
           expiredate: '',
+          startdate:'',
           flyer: false,
           active: false
 
