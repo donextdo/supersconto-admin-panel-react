@@ -6,8 +6,8 @@ import { Button, ButtonNormal, ButtonSave } from './Button'
 const Modal = ({children, onClose, onCancel, onSave, title,height,width}) => {
   return (
     
-        <div className='fixed overlay inset-0  z-50 grid place-items-center bg-slate-900 bg-opacity-10 '>
-           <div className='h-3/4 w-full flex  justify-center h-screen '>
+        <div className='fixed overlay inset-0 z-50 grid place-items-center bg-slate-900 bg-opacity-10'>
+           <div className='h-[80vh] w-full flex justify-center'>
             <div className={`py-6 px-4 flex  gap-6 flex-col relative bg-white overflow-y-auto shadow-md rounded-md ${height && height } ${width ? width : 'w-96'}`}>
 
                 <h4 className='text-base w-full font-medium text-gray-900'>

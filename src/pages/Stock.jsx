@@ -9,7 +9,8 @@ import { FcClearFilters } from "react-icons/fc";
 import baseUrl from "../utils/baseUrl";
 import Dropdown from "../components/shared/Dropdown";
 import { ToastContainer, toast } from "react-toastify";
-
+const userData = sessionStorage.getItem("user") ? JSON.parse(atob(sessionStorage.getItem("user"))) : null
+const token = localStorage.getItem("token") ? localStorage.getItem("token") : null
 const Stocks = () => {
   const [stockData, setStockData] = useState([]);
   const [modal, setModal] = useState(false);
@@ -23,10 +24,24 @@ const Stocks = () => {
 
   async function fetchData() {
     try {
-      const { data } = await axios.get(`${baseUrl}/stock`);
-      setStockData(data);
+      let res = []
 
-      console.log({ data });
+      if (userData){
+        if (userData?.userType === 0) {
+          res = await axios.get(`${baseUrl}/stock`);
+        } else {
+          res = await axios.get(`${baseUrl}/stock/filter-by-vendor/${userData?._id}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Authorization': `Bearer ${token}`,
+              'Accept': "application/json"
+            }
+          });
+        }
+      }
+      setStockData(res.data);
+
     } catch (error) {
       console.log(error);
     }
@@ -34,7 +49,22 @@ const Stocks = () => {
 
   async function fetchShops() {
     try {
-      const res = await axios.get(`${baseUrl}/shop`);
+      let res = []
+
+      if (userData){
+        if (userData?.userType === 0) {
+          res = await axios.get(`${baseUrl}/shop`);
+        } else {
+          res = await axios.get(`${baseUrl}/shop/by-vendor/${userData?._id}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*',
+              'Authorization': `Bearer ${token}`,
+              'Accept': "application/json"
+            }
+          });
+        }
+      }
       const shopData = res?.data.map((d) => {
         return {
           value: d._id,

@@ -16,6 +16,9 @@ import baseUrl from '../utils/baseUrl'
 import Confirm from '../components/shared/Confirm'
 import Alert from '../components/shared/Alert'
 import { ToastContainer, toast } from 'react-toastify';
+import CustomTooltip from '../components/shared/Tooltip'
+import { MdArrowDropDown } from "react-icons/md";
+
 
 const Vender = () => {
   const [alertTitle, setAlertTitle] = useState(null)
@@ -23,6 +26,10 @@ const Vender = () => {
   const [alertError, setAlertError] = useState(false)
   const [confirm, setConfirm] = useState(false)
   const [med, setMed] = useState('delete')
+  const [search, setSearch] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
   const [formData, setFormData] = useState({
     fullname: '',
     username: '',
@@ -85,20 +92,28 @@ const Vender = () => {
   }
  
     
+  useEffect(() => {
+    fetchData();
+  }, [page, search, itemsPerPage]);
 
       async function fetchData() {
           try {
-            const res = await axios.get(`${baseUrl}/vendor`);
+            const res = await axios.get(`${baseUrl}/vendor/getall`,{
+              params: {
+                  page,
+                  search,
+                  itemsPerPage,
+              },
+          });
 console.log(res)
-              setData(res.data);
+              setData(res.data.venders);
+            setTotalPages(res.data.totalPages)
           } catch (err) {
               console.log(err);
           }
       }
  
-  useEffect(() => {
-    fetchData();
-  }, []);
+ 
   
   const toggleAlert = (title) => {
 
@@ -210,6 +225,75 @@ const toDelete = async () => {
       setConfirm(false)
 //  toggleAlert('Data inserted Successfully')
 
+}
+
+const handleSearchChange = (event) => {
+  setSearch(event.target.value);
+};
+
+const handlePageChange = (newPage) => {
+  if (newPage >= 1 && newPage <= totalPages) {
+      setPage(newPage);
+  }
+};
+
+const renderPageButtons = () => {
+  const maxVisibleButtons = 5; // Adjust as needed
+  const buttons = [];
+
+  if (totalPages <= maxVisibleButtons) {
+      for (let pageNum = 1; pageNum <= totalPages; pageNum++) {
+          buttons.push(
+              <button
+                  key={pageNum}
+                  onClick={() => handlePageChange(pageNum)}
+                  className={`py-1 px-2 text-white  ${page === pageNum ? 'border-2 border-black bg-gray-400' : 'bg-gray-400 border'}`}
+              >
+                  {pageNum}
+              </button>
+          );
+      }
+  } else {
+      const startPage = Math.max(1, page - Math.floor(maxVisibleButtons / 2));
+      const endPage = Math.min(totalPages, startPage + maxVisibleButtons - 1);
+
+      if (startPage > 1) {
+          buttons.push(
+              <button key="1" onClick={() => handlePageChange(1)}>
+                  1
+              </button>
+          );
+          if (startPage > 2) {
+              buttons.push(<span key="ellipsis-start">...</span>);
+          }
+      }
+
+      for (let pageNum = startPage; pageNum <= endPage; pageNum++) {
+          buttons.push(
+              <button
+                  key={pageNum}
+                  onClick={() => handlePageChange(pageNum)}
+                  className={`py-1 px-2 text-white  ${page === pageNum ? 'border-2 border-black bg-gray-400' : 'bg-gray-400 border'}`}
+
+              >
+                  {pageNum}
+              </button>
+          );
+      }
+
+      if (endPage < totalPages) {
+          if (endPage < totalPages - 1) {
+              buttons.push(<span key="ellipsis-end">...</span>);
+          }
+          buttons.push(
+              <button key={totalPages} onClick={() => handlePageChange(totalPages)}>
+                  {totalPages}
+              </button>
+          );
+      }
+  }
+
+  return buttons;
 }
 
   return (
@@ -367,12 +451,46 @@ const toDelete = async () => {
             </Modal>
           }
           <Card>
-             <div className='w-full py-4 flex gap-6'>
-                <ButtonNormal onClick={toggleModal}>
-                  <RiAddCircleLine className='w-5 h-5'/>
-                  <span>Add</span>
-                </ButtonNormal>
-            </div>
+          <div className="w-full py-4 flex justify-between items-center">
+                        <div className="py-4 flex gap-6">
+                            <ButtonNormal onClick={toggleModal}>
+                                <RiAddCircleLine className="w-5 h-5" />
+                                <span>Add</span>
+                            </ButtonNormal>
+                            <div>
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={handleSearchChange}
+                                    placeholder="Search"
+                                    className="border py-2 px-4 rounded-md"
+                                />
+                            </div>
+                        </div>
+
+                        <div className="relative">
+                            <select
+                                id="shop"
+                                value={itemsPerPage}
+                                onChange={(event) => setItemsPerPage(event.target.value)}
+                                className="w-20 px-6 py-2 border bg-white border-slate-400 text-gray-600 text-sm font-semibold focus:outline-none appearance-none"
+                            >
+
+                                {[
+                                    10,
+                                    25,
+                                    50,
+                                    100,
+                                ].map((option, index) => (
+                                    <option key={index} value={option} className="text-sm font-semibold text-gray-500 appearance-none">
+                                        {option}
+                                    </option>
+                                ))}
+                            </select>
+                            <MdArrowDropDown className="text-gray-600 text-lg absolute right-4 top-0 bottom-0 my-auto cursor-pointer pointer-events-none" />
+                        </div>
+
+                    </div>
             <Table>
 
               <THead>
@@ -415,15 +533,19 @@ const toDelete = async () => {
                         { d.address.city }
                       </TD>
                       <TD>
-                        { d.address.postal_code }
+                        { d.address.postal_code !== "undefined" ? d.address.postal_code : 'N/A'}
                       </TD>
                       <TD>
                           <img className='w-1/2 h-1/2' src={d.profilePic}></img>
                       </TD>
                       <TD>
-                        <div className='w-full h-full flex items-center justify-center gap-4'>
-                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer'/>
-                          <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer'/>
+                      <div className='w-full h-full flex items-center justify-center gap-4'>
+                        <CustomTooltip content="Delete">
+                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer' />
+                        </CustomTooltip>
+                        <CustomTooltip content="Edit">
+                        <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer' />
+                        </CustomTooltip>
                         </div>  
                       </TD>
                     </Row>
@@ -435,6 +557,24 @@ const toDelete = async () => {
               </TBody>
 
             </Table>
+            <div className="flex mt-2">
+                        <button
+                            disabled={page === 1}
+                            onClick={() => handlePageChange(page - 1)}
+                            className={`py-1 px-2  text-white ${page === 1?"bg-black opacity-10 text-gray-100":"bg-green-900"}`}
+                        >
+                            Previous
+                        </button>
+                        {renderPageButtons()}
+                        <button
+                            disabled={page === totalPages}
+                            onClick={() => handlePageChange(page + 1)}
+                            className={`py-1 px-2  text-white ${page === totalPages?"bg-black opacity-10 text-gray-100":"bg-green-900"}`}
+
+                        >
+                            Next
+                        </button>
+                    </div>
 
           </Card>
 

@@ -20,7 +20,7 @@ const Confirm = ({ onClose, onCancel,method, onSave,width}) => {
                     <FaTimes className='mt-3 fill-gray-500 w-5 h-5'/>
                 </Button>   
 
-                <h5>Do you really want to {method} data </h5>
+                <h5>Do you really want to {method}?</h5>
 
                 <div className='flex items-center justify-end self-end gap-4'>
                     {onCancel &&<button onClick={onCancel} className="bg-white  text-black hover:bg-gray-400  border  shadow  py-1 px-4 rounded">

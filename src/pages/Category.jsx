@@ -14,6 +14,7 @@ import { ToastContainer, toast } from "react-toastify";
 import Dropdown from "../components/shared/Dropdown";
 import Confirm from "../components/shared/Confirm";
 import { PencilAltIcon } from "@heroicons/react/solid";
+import CustomTooltip from "../components/shared/Tooltip";
 
 const Category = () => {
   const [isEdit, setIsEdit] = useState(false);
@@ -23,6 +24,8 @@ const Category = () => {
   const [confirm, setConfirm] = useState(false);
   const [alertError, setAlertError] = useState(false);
   const [categoryId, setCategoryId] = useState();
+  const [search, setSearch] = useState('');
+
   const [formData, setFormData] = useState({
     name: null,
     mainCategoryName: null,
@@ -35,27 +38,31 @@ const Category = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [search]);
 
   const fetchData = async () => {
     try {
       const categories = [];
-      const res = await axios.get(baseUrl + "/category/categories");
+      const res = await axios.get(baseUrl + "/category/categories/getall",{
+        params: {
+            search,  
+        },
+    });
       console.log("category List:", res);
       setOptions([{ value: "none", label: "none" }]);
-      res.data.mainCategories.forEach(assign);
-      res.data.subCategories.forEach(assign);
-      setData(categories);
-      function assign(val) {
-        categories.push(val);
+      // res.data.mainCategories.forEach(assign);
+      // res.data.subCategories.forEach(assign);
+      setData(res.data.mainCategories);
+      // function assign(val) {
+      //   categories.push(val);
 
-        if (!options.includes({ value: val.name, label: val.name })) {
-          setOptions((prevItems) => [
-            ...prevItems,
-            { value: val.name, label: val.name },
-          ]);
-        }
-      }
+      //   if (!options.includes({ value: val.name, label: val.name })) {
+      //     setOptions((prevItems) => [
+      //       ...prevItems,
+      //       { value: val.name, label: val.name },
+      //     ]);
+      //   }
+      // }
 
       console.log(options);
     } catch (err) {
@@ -96,10 +103,7 @@ const Category = () => {
       console.log("null");
     }
   };
-  // const updateSelect = (option) => {
-  //   setSelected(option);
-  //   console.log("selected main category: ", selected);
-  // };
+
   const onSave = async () => {
     console.log("while saving:", formData);
     if (selected.value == "none" || !selected.value) {
@@ -201,6 +205,11 @@ const Category = () => {
     setFormData({});
   };
   const nameRef = useRef();
+
+  const handleSearchChange = (event) => {
+    setSearch(event.target.value);
+};
+
   return (
     <div>
       {/* <Sidebar />
@@ -230,7 +239,7 @@ const Category = () => {
                 <Dropdown
                   label="Main Category"
                   border
-                  value={selected ? selected : options[0]}
+                  value={options[0]}
                   borderColor="border-gray-600"
                   options={options}
                   onChange={updateSelect}
@@ -240,7 +249,7 @@ const Category = () => {
             <div className="flex gap-4">
               <div className="flex-1">
                 <TextInput
-                  label="Sub Category/Category Name"
+                  label="Category Name"
                   border
                   borderColor="border-gray-600"
                   value={formData.name}
@@ -256,6 +265,15 @@ const Category = () => {
               <RiAddCircleLine className="w-5 h-5" />
               <span>Add</span>
             </ButtonNormal>
+            <div>
+                                <input
+                                    type="text"
+                                    value={search}
+                                    onChange={handleSearchChange}
+                                    placeholder="Search"
+                                    className="border py-2 px-4 rounded-md"
+                                />
+                            </div>
           </div>
           <Table>
             <THead>
@@ -270,15 +288,13 @@ const Category = () => {
                   <Row key={d._id}>
                     <TD>{d.name}</TD>
                     <TD>
-                      <div className="w-full h-full flex items-center justify-center gap-4">
-                        <FaTrash
-                          onClick={() => onDelete(d._id)}
-                          className="w-3 h-3 fill-red-500 cursor-pointer"
-                        />
-                        <PencilAltIcon
-                          onClick={() => toUpdate(d)}
-                          className="w-4 h-4 fill-blue-500 cursor-pointer"
-                        />
+                    <div className='w-full h-full flex items-center justify-center gap-4'>
+                        <CustomTooltip content="Delete">
+                          <FaTrash onClick={() => onDelete(d._id)} className='w-3 h-3 fill-red-500 cursor-pointer' />
+                        </CustomTooltip>
+                        <CustomTooltip content="Edit">
+                        <PencilAltIcon onClick={() => toUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer' />
+                        </CustomTooltip>
                       </div>
                     </TD>
                   </Row>

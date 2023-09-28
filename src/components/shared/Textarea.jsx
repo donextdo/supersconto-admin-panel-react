@@ -7,7 +7,8 @@ const Textarea = ({
     Styles, 
     border, 
     borderColor, 
-    onChange
+    onChange,
+    maxlength
 }) => {
 return (
 <div className='flex flex-col gap-2 items-start'>
@@ -19,6 +20,7 @@ return (
     }
 
     <textarea
+        maxlength={maxlength}
         value={value}
         name={name}
         rows='4'

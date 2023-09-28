@@ -10,11 +10,29 @@ const Form = ({ catelog, setCatelog }) => {
 
     const [shops, setShops] = useState([])
     const [defaultValue, setDefaultValue] = useState(null)
+    const userData = sessionStorage.getItem("user") ? JSON.parse(atob(sessionStorage.getItem("user"))) : null
+    const token = localStorage.getItem("token") ? localStorage.getItem("token") : null
 
     useEffect(() => {
+
         async function fetchData() {
             try {
-                const res = await axios.get(`${baseUrl}/shop`);
+                let res = []
+
+                if (userData) {
+                    if (userData?.userType === 0) {
+                        res = await axios.get(`${baseUrl}/shop`);
+                    } else {
+                        res = await axios.get(`${baseUrl}/shop/by-vendor/${userData?._id}`, {
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'Access-Control-Allow-Origin': '*',
+                                'Authorization': `Bearer ${token}`,
+                                'Accept': "application/json"
+                            }
+                        });
+                    }
+                }
                 const shopData = res.data.map(d => {
                     return {
                         value: d._id,
@@ -22,7 +40,6 @@ const Form = ({ catelog, setCatelog }) => {
                     }
                 })
                 setShops(shopData);
-
             } catch (err) {
                 console.log(err);
             }
@@ -38,6 +55,21 @@ const Form = ({ catelog, setCatelog }) => {
         })
     }
 
+    const handleTrueFlase = (e) => {
+        setCatelog(prevCatelog => ({
+            ...prevCatelog,
+            flyer: !prevCatelog.flyer,
+        }));
+    }
+
+    const activeTrueFlase = (e) => {
+        setCatelog(prevCatelog => ({
+            ...prevCatelog,
+            active: !prevCatelog.active,
+        }));
+    }
+
+
     const handleDropDownChange = (selectedOption) => {
         setCatelog({
             ...catelog,
@@ -49,14 +81,14 @@ const Form = ({ catelog, setCatelog }) => {
         <div className='flex flex-col gap-4'>
 
             <Dropdown
-                label='Select Shop'
+                label='Select Shop *'
                 value={shops.find(shop => shop.value === catelog.shop_id)}
                 options={shops}
                 onChange={handleDropDownChange}
             />
 
             <TextInput
-                label='Title'
+                label='Title *'
                 border
                 borderColor='border-gray-600'
                 name={'title'}
@@ -71,10 +103,11 @@ const Form = ({ catelog, setCatelog }) => {
                 name={'description'}
                 value={catelog.description}
                 onChange={handleChange}
+                maxlength="200"
             />
 
             <TextInput
-                label='Expire Date'
+                label='Expire Date *'
                 type={'date'}
                 border
                 borderColor='border-gray-600'
@@ -83,13 +116,31 @@ const Form = ({ catelog, setCatelog }) => {
                 onChange={handleChange}
             />
 
-            {/* <MySwitch
+            <TextInput
+                label='Start Date *'
+                type={'date'}
+                border
+                borderColor='border-gray-600'
+                name={'startdate'}
+                value={catelog.startdate.substring(0, 10)}
+                onChange={handleChange}
+            />
+
+            <MySwitch
                 label="Featured Flyer"
                 border
                 value={catelog.flyer}
-                onChange={handleChange}
+                onChange={handleTrueFlase}
                 borderColor="border-gray-600"
-            /> */}
+            />
+
+            <MySwitch
+                label="Active"
+                border
+                value={catelog.active}
+                onChange={activeTrueFlase}
+                borderColor="border-gray-600"
+            />
 
 
         </div>

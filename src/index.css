@@ -178,3 +178,7 @@ input:checked + .slider:before {
   background-color: #888; /* Example thumb color */
   border-radius: 8px; /* Add border radius */
 }
+
+.custom-table thead .sortable::after {
+  content: none; /* Hide the sort arrow */
+}
