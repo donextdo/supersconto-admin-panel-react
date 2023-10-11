@@ -2,11 +2,11 @@ import React, { useState, useEffect } from 'react'
 import { Content, Card } from '../components/shared/Utils'
 import { Table, THead, TBody, TH, Row, TD } from '../components/shared/Table'
 import { FaTrash } from 'react-icons/fa'
-import { PencilAltIcon } from '@heroicons/react/solid'
+import { PencilAltIcon, ClipboardCopyIcon } from '@heroicons/react/solid'
 import { MdPreview } from "react-icons/md";
 import axios from 'axios'
 import { ButtonSuccess } from '../components/shared/Button'
-import { RiAddCircleLine, RiPagesFill } from 'react-icons/ri'
+import { RiAddCircleLine, RiPagesFill, } from 'react-icons/ri'
 import Modal from '../components/shared/Modal'
 import Form from '../components/catelog/Form'
 import { normalizeDate } from '../utils/functions'
@@ -16,7 +16,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import CustomTooltip from '../components/shared/Tooltip'
 import Swal from "sweetalert2";
 import { MdArrowDropDown } from "react-icons/md";
-
+import Dropdown from "../components/shared/Dropdown.jsx";
 
 const Catalog = () => {
 
@@ -38,13 +38,44 @@ const Catalog = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [entries, setEntries] = useState(10);
+  const [showClonePopup, setShowClonePopup] = useState(false)
+  const [shops, setShops] = useState([])
+  const [cloneData, setCloneData] = useState(null)
 
   const userData = sessionStorage.getItem("user") ? JSON.parse(atob(sessionStorage.getItem("user"))) : null
   const token = localStorage.getItem("token") ? localStorage.getItem("token") : null
+  console.log({ userData })
+  const isAdmin = userData?.userType === 0;
 
   useEffect(() => {
     fetchData();
   }, [page, search, entries]);
+
+  useEffect(() => {
+
+    async function fetchData() {
+      try {
+
+        if (userData) {
+          if (userData?.userType === 0) {
+            const res = await axios.get(`${baseUrl}/shop`);
+            const shopData = res.data.map(d => {
+              return {
+                value: d._id,
+                label: `${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`
+              }
+            })
+            setShops(shopData);
+          }
+        }
+
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   async function fetchData() {
     try {
@@ -263,6 +294,36 @@ const Catalog = () => {
     return buttons;
 }
 
+  const onCloneDataSubmit = () => {
+    console.log({cloneData})
+
+    Swal.fire({
+      title: 'Clone',
+      text: `Are you sure you want clone ${cloneData.catalog.title} to ${cloneData.shop.label} ?`,
+      icon: 'info',
+      showCancelButton: true, // Add this line to show the cancel button
+      confirmButtonText: 'Clone',
+      cancelButtonText: 'Cancel', // Add this line to set the cancel button text
+      confirmButtonColor: '#8DC14F',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+
+        axios.post(`${baseUrl}/catelog/book/clone`, {
+          shopId: cloneData.shop.value,
+          catalogId: cloneData.catalog._id
+        }).then(res => {
+          toast.success('Catalog cloned successfully')
+        }).catch((error) => {
+          toast.error('Catalog cloned failed')
+        }).finally(() => {
+          fetchData()
+          setCloneData(null)
+          setShowClonePopup(false)
+        })
+      }
+    });
+  }
+
   return (
     <div>
       {/* <Sidebar />
@@ -287,6 +348,29 @@ const Catalog = () => {
 
           </Modal>
         }
+
+        {showClonePopup && <Modal
+            onClose={() => {
+              setShowClonePopup(false)
+              setCloneData(null)
+            }}
+            onCancel={() => {
+              setShowClonePopup(false)
+              setCloneData(null)
+            }}
+            onSave={onCloneDataSubmit}
+            styleClass="max-h-[50vh]"
+            title="Clone Catalog">
+          <Dropdown
+              label='Select Shop *'
+              value={shops.find(shop => shop.value === cloneData?.shop?.value)}
+              options={shops}
+              onChange={(data) => {
+                setCloneData(prev => ({...prev, shop: data}))
+              }}
+          />
+
+        </Modal>}
 
         <Card>
 
@@ -377,6 +461,14 @@ const Catalog = () => {
                         <CustomTooltip content="Edit">
                           <PencilAltIcon onClick={() => onUpdate(d)} className='w-4 h-4 fill-blue-500 cursor-pointer' />
                         </CustomTooltip>
+                        {isAdmin &&
+                          <CustomTooltip content="Clone">
+                            <ClipboardCopyIcon onClick={() => {
+                              setShowClonePopup(true)
+                              setCloneData(prev => ({...prev, catalog:d}))
+                            }}
+                                           className='w-4 h-4 fill-blue-500 cursor-pointer'/>
+                          </CustomTooltip>}
 
                       </div>
                     </TD>
