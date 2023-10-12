@@ -187,7 +187,7 @@ const Catalog = () => {
       expiredate: d.expiredate,
       flyer: d.flyer,
       active: d.active,
-      startdate:d.startdate ? d.startdate :'',
+      startdate: d.startdate ? d.startdate : '',
     })
     setUpdateMode(true)
     console.log(d)

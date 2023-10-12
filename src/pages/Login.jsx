@@ -63,15 +63,15 @@ const Login = () => {
 
   return (
     <>
-      <div className="grid grid-cols-2 w-full h-screen">
-        <div className="h-full">
+      <div className="relative h-full w-full">
+        <div className="w-full h-screen">
           <img
             src={image}
             alt="login image"
             className="w-full h-full object-cover"
           />
         </div>
-        <div className="bg-gray-900 text-white px-28 flex flex-col justify-center gap-6">
+        <div className="w-full h-full absolute right-0 top-0 md:w-1/2 bg-gray-900 text-white px-10 lg:px-28 flex flex-col justify-center gap-6 bg-opacity-90">
           <div>
             <h3 className="text-4xl font-semibold mb-6">Login</h3>
           </div>

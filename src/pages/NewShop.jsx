@@ -953,8 +953,8 @@ const NewShop = () => {
                     </Modal>
                 )}
                 <Card>
-                    <div className="w-full py-4 flex justify-between items-center">
-                        <div className="py-4 flex gap-6">
+                    <div className="w-full py-4 flex flex-col md:flex-row justify-between items-center">
+                        <div className="py-4 flex flex-col md:flex-row gap-6">
                             <ButtonNormal onClick={toggleModal}>
                                 <RiAddCircleLine className="w-5 h-5" />
                                 <span>Add</span>
