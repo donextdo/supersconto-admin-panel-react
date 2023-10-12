@@ -8,6 +8,7 @@ const Dropdown = ({
     value, 
     options,
     onChange,
+    isMulti,
     defaultValue
 }) => {
 
@@ -34,6 +35,7 @@ return (
 
         <Select
             value={value}
+            isMulti={isMulti}
             onChange={onChange}
             options={options}
             defaultValue={defaultValue}
