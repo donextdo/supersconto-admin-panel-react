@@ -30,7 +30,7 @@ function App({imgSrc, onClick, exCoordinates}) {
 
     useEffect(() => {
         // setCoordinates([])
-        // setCroppedImages([])
+        setCroppedImages([])
 
         if (imageRef.current) {
             console.log({exCoordinates, coordinates})

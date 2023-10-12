@@ -299,7 +299,7 @@ const Catalog = () => {
 
     Swal.fire({
       title: 'Clone',
-      text: `Are you sure you want clone ${cloneData.catalog.title} to ${cloneData.shop.label} ?`,
+      text: `Are you sure you want clone ${cloneData.catalog.title} to selected shops ?`,
       icon: 'info',
       showCancelButton: true, // Add this line to show the cancel button
       confirmButtonText: 'Clone',
@@ -309,7 +309,7 @@ const Catalog = () => {
       if (result.isConfirmed) {
 
         axios.post(`${baseUrl}/catelog/book/clone`, {
-          shopId: cloneData.shop.value,
+          shops: cloneData.shops.map(shop => shop.value),
           catalogId: cloneData.catalog._id
         }).then(res => {
           toast.success('Catalog cloned successfully')
@@ -363,10 +363,10 @@ const Catalog = () => {
             title="Clone Catalog">
           <Dropdown
               label='Select Shop *'
-              value={shops.find(shop => shop.value === cloneData?.shop?.value)}
               options={shops}
+              isMulti
               onChange={(data) => {
-                setCloneData(prev => ({...prev, shop: data}))
+                setCloneData(prev => ({...prev, shops: data}))
               }}
           />
 
