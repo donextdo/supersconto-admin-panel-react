@@ -377,7 +377,6 @@ const NewShop = () => {
             is_online_selling: data.is_online_selling,
             telephone: data.telephone,
             website: data.website,
-            city: data.city,
             vendor: data.vendor,
             role: data.role,
             city: data.city,
