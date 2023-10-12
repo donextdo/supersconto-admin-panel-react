@@ -49,7 +49,7 @@ const Stocks = () => {
 
   async function fetchShops() {
     try {
-      let res = []
+      let res
 
       if (userData){
         if (userData?.userType === 0) {
@@ -65,13 +65,17 @@ const Stocks = () => {
           });
         }
       }
-      const shopData = res?.data.map((d) => {
-        return {
-          value: d._id,
-          label: `${d.shop_name} - ${d.address.address}`,
-        };
-      });
-      setShops(shopData);
+      if (res.data && res.data?.length > 0){
+        const shopData = res?.data.map((d) => {
+          return {
+            value: d._id,
+            label: `${d.shop_name} - ${d.address.address}`,
+          };
+        });
+        setShops(shopData);
+      } else {
+        setShops([]);
+      }
       console.log(res.data);
     } catch (error) {
       console.log(error);

@@ -4,8 +4,11 @@ import TextInput from "../shared/TextInput";
 import Dropdown from "../shared/Dropdown";
 import Textarea from "../shared/Textarea";
 import baseUrl from "../../utils/baseUrl.js";
+import {useLocation} from "react-router-dom";
 
 const Form = ({ pageItem, setPageItem }) => {
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
   const [selectedOption, setSelectedOption] = useState(null);
   const [categories, setCategories] = useState([]);
   const subList = useRef([]);
@@ -22,6 +25,12 @@ const Form = ({ pageItem, setPageItem }) => {
   const [subCategoriesLevelFour, setSubCategoriesLevelFour] = useState([]);
 
   useEffect(() => {
+
+    setPageItem({
+      ...pageItem,
+      catelog_book_id: queryParams.get('catelog'),
+    });
+
     axios
       .get(`${baseUrl}/category/categories`)
       .then((res) => {
@@ -179,7 +188,7 @@ const Form = ({ pageItem, setPageItem }) => {
 
   };
 
-  console.log("render", { pageItem });
+  console.log("render", { pageItem },queryParams.get('catelog'));
   return (
     <div className="grid grid-cols-2 gap-6">
       <div className="flex flex-col gap-4">
@@ -259,7 +268,7 @@ const Form = ({ pageItem, setPageItem }) => {
           name={"product_description"}
           value={pageItem.product_description}
           onChange={handleChange}
-          maxlength="200"
+          maxLength="200"
         />
 
         <TextInput
@@ -408,11 +417,11 @@ const Form = ({ pageItem, setPageItem }) => {
         </div>
       </div>
 
-      <div className="h-[50vh]">
+      <div className="self-start sticky top-0">
         <img
           src={pageItem.product_image}
           alt=""
-          className="w-full h-full object-contain"
+          className="w-full h-full h-[30vw] object-contain"
         />
       </div>
     </div>

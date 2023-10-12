@@ -29,17 +29,33 @@ function App({imgSrc, onClick, exCoordinates}) {
     }, [coordinates, imageRef.current])
 
     useEffect(() => {
-        setCoordinates([])
-        setCroppedImages([])
+        // setCoordinates([])
+        // setCroppedImages([])
 
         if (imageRef.current) {
-            const asyncTasks = exCoordinates.map(async (item, index) => {
+            console.log({exCoordinates, coordinates})
+
+            const itemMap = new Map();
+            coordinates.forEach((item) => {
+                itemMap.set(`${item.x}-${item.y}`, item);
+            });
+
+            exCoordinates.forEach((item) => {
+                itemMap.set(`${item.x}-${item.y}`, item);
+            });
+
+            const data = Array.from(itemMap.values());
+            console.log({data});
+
+            const asyncTasks = data.map(async (item, index) => {
                 // perform async task and return result
                 return await loadPreviousData(item, generateUUID());
             });
             Promise.all(asyncTasks)
                 .then((results) => {
-                    console.log({results})
+                    console.log({results, coordinates})
+                    // setCoordinates(arr => [...arr, ...results.filter(result => !arr.some(item => item.x === result.x && item.y === result.y))])
+                    // setCoordinates(temp1 => [...results,...temp1.filter(t1 => results.some(t2 => t2.x !== t1.x && t2.y !== t1.y))])
                     setCoordinates(results)
                 })
                 .catch((error) => console.error(error));

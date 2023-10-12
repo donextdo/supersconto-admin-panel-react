@@ -33,6 +33,7 @@ const Pages = () => {
     const [progress, setProgress] = useState(0);
     const [progressImage, setProgressImage] = useState(0)
     const [progressImageLength, setProgressImageLength] = useState(0)
+    const [curUpImg, setCurUpImg] = useState("")
 
 
     useEffect(() => {
@@ -88,14 +89,14 @@ const Pages = () => {
         try {
             const currentPageNo = pages.length > 0 ? pages.length : 0
             console.log({pl: pages.length, ipl: imagePreviews.length})
-            imagePreviews.map(async (img, index) => {
+            const promises = imagePreviews.map(async (img, index) => {
 
                 const dimensions = await getImageDimensions(img)
                 const page_no = currentPageNo + 1 + index
                 console.log({dimensions, currentPageNo, page_no})
 
                 const pageDto = new FormData()
-                console.log(shop)
+                console.log({img})
                 pageDto.append('shop_id', shop)
                 pageDto.append('catelog_book_id', catelog)
                 pageDto.append('page_no', page_no)
@@ -103,25 +104,57 @@ const Pages = () => {
                 pageDto.append('page_image', dataURLtoFile(img, 'page_1'))
 
 
-                axios.post(`${baseUrl}/catelog/page`, pageDto, {
+                /* axios.post(`${baseUrl}/catelog/page`, pageDto, {
+                     onUploadProgress: progressEvent => {
+                         console.log(progressEvent);
+                         const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+
+                         setCurUpImg(`Uploading image - ${index}`)
+                         if (progressEvent.loaded === progressEvent.total) {
+                             setProgressImage(prevState => prevState + 1)
+                         }
+                         setProgress(progress);
+                     }
+                 }).then(res => {
+                     console.log({add: res})
+                     // setProgress(0);
+                     // setProgressImage(prevState => prevState + 1)
+                     fetchData(catelog).then(res => {
+                         setPages(res?.data)
+                         console.log({pages: res})
+                     }).catch(error => {
+                         // TODO
+                         console.log(error)
+                     })
+                 })*/
+
+                await axios.post(`${baseUrl}/catelog/page`, pageDto, {
                     onUploadProgress: progressEvent => {
                         console.log(progressEvent);
                         const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
+
+                        setCurUpImg(`Uploading image - ${index + 1}`)
+                        if (progressEvent.loaded === progressEvent.total) {
+                            setProgressImage(prevState => prevState + 1)
+                            setCurUpImg(`Image - ${index + 1} Successfully Uploaded`)
+                        }
                         setProgress(progress);
                     }
-                }).then(res => {
-                    console.log({add: res})
-                    // setProgress(0);
-                    setProgressImage(prevState => prevState + 1)
-                    fetchData(catelog).then(res => {
-                        setPages(res?.data)
-                        console.log({pages: res})
-                    }).catch(error => {
-                        // TODO
-                        console.log(error)
-                    })
                 })
 
+            })
+
+            Promise.all(promises).then(res => {
+                fetchData(catelog).then(res => {
+                    setPages(res?.data)
+                    console.log({pages: res})
+                }).catch(error => {
+                    // TODO
+                    console.log(error)
+                })
+            }).catch(error => {
+                // TODO
+                console.log(error)
             })
 
             setImagePreviews(null)
@@ -180,11 +213,15 @@ const Pages = () => {
                 <button className="text-4xl pl-20 fixed z-50 left-6 top-4"><FaAngleLeft/></button>
             </Link>
 
-            {progressImageLength > 0 && <div className="flex justify-between items-center gap-2">
-                <progress value={progress} max="100" className="flex-1"/>
-                <div>{progress}%</div>
-                <div>{progressImage}/{progressImageLength}</div>
-            </div>}
+            {progressImageLength > 0 && <>
+                <div className="flex justify-between items-center gap-2">
+                    <progress value={progress} max="100" className="flex-1"/>
+                    <div>{progress}%</div>
+                    <div>{progressImage}/{progressImageLength}</div>
+                </div>
+                <div className="">{progressImage === progressImageLength ? "All images uploaded" : curUpImg}</div>
+
+            </>}
 
             {/* <Content expand> */}
             <>
