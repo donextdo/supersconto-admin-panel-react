@@ -218,7 +218,7 @@ const Catalog = () => {
       expiredate: d.expiredate,
       flyer: d.flyer,
       active: d.active,
-      startdate:d.startdate ? d.startdate :'',
+      startdate: d.startdate ? d.startdate : '',
     })
     setUpdateMode(true)
     console.log(d)
@@ -420,6 +420,7 @@ const Catalog = () => {
               <THead>
                 <TH title={'Id'}/>
                 <TH title={'Title'}/>
+                <TH title={'Shop'}/>
                 <TH title={'Expired Date'}/>
                 <TH title={'Display Date'}/>
                 <TH title={'Actions'}/>
@@ -436,7 +437,9 @@ const Catalog = () => {
                     <TD>
                       {d.title}
                     </TD>
-
+                    <TD>
+                      {d.shop_id?.shop_name ? d.shop_id?.shop_name : '-'}
+                    </TD>
                       <TD>
                         { normalizeDate(d.expiredate) }
                       </TD>
