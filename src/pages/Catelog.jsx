@@ -324,6 +324,16 @@ const Catalog = () => {
     });
   }
 
+  const customDropFilter = (options, filter, currentValues) => {
+    const filterLower = filter.toLowerCase();
+
+    const optionLabel = options.label.toLowerCase();
+
+    const filterWords = filterLower.split(' ');
+
+    return filterWords.every(word => optionLabel.includes(word));
+  }
+
   return (
     <div>
       {/* <Sidebar />
@@ -365,6 +375,7 @@ const Catalog = () => {
               label='Select Shop *'
               options={shops}
               isMulti
+              customDropFilter={customDropFilter}
               onChange={(data) => {
                 setCloneData(prev => ({...prev, shops: data}))
               }}
