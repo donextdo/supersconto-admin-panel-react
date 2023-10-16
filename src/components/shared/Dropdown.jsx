@@ -9,6 +9,7 @@ const Dropdown = ({
     options,
     onChange,
     isMulti,
+    customDropFilter,
     defaultValue
 }) => {
 
@@ -41,6 +42,7 @@ return (
             defaultValue={defaultValue}
             styles={customStyles}
             className='w-full text-black'
+            filterOption={customDropFilter}
         />
 
     {error && 
