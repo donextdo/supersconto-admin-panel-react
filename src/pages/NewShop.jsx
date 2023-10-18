@@ -1,26 +1,25 @@
 import axios from "axios";
-import { RiAddCircleLine } from "react-icons/ri";
-import { ButtonNormal, ButtonSuccess } from "../components/shared/Button";
+import {RiAddCircleLine, RiFilter2Fill} from "react-icons/ri";
+import {ButtonDanger, ButtonNormal, ButtonSuccess} from "../components/shared/Button";
 import Modal from "../components/shared/Modal";
 import TextInput from "../components/shared/TextInput";
-import React, { useEffect, useState } from "react";
-import Navbar from "../components/shared/Navbar";
-import Sidebar from "../components/shared/Sidebar";
-import { Content, Card } from "../components/shared/Utils";
+import React, {useEffect, useState} from "react";
+import {Card} from "../components/shared/Utils";
 import Fileinput from "../components/shared/Fileinput";
-import { Table, THead, TBody, TH, Row, TD } from "../components/shared/Table";
-import { FaTrash } from "react-icons/fa";
-import { PencilAltIcon } from "@heroicons/react/solid";
+import {Row, Table, TBody, TD, TH, THead} from "../components/shared/Table";
+import {FaTrash} from "react-icons/fa";
+import {PencilAltIcon, XCircleIcon, XIcon} from "@heroicons/react/solid";
 import baseUrl from "../utils/baseUrl.js";
 import Alert from "../components/shared/Alert";
 import MySwitch from "../components/shared/Switch";
 import Confirm from "../components/shared/Confirm";
-import { ToastContainer, toast } from "react-toastify";
+import {toast, ToastContainer} from "react-toastify";
 import Dropdown from "../components/shared/Dropdown.jsx";
 import CustomTooltip from "../components/shared/Tooltip";
-import { MdArrowDropDown } from "react-icons/md";
+import {MdArrowDropDown} from "react-icons/md";
 import Swal from "sweetalert2";
-
+import DropdownComponent from "../components/advanced-filter/DropdownComponent.jsx";
+import {convertToTitleCase} from "../utils/functions.js";
 
 const NewShop = () => {
     const [confirm, setConfirm] = useState(false);
@@ -77,6 +76,9 @@ const NewShop = () => {
     });
 
     const [isEdit, setIsEdit] = useState(false);
+    const [filterData, setFilterData] = useState({})
+    const [filterData2, setFilterData2] = useState({})
+    const [filterOptions, setFilterOptions] = useState([])
     const userData = sessionStorage.getItem("user") ? JSON.parse(atob(sessionStorage.getItem("user"))) : null
     const token = localStorage.getItem("token") ? localStorage.getItem("token") : null
     console.log({ userData })
@@ -90,7 +92,7 @@ const NewShop = () => {
 
     useEffect(() => {
         fetchData();
-    }, [page, search, itemsPerPage]);
+    }, [page, search, itemsPerPage,filterData2]);
 
     async function fetchData() {
         try {
@@ -98,7 +100,8 @@ const NewShop = () => {
 
             if (userData) {
                 if (isAdmin) {
-                    res = await axios.get(`${baseUrl}/shop/allshops`, {
+                    res = await axios.post(`${baseUrl}/shop/apply-filters`, {
+                        filterData:filterData2,
                         params: {
                             page,
                             search,
@@ -106,23 +109,25 @@ const NewShop = () => {
                         },
                     });
                 } else {
-                    res = await axios.get(`${baseUrl}/shop/by-vendor-params/${userData?._id}`, {
+                    res = await axios.post(`${baseUrl}/shop/apply-filters-vendor`, {
+                        filterData: {...filterData2, vendorId: userData?._id},
+                        params: {
+                            page,
+                            search,
+                            itemsPerPage,
+                        },
+                    },{
                         headers: {
                             'Content-Type': 'application/json',
                             'Access-Control-Allow-Origin': '*',
                             'Authorization': `Bearer ${token}`,
                             'Accept': "application/json"
                         }
-                    }, {
-                        params: {
-                            page,
-                            search,
-                            itemsPerPage,
-                        },
-                    }
-                    );
+                    });
                 }
             }
+            const filtersRes = await axios.get(`${baseUrl}/shop/filters`);
+            setFilterOptions(filtersRes.data)
             setData(res.data.shops);
             setTotalPages(res.data.totalPages)
             console.log("data : ", res.data);
@@ -662,6 +667,21 @@ const NewShop = () => {
     console.log("formData", formData)
     console.log("page", itemsPerPage)
 
+
+    const handleFilterClick = (filter,value) => {
+        console.log({filter, value})
+        setFilterData(prevState => ({...prevState, [filter]:value}))
+    }
+
+    console.log(filterData)
+    const applyFilter = async () => {
+        setFilterData2(filterData)
+        setPage(1)
+    }
+
+    const resetFilter = () => {
+        setFilterData({})
+    }
     return (
         <div>
             <>
@@ -951,6 +971,55 @@ const NewShop = () => {
 
                     </Modal>
                 )}
+
+
+
+                <DropdownComponent topic="Shop Filter" styleClass="advanced-filter" bodyStyleClass="flex gap-4 flex-wrap">
+                    <>
+                        <div className="selected-filters flex flex-wrap items-center w-full gap-4 pt-2">
+                            {Object.keys(filterData).map((data, index) => (
+                                <div className="flex flex-1 items-center justify-between border-2 basis-1/5 max-w-[250px]" key={`${data}-${index}`}>
+                                    <span className="truncate">{convertToTitleCase(data)} : {filterData[data]}</span>
+                                    <span className="remove-filter cursor-pointer  flex-shrink-0" onClick={() => {
+                                        const updatedFilterData = { ...filterData };
+                                        delete updatedFilterData[data];
+                                        setFilterData(updatedFilterData);
+                                    }}><XIcon className='w-4 h-4 fill-blue-500  flex-shrink-0 pointer-events-none'/></span>
+
+                                </div>
+                            ))}
+                            <ButtonSuccess onClick={applyFilter}>
+                                <RiFilter2Fill className="w-5 h-5" />
+                                <span>Apply filter</span>
+                            </ButtonSuccess>
+                            <ButtonDanger onClick={resetFilter}>
+                                <XCircleIcon className="w-5 h-5" />
+                                <span>Reset</span>
+                            </ButtonDanger>
+                        </div>
+
+
+                        {Object.keys(filterOptions).map((topic, index) => {
+
+                            return (
+
+                                <DropdownComponent key={`${topic}-${index}`} topic={topic} styleClass="filter-item">
+                                    <ul>
+                                        {
+                                            filterOptions[topic].map((item, index) => (
+                                                <li key={`${item}-${index}`}
+                                                    onClick={() => handleFilterClick(topic, item)}>{item}</li>
+                                            ))
+                                        }
+                                    </ul>
+                                </DropdownComponent>
+                            )
+                        })}</>
+
+
+
+                </DropdownComponent>
+
                 <Card>
                     <div className="w-full py-4 flex flex-col md:flex-row justify-between items-center">
                         <div className="py-4 flex flex-col md:flex-row gap-6">
