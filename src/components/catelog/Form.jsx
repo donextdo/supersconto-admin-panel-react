@@ -6,7 +6,7 @@ import Textarea from '../shared/Textarea'
 import MySwitch from '../shared/Switch'
 import baseUrl from '../../utils/baseUrl'
 
-const Form = ({ catelog, setCatelog }) => {
+const Form = ({ catelog, setCatelog, children }) => {
 
     const [shops, setShops] = useState([])
     const [defaultValue, setDefaultValue] = useState(null)
@@ -80,12 +80,14 @@ const Form = ({ catelog, setCatelog }) => {
     return (
         <div className='flex flex-col gap-4'>
 
-            <Dropdown
+            {/*<Dropdown
                 label='Select Shop *'
                 value={shops.find(shop => shop.value === catelog.shop_id)}
                 options={shops}
                 onChange={handleDropDownChange}
-            />
+            />*/}
+
+            {children}
 
             <TextInput
                 label='Title *'

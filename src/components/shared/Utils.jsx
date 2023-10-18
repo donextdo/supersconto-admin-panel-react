@@ -25,9 +25,9 @@ useEffect(() => {
 }
 
 
-export const Card = ({ children, title }) => {
+export const Card = ({ children, title, className }) => {
   return (
-    <div className="w-full px-6 py-7 bg-white shadow-md">
+    <div className={`w-full px-6 py-7 bg-white shadow-md ${className??""}`}>
 
       { title && 
         <h3 className="text-lg font-semibold text-gray-800 ">

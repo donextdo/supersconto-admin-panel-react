@@ -1,22 +1,21 @@
-import React, { useState, useEffect } from 'react'
-import { Content, Card } from '../components/shared/Utils'
-import { Table, THead, TBody, TH, Row, TD } from '../components/shared/Table'
-import { FaTrash } from 'react-icons/fa'
-import { PencilAltIcon, ClipboardCopyIcon } from '@heroicons/react/solid'
-import { MdPreview } from "react-icons/md";
+import React, {useCallback, useEffect, useRef, useState} from 'react'
+import {Card} from '../components/shared/Utils'
+import {Row, Table, TBody, TD, TH, THead} from '../components/shared/Table'
+import {FaTrash} from 'react-icons/fa'
+import {ClipboardCopyIcon, PencilAltIcon, XCircleIcon, XIcon} from '@heroicons/react/solid'
+import {MdArrowDropDown, MdPreview} from "react-icons/md";
 import axios from 'axios'
-import { ButtonSuccess } from '../components/shared/Button'
-import { RiAddCircleLine, RiPagesFill, } from 'react-icons/ri'
+import {ButtonDanger, ButtonSuccess} from '../components/shared/Button'
+import {RiAddCircleLine, RiFilter2Fill, RiPagesFill,} from 'react-icons/ri'
 import Modal from '../components/shared/Modal'
 import Form from '../components/catelog/Form'
-import { normalizeDate } from '../utils/functions'
-import { Link } from 'react-router-dom'
-import baseUrl, { clientAppUrl } from '../utils/baseUrl'
-import { ToastContainer, toast } from 'react-toastify';
+import {convertToTitleCase, normalizeDate} from '../utils/functions'
+import {Link} from 'react-router-dom'
+import baseUrl, {clientAppUrl} from '../utils/baseUrl'
+import {toast, ToastContainer} from 'react-toastify';
 import CustomTooltip from '../components/shared/Tooltip'
 import Swal from "sweetalert2";
-import { MdArrowDropDown } from "react-icons/md";
-import Dropdown from "../components/shared/Dropdown.jsx";
+import DropdownComponent from "../components/advanced-filter/DropdownComponent.jsx";
 
 const Catalog = () => {
 
@@ -25,7 +24,7 @@ const Catalog = () => {
   const [updateMode, setUpdateMode] = useState(false)
   const [catelog, setCatelog] = useState({
     _id: '',
-    shop_id: '',
+    shops: [],
     title: '',
     description: '',
     expiredate: '',
@@ -40,7 +39,20 @@ const Catalog = () => {
   const [entries, setEntries] = useState(10);
   const [showClonePopup, setShowClonePopup] = useState(false)
   const [shops, setShops] = useState([])
-  const [cloneData, setCloneData] = useState(null)
+  const [cloneData, setCloneData] = useState({catalog: null, shops:[]})
+
+  // shop
+  const [filterData, setFilterData] = useState({})
+  const [filterData2, setFilterData2] = useState({})
+  const [filterOptions, setFilterOptions] = useState([])
+  const [itemsPerPageShop, setItemsPerPageShop] = useState(20);
+  const [totalPagesShop, setTotalPagesShop] = useState(1);
+  const [pageShop, setPageShop] = useState(1);
+  const [dataShop, setDataShop] = useState([])
+  const [loadingShop, setLoadingShop] = useState(false)
+
+  const observer = useRef();
+
 
   const userData = sessionStorage.getItem("user") ? JSON.parse(atob(sessionStorage.getItem("user"))) : null
   const token = localStorage.getItem("token") ? localStorage.getItem("token") : null
@@ -52,30 +64,80 @@ const Catalog = () => {
   }, [page, search, entries]);
 
   useEffect(() => {
+    setDataShop([])
+  }, [filterData2])
 
+  useEffect(() => {
+    let cancel
+    setLoadingShop(true)
     async function fetchData() {
+      let res
       try {
 
         if (userData) {
-          if (userData?.userType === 0) {
-            const res = await axios.get(`${baseUrl}/shop`);
-            const shopData = res.data.map(d => {
-              return {
-                value: d._id,
-                label: `${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`
-              }
-            })
-            setShops(shopData);
+          if (isAdmin) {
+            res = await axios.post(`${baseUrl}/shop/apply-filters`, {
+              filterData:filterData2,
+              params: {
+                page,
+                search,
+                itemsPerPageShop,
+              },
+            },{
+              cancelToken: new axios.CancelToken(c => cancel = c)
+            });
+          } else {
+            res = await axios.post(`${baseUrl}/shop/apply-filters-vendor`, {
+              filterData: {...filterData2, vendorId: userData?._id},
+              params: {
+                page,
+                search,
+                itemsPerPageShop,
+              },
+            },{
+              headers: {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*',
+                'Authorization': `Bearer ${token}`,
+                'Accept': "application/json"
+              },
+              cancelToken: new axios.CancelToken(c => cancel = c)
+            });
           }
         }
-
+        const filtersRes = await axios.get(`${baseUrl}/shop/filters`);
+        console.log(res.data)
+        setFilterOptions(filtersRes.data)
+        setDataShop(prev => [...prev,...res.data.shops]);
+        // setDataShop(prev => [...prev,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops]);
+        setTotalPagesShop(res.data.totalPages)
+        setLoadingShop(false)
       } catch (err) {
+        setLoadingShop(false)
         console.log(err);
       }
     }
 
     fetchData();
-  }, []);
+
+    return () => cancel()
+  }, [pageShop, itemsPerPageShop,filterData2]);
+
+
+  const lastShopElement = useCallback((node) => {
+    if (loadingShop) return
+    if (observer.current) observer.current.disconnect()
+    observer.current = new IntersectionObserver((entries) => {
+      console.log("IntersectionObserver", entries[0].isIntersecting)
+
+      if (entries[0].isIntersecting && (page < totalPagesShop)) {
+        console.log("updates")
+        setPageShop(prevState => prevState + 1)
+      }
+    })
+    if (node) observer.current.observe(node)
+  },[loadingShop, totalPagesShop])
+
 
   async function fetchData() {
     try {
@@ -114,7 +176,7 @@ const Catalog = () => {
     setModal(!modal)
     setCatelog({
       _id: '',
-      shop_id: '',
+      shops: [],
       title: '',
       description: '',
       expiredate: '',
@@ -125,11 +187,14 @@ const Catalog = () => {
 
     })
     setUpdateMode(false)
+    setCloneData({catalog: null, shops:[]})
+    resetFilter()
+
   }
 
   const onSave = async () => {
     console.log(catelog)
-    if (catelog.shop_id == "" || catelog.title == '' || catelog.expiredate == '') {
+    if (catelog.shops.length === 0 || catelog.title === '' || catelog.expiredate === '') {
       setFormError('Please fill in the required field marked with an asterisk (*).');
     } else {
 
@@ -143,14 +208,16 @@ const Catalog = () => {
           await axios.post(`${baseUrl}/catelog/book`, catalogData)
         }
         else {
-          await axios.patch(`${baseUrl}/catelog/book/${catelog._id}`, catalogData)
+          const {shops,...sendData} = catalogData
+          sendData.shop_id = shops[0]
+          await axios.patch(`${baseUrl}/catelog/book/${catelog._id}`, sendData)
         }
 
         fetchData()
 
         setCatelog({
           _id: '',
-          shop_id: '',
+          shops: [],
           title: '',
           description: '',
           expiredate: '',
@@ -212,7 +279,7 @@ const Catalog = () => {
     setModal(true)
     setCatelog({
       _id: d._id,
-      shop_id: d.shop_id._id,
+      shops: [d.shop_id._id],
       title: d.title,
       description: d.description,
       expiredate: d.expiredate,
@@ -297,43 +364,55 @@ const Catalog = () => {
   const onCloneDataSubmit = () => {
     console.log({cloneData})
 
-    Swal.fire({
-      title: 'Clone',
-      text: `Are you sure you want clone ${cloneData.catalog.title} to selected shops ?`,
-      icon: 'info',
-      showCancelButton: true, // Add this line to show the cancel button
-      confirmButtonText: 'Clone',
-      cancelButtonText: 'Cancel', // Add this line to set the cancel button text
-      confirmButtonColor: '#8DC14F',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
+    if(cloneData.shops.length === 0) {
+      toast.error('No shops are selected')
+    }
+    else {
+      Swal.fire({
+        title: 'Clone',
+        text: `Are you sure you want clone ${cloneData.catalog.title} to selected shops ?`,
+        icon: 'info',
+        showCancelButton: true, // Add this line to show the cancel button
+        confirmButtonText: 'Clone',
+        cancelButtonText: 'Cancel', // Add this line to set the cancel button text
+        confirmButtonColor: '#8DC14F',
+      }).then(async (result) => {
+        if (result.isConfirmed) {
 
-        axios.post(`${baseUrl}/catelog/book/clone`, {
-          shops: cloneData.shops.map(shop => shop.value),
-          catalogId: cloneData.catalog._id
-        }).then(res => {
-          toast.success('Catalog cloned successfully')
-        }).catch((error) => {
-          toast.error('Catalog cloned failed')
-        }).finally(() => {
-          fetchData()
-          setCloneData(null)
-          setShowClonePopup(false)
-        })
-      }
-    });
+          axios.post(`${baseUrl}/catelog/book/clone`, {
+            shops: cloneData.shops.map(shop => shop.value),
+            catalogId: cloneData.catalog._id
+          }).then(res => {
+            toast.success('Catalog cloned successfully')
+          }).catch((error) => {
+            toast.error('Catalog cloned failed')
+          }).finally(() => {
+            fetchData()
+            setCloneData({catalog: null, shops:[]})
+            setShowClonePopup(false)
+          })
+        }
+      });
+    }
   }
 
-  const customDropFilter = (options, filter, currentValues) => {
-    const filterLower = filter.toLowerCase();
-
-    const optionLabel = options.label.toLowerCase();
-
-    const filterWords = filterLower.split(' ');
-
-    return filterWords.every(word => optionLabel.includes(word));
+  const handleFilterClick = (filter,value) => {
+    console.log({filter, value})
+    setFilterData(prevState => ({...prevState, [filter]:value}))
   }
 
+  console.log(filterData)
+  const applyFilter = async () => {
+    setFilterData2(filterData)
+    setPageShop(1)
+  }
+
+  const resetFilter = () => {
+    setFilterData({})
+    setFilterData2({})
+  }
+
+  console.log({dataShop, cloneData, catelog})
   return (
     <div>
       {/* <Sidebar />
@@ -344,42 +423,237 @@ const Catalog = () => {
 
         <ToastContainer />
         {modal &&
-          <Modal
-            onClose={toggleModal}
-            onCancel={onCancel}
-            onSave={onSave}
-            title={updateMode ? "Update Catalog" : "Add Catalog"}>
+            <Modal
+                onClose={toggleModal}
+                onCancel={onCancel}
+                onSave={onSave}
+                title={updateMode ? "Update Catalog" : "Add Catalog"}
+                styleClass={!updateMode ? "max-h-[80vh] w-full": ""}
+                width={!updateMode ? 'w-[80vw]': ""}
+            >
 
-            <Form
-              catelog={catelog}
-              setCatelog={setCatelog}
-            />
-            {formError && <div className='text-red-500'>{formError}</div>}
+              <Form
+                  catelog={catelog}
+                  setCatelog={setCatelog}
+              >
+                <DropdownComponent topic="Shop Filter" styleClass="advanced-filter" bodyStyleClass="flex gap-4 flex-wrap">
+                  <>
+                    <div className="selected-filters flex flex-wrap items-center w-full gap-4 pt-2">
+                      {Object.keys(filterData).map((data, index) => (
+                          <div className="flex flex-1 items-center justify-between border-2 basis-1/5 max-w-[250px]"
+                               key={`${data}-${index}`}>
+                            <span className="truncate">{convertToTitleCase(data)} : {filterData[data]}</span>
+                            <span className="remove-filter cursor-pointer  flex-shrink-0" onClick={() => {
+                              const updatedFilterData = {...filterData};
+                              delete updatedFilterData[data];
+                              setFilterData(updatedFilterData);
+                            }}><XIcon className='w-4 h-4 fill-blue-500  flex-shrink-0 pointer-events-none'/></span>
 
-          </Modal>
+                          </div>
+                      ))}
+                      <ButtonSuccess onClick={applyFilter}>
+                        <RiFilter2Fill className="w-5 h-5"/>
+                        <span>Apply filter</span>
+                      </ButtonSuccess>
+                      <ButtonDanger onClick={resetFilter}>
+                        <XCircleIcon className="w-5 h-5"/>
+                        <span>Reset</span>
+                      </ButtonDanger>
+                    </div>
+
+                    {Object.keys(filterOptions).map((topic, index) => {
+
+                      return (
+
+                          <DropdownComponent key={`${topic}-${index}`} topic={topic} styleClass="filter-item">
+                            <ul>
+                              {
+                                filterOptions[topic].map((item, index) => (
+                                    <li key={`${item}-${index}`}
+                                        onClick={() => handleFilterClick(topic, item)}>{item}</li>
+                                ))
+                              }
+                            </ul>
+                          </DropdownComponent>
+                      )
+                    })}
+
+                  </>
+
+                </DropdownComponent>
+
+                <ul className="overflow-y-auto max-h-[200px]">
+                  {dataShop.length > 0 && dataShop.map((d, index) => {
+                    if (dataShop.length === index + 1) {
+                      return (
+                          <li ref={lastShopElement} key={`${d.shop_name} ${index}`}>
+                            <label>
+                              <input
+                                  className="m-2 ml-0"
+                                  type="checkbox"
+                                  checked={catelog?.shops?.some(shop => shop === d._id)}
+                                  onChange={(e) => {
+                                    if (e.target.checked) {
+                                      setCatelog(prev => ({...prev, shops: updateMode ? [d._id] : [...prev.shops, d._id]}))
+                                    }
+                                    else {
+                                      setCatelog(prev => ({
+                                        ...prev,
+                                        shops: prev.shops.filter(shop => shop !== d._id)
+                                      }));
+                                    }
+
+                                  }}
+                              />
+                              {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
+                            </label>
+                          </li>
+                      )
+                    } else {
+                      return (
+                          <li key={`${d.shop_name} ${index}`}>
+                            <label>
+                              <input
+                                  className="m-2 ml-0"
+                                  type="checkbox"
+                                  checked={catelog?.shops?.some(shop => shop === d._id)}
+                                  onChange={(e) => {
+                                    if (e.target.checked)
+                                      setCatelog(prev => ({...prev, shops: updateMode ? [d._id] : [...prev.shops, d._id]}))
+                                    else
+                                      setCatelog(prev => ({
+                                        ...prev,
+                                        shops: prev.shops.filter(shop => shop !== d._id)
+                                      }));
+                                  }}
+                              />
+                              {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
+                            </label>
+                          </li>
+                      )
+                    }
+                  })}
+                </ul>
+
+              </Form>
+              {formError && <div className='text-red-500'>{formError}</div>}
+
+            </Modal>
         }
 
         {showClonePopup && <Modal
             onClose={() => {
               setShowClonePopup(false)
-              setCloneData(null)
+              setCloneData({catalog: null, shops:[]})
+              resetFilter()
             }}
             onCancel={() => {
               setShowClonePopup(false)
-              setCloneData(null)
+              setCloneData({catalog: null, shops:[]})
+              resetFilter()
             }}
             onSave={onCloneDataSubmit}
-            styleClass="max-h-[50vh]"
+            styleClass="max-h-[80vh] w-full"
+            width={'w-full'}
             title="Clone Catalog">
-          <Dropdown
-              label='Select Shop *'
-              options={shops}
-              isMulti
-              customDropFilter={customDropFilter}
-              onChange={(data) => {
-                setCloneData(prev => ({...prev, shops: data}))
-              }}
-          />
+
+          <DropdownComponent topic="Shop Filter" styleClass="advanced-filter" bodyStyleClass="flex gap-4 flex-wrap">
+            <>
+              <div className="selected-filters flex flex-wrap items-center w-full gap-4 pt-2">
+                {Object.keys(filterData).map((data, index) => (
+                    <div className="flex flex-1 items-center justify-between border-2 basis-1/5 max-w-[250px]"
+                         key={`${data}-${index}`}>
+                      <span className="truncate">{convertToTitleCase(data)} : {filterData[data]}</span>
+                      <span className="remove-filter cursor-pointer  flex-shrink-0" onClick={() => {
+                        const updatedFilterData = {...filterData};
+                        delete updatedFilterData[data];
+                        setFilterData(updatedFilterData);
+                      }}><XIcon className='w-4 h-4 fill-blue-500  flex-shrink-0 pointer-events-none'/></span>
+
+                    </div>
+                ))}
+                <ButtonSuccess onClick={applyFilter}>
+                  <RiFilter2Fill className="w-5 h-5"/>
+                  <span>Apply filter</span>
+                </ButtonSuccess>
+                <ButtonDanger onClick={resetFilter}>
+                  <XCircleIcon className="w-5 h-5"/>
+                  <span>Reset</span>
+                </ButtonDanger>
+              </div>
+
+
+              {Object.keys(filterOptions).map((topic, index) => {
+
+                return (
+
+                    <DropdownComponent key={`${topic}-${index}`} topic={topic} styleClass="filter-item">
+                      <ul>
+                        {
+                          filterOptions[topic].map((item, index) => (
+                              <li key={`${item}-${index}`}
+                                  onClick={() => handleFilterClick(topic, item)}>{item}</li>
+                          ))
+                        }
+                      </ul>
+                    </DropdownComponent>
+                )
+              })}</>
+
+
+          </DropdownComponent>
+
+          <ul className="overflow-y-auto max-h-1/5">
+            {dataShop.length > 0 && dataShop.map((d, index) => {
+              if (dataShop.length === index + 1) {
+                return (
+                    <li ref={lastShopElement} key={`${d.shop_name} ${index}`}>
+                      <label>
+                        <input
+                            className="m-2 ml-0"
+                            type="checkbox"
+                            checked={cloneData?.shops?.some(shop => shop === d._id)}
+                            onChange={(e) => {
+                              if (e.target.checked)
+                                setCloneData(prev => ({...prev, shops: [...prev.shops, d._id]}))
+                              else
+                                setCloneData(prev => ({
+                                  ...prev,
+                                  shops: prev.shops.filter(shop => shop !== d._id)
+                                }));
+
+                            }}
+                        />
+                        {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
+                      </label>
+                    </li>
+                )
+              } else {
+                return (
+                    <li key={`${d.shop_name} ${index}`}>
+                      <label>
+                        <input
+                            className="m-2 ml-0"
+                            type="checkbox"
+                            checked={cloneData?.shops?.some(shop => shop === d._id)}
+                            onChange={(e) => {
+                              if (e.target.checked)
+                                setCloneData(prev => ({...prev, shops: [...prev.shops, d._id]}))
+                              else
+                                setCloneData(prev => ({
+                                  ...prev,
+                                  shops: prev.shops.filter(shop => shop !== d._id)
+                                }));
+
+                            }}
+                        />
+                        {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
+                      </label>
+                    </li>
+                )
+              }
+            })}
+          </ul>
 
         </Modal>}
 

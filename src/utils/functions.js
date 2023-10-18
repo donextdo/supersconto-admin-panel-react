@@ -21,3 +21,9 @@ export const dataURLtoFile = (dataurl, filename) => {
 
     return new File([u8arr], newFilename, {type:mime});
   }
+
+export function convertToTitleCase(input) {
+    return input.replaceAll("_", " ").replace(/([A-Z])/g, ' $1').replace(/^./, function (str) {
+        return str.toUpperCase();
+    });
+}

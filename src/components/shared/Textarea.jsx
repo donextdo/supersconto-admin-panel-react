@@ -20,7 +20,7 @@ return (
     }
 
     <textarea
-        maxlength={maxlength}
+        maxLength={maxlength}
         value={value}
         name={name}
         rows='4'

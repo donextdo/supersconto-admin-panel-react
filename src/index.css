@@ -182,3 +182,48 @@ input:checked + .slider:before {
 .custom-table thead .sortable::after {
   content: none; /* Hide the sort arrow */
 }
+
+
+/* Advanced filter */
+.filter-container .filter-head .arrow-icon {
+  border: solid black;
+  border-width: 0 3px 3px 0;
+  display: inline-block;
+  padding: 3px;
+  transform: rotate(-45deg);
+  -webkit-transform: rotate(-45deg);
+  transition: 0.4s ease;
+}
+.filter-container .filter-head .arrow-icon.down {
+  transform: rotate(45deg);
+  -webkit-transform: rotate(45deg);
+}
+.filter-container .filter-body {
+  max-height: 0;
+  overflow: auto;
+  transition: 0.4s ease;
+
+}
+.filter-container .filter-body.enable {
+  max-height: 100vh;
+}
+.filter-container.filter-item {
+  margin: 0.5rem;
+  flex: 1 1 30%;
+}
+
+.filter-container.filter-item > div {
+  padding: 0.5rem;
+}
+.filter-container.filter-item .filter-body.enable {
+  max-height: 30vh;
+  margin-top: 0.5rem;
+}
+.filter-container.filter-item .filter-body ul li {
+  padding: 0.25rem;
+  cursor: pointer;
+}
+.filter-container.filter-item .filter-body ul li:hover {
+  background: #88888830;
+}
+
