@@ -75,7 +75,14 @@ function App({imgSrc, onClick, exCoordinates}) {
     }, [imgSrc])
 
     const getFileFromUrl = async (url, name, defaultType = 'image/jpeg') => {
-        const response = await fetch(url);
+        const response = await fetch(url,{
+            method: 'GET',
+            mode: 'cors',
+            cache: 'no-cache',
+            headers: {
+                Origin: window.location.origin,
+            },
+        });
         const data = await response.blob();
         return new File([data], name, {
             type: data.type || defaultType,
