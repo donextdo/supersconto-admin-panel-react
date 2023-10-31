@@ -380,7 +380,7 @@ const Catalog = () => {
         if (result.isConfirmed) {
 
           axios.post(`${baseUrl}/catelog/book/clone`, {
-            shops: cloneData.shops.map(shop => shop.value),
+            shops: cloneData.shops,
             catalogId: cloneData.catalog._id
           }).then(res => {
             toast.success('Catalog cloned successfully')
