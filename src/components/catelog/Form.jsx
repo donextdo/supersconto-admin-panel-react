@@ -107,6 +107,15 @@ const Form = ({ catelog, setCatelog, children }) => {
                 onChange={handleChange}
                 maxlength="200"
             />
+                        <TextInput
+                label='Start Date *'
+                type={'date'}
+                border
+                borderColor='border-gray-600'
+                name={'startdate'}
+                value={catelog.startdate.substring(0, 10)}
+                onChange={handleChange}
+            />
 
             <TextInput
                 label='Expire Date *'
@@ -115,16 +124,6 @@ const Form = ({ catelog, setCatelog, children }) => {
                 borderColor='border-gray-600'
                 name={'expiredate'}
                 value={catelog.expiredate.substring(0, 10)}
-                onChange={handleChange}
-            />
-
-            <TextInput
-                label='Start Date *'
-                type={'date'}
-                border
-                borderColor='border-gray-600'
-                name={'startdate'}
-                value={catelog.startdate.substring(0, 10)}
                 onChange={handleChange}
             />
 
