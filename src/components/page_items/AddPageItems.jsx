@@ -24,6 +24,8 @@ const Form = ({ pageItem, setPageItem }) => {
   const [subCategoriesLevelThree, setSubCategoriesLevelThree] = useState([]);
   const [subCategoriesLevelFour, setSubCategoriesLevelFour] = useState([]);
 
+  
+
   useEffect(() => {
 
     setPageItem({
@@ -188,7 +190,23 @@ const Form = ({ pageItem, setPageItem }) => {
 
   };
 
+  const handleReviewChange = (event) => {
+    const enteredReview = parseInt(event.target.value);
+  
+    // Check if enteredReview is a number and within the range [1, 5]
+    if (!isNaN(enteredReview)) {
+      const reviewValue = Math.min(Math.max(enteredReview, 1), 5);
+      setPageItem({
+        ...pageItem,
+        review: reviewValue,
+      });
+    }
+  };
+  
+
   console.log("render", { pageItem },queryParams.get('catelog'));
+
+
   return (
     <div className="grid grid-cols-2 gap-6">
       <div className="flex flex-col gap-4">
@@ -366,8 +384,6 @@ const Form = ({ pageItem, setPageItem }) => {
           min={new Date().toISOString().split("T")[0]}
         />
 
-
-
         <TextInput
           label="review"
           type="number"
@@ -377,8 +393,11 @@ const Form = ({ pageItem, setPageItem }) => {
           borderColor="border-gray-600"
           name="review"
           value={pageItem.review}
-          onChange={handleChange}
+          onChange={handleReviewChange}
         />
+
+  
+
 
         <TextInput
           label="life"
@@ -427,5 +446,6 @@ const Form = ({ pageItem, setPageItem }) => {
     </div>
   );
 };
+
 
 export default Form;
