@@ -63,9 +63,6 @@ const Catalog = () => {
     fetchData();
   }, [page, search, entries]);
 
-  useEffect(() => {
-    setDataShop([])
-  }, [filterData2])
 
   useEffect(() => {
     let cancel
@@ -109,7 +106,6 @@ const Catalog = () => {
         console.log(res.data)
         setFilterOptions(filtersRes.data)
         setDataShop(prev => [...prev,...res.data.shops]);
-        // setDataShop(prev => [...prev,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops,...res.data.shops]);
         setTotalPagesShop(res.data.totalPages)
         setLoadingShop(false)
       } catch (err) {
@@ -121,14 +117,14 @@ const Catalog = () => {
     fetchData();
 
     return () => cancel()
-  }, [pageShop, itemsPerPageShop,filterData2]);
+  }, [pageShop, itemsPerPageShop, filterData2]);
 
 
   const lastShopElement = useCallback((node) => {
     if (loadingShop) return
     if (observer.current) observer.current.disconnect()
     observer.current = new IntersectionObserver((entries) => {
-      console.log("IntersectionObserver", entries[0].isIntersecting)
+      console.log("IntersectionObserver", entries[0].isIntersecting, page < totalPagesShop, {page, totalPagesShop})
 
       if (entries[0].isIntersecting && (page < totalPagesShop)) {
         console.log("updates")
@@ -136,7 +132,7 @@ const Catalog = () => {
       }
     })
     if (node) observer.current.observe(node)
-  },[loadingShop, totalPagesShop])
+  },[loadingShop, totalPagesShop, page])
 
 
   async function fetchData() {
@@ -403,14 +399,23 @@ const Catalog = () => {
 
   console.log(filterData)
   const applyFilter = async () => {
+    setDataShop([])
     setFilterData2(filterData)
     setPageShop(1)
   }
 
-  const resetFilter = () => {
-    setFilterData({})
-    setFilterData2({})
-  }
+    const resetFilter = () => {
+        setFilterData({})
+        setDataShop([])
+        setFilterData2(prevState => {
+            if (Object.keys(prevState).length === 0) {
+                return prevState
+            } else {
+                return {}
+            }
+        })
+
+    }
 
   console.log({dataShop, cloneData, catelog})
   return (
@@ -428,8 +433,8 @@ const Catalog = () => {
                 onCancel={onCancel}
                 onSave={onSave}
                 title={updateMode ? "Update Catalog" : "Add Catalog"}
-                styleClass={!updateMode ? "max-h-[80vh] w-full": ""}
-                width={!updateMode ? 'w-[80vw]': ""}
+                styleClass={"max-h-[80vh] w-full"}
+                width={'w-[80vw]'}
             >
 
               <Form
@@ -461,6 +466,23 @@ const Catalog = () => {
                       </ButtonDanger>
                     </div>
 
+                    <div className="flex basis-full gap-4">
+                      <input
+                          type="text"
+                          value={filterData.shop_name ?? ""}
+                          onChange={(e) => handleFilterClick("shop_name", e.target.value)}
+                          placeholder="Shop Name"
+                          className="border py-2 px-4 rounded-md flex-1"
+                      />
+                      <input
+                          type="text"
+                          value={filterData.customized_shop_name ?? ""}
+                          onChange={(e) => handleFilterClick("customized_shop_name", e.target.value)}
+                          placeholder="Customized Shop Name"
+                          className="border py-2 px-4 rounded-md flex-1"
+                      />
+                    </div>
+
                     {Object.keys(filterOptions).map((topic, index) => {
 
                       return (
@@ -482,7 +504,7 @@ const Catalog = () => {
 
                 </DropdownComponent>
 
-                <ul className="overflow-y-auto max-h-[200px]">
+                {loadingShop ? <p> Loading...</p> :<ul className="overflow-y-auto max-h-[200px]">
                   {dataShop.length > 0 && dataShop.map((d, index) => {
                     if (dataShop.length === index + 1) {
                       return (
@@ -494,9 +516,11 @@ const Catalog = () => {
                                   checked={catelog?.shops?.some(shop => shop === d._id)}
                                   onChange={(e) => {
                                     if (e.target.checked) {
-                                      setCatelog(prev => ({...prev, shops: updateMode ? [d._id] : [...prev.shops, d._id]}))
-                                    }
-                                    else {
+                                      setCatelog(prev => ({
+                                        ...prev,
+                                        shops: updateMode ? [d._id] : [...prev.shops, d._id]
+                                      }))
+                                    } else {
                                       setCatelog(prev => ({
                                         ...prev,
                                         shops: prev.shops.filter(shop => shop !== d._id)
@@ -519,7 +543,10 @@ const Catalog = () => {
                                   checked={catelog?.shops?.some(shop => shop === d._id)}
                                   onChange={(e) => {
                                     if (e.target.checked)
-                                      setCatelog(prev => ({...prev, shops: updateMode ? [d._id] : [...prev.shops, d._id]}))
+                                      setCatelog(prev => ({
+                                        ...prev,
+                                        shops: updateMode ? [d._id] : [...prev.shops, d._id]
+                                      }))
                                     else
                                       setCatelog(prev => ({
                                         ...prev,
@@ -533,7 +560,7 @@ const Catalog = () => {
                       )
                     }
                   })}
-                </ul>
+                </ul>}
 
               </Form>
               {formError && <div className='text-red-500'>{formError}</div>}
@@ -582,6 +609,23 @@ const Catalog = () => {
                 </ButtonDanger>
               </div>
 
+              <div className="flex basis-full gap-4">
+                <input
+                    type="text"
+                    value={filterData.shop_name ?? ""}
+                    onChange={(e) => handleFilterClick("shop_name", e.target.value)}
+                    placeholder="Shop Name"
+                    className="border py-2 px-4 rounded-md flex-1"
+                />
+                <input
+                    type="text"
+                    value={filterData.customized_shop_name ?? ""}
+                    onChange={(e) => handleFilterClick("customized_shop_name", e.target.value)}
+                    placeholder="Customized Shop Name"
+                    className="border py-2 px-4 rounded-md flex-1"
+                />
+              </div>
+
 
               {Object.keys(filterOptions).map((topic, index) => {
 
@@ -603,7 +647,7 @@ const Catalog = () => {
 
           </DropdownComponent>
 
-          <ul className="overflow-y-auto max-h-1/5">
+          {loadingShop ? <p> Loading...</p> : <ul className="overflow-y-auto max-h-1/5">
             {dataShop.length > 0 && dataShop.map((d, index) => {
               if (dataShop.length === index + 1) {
                 return (
@@ -653,7 +697,7 @@ const Catalog = () => {
                 )
               }
             })}
-          </ul>
+          </ul>}
 
         </Modal>}
 

@@ -675,11 +675,13 @@ const NewShop = () => {
 
     console.log(filterData)
     const applyFilter = async () => {
+        setData([])
         setFilterData2(filterData)
         setPage(1)
     }
 
     const resetFilter = () => {
+        setData([])
         setFilterData({})
     }
     return (
@@ -974,7 +976,7 @@ const NewShop = () => {
 
 
 
-                <DropdownComponent topic="Shop Filter" styleClass="advanced-filter" bodyStyleClass="flex gap-4 flex-wrap">
+                <DropdownComponent cardStyleClass="pb-0" topic="Shop Filter" styleClass="advanced-filter" bodyStyleClass="flex gap-4 flex-wrap">
                     <>
                         <div className="selected-filters flex flex-wrap items-center w-full gap-4 pt-2">
                             {Object.keys(filterData).map((data, index) => (
@@ -996,6 +998,23 @@ const NewShop = () => {
                                 <XCircleIcon className="w-5 h-5" />
                                 <span>Reset</span>
                             </ButtonDanger>
+                        </div>
+
+                        <div className="flex basis-full gap-4">
+                            <input
+                            type="text"
+                            value={filterData.shop_name ?? ""}
+                            onChange={(e) => handleFilterClick("shop_name", e.target.value)}
+                            placeholder="Shop Name"
+                            className="border py-2 px-4 rounded-md flex-1"
+                        />
+                            <input
+                                type="text"
+                                value={filterData.customized_shop_name ?? ""}
+                                onChange={(e) => handleFilterClick("customized_shop_name", e.target.value)}
+                                placeholder="Customized Shop Name"
+                                className="border py-2 px-4 rounded-md flex-1"
+                            />
                         </div>
 
 
@@ -1027,15 +1046,7 @@ const NewShop = () => {
                                 <RiAddCircleLine className="w-5 h-5" />
                                 <span>Add</span>
                             </ButtonNormal>
-                            <div>
-                                <input
-                                    type="text"
-                                    value={search}
-                                    onChange={handleSearchChange}
-                                    placeholder="Search"
-                                    className="border py-2 px-4 rounded-md"
-                                />
-                            </div>
+
                         </div>
 
                         <div className="relative">

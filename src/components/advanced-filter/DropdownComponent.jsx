@@ -2,7 +2,7 @@ import {Card} from "../shared/Utils.jsx";
 import {useEffect, useRef, useState} from "react";
 import {convertToTitleCase} from "../../utils/functions.js";
 
-function DropdownComponent({topic, children, styleClass, bodyStyleClass}) {
+function DropdownComponent({topic, children, styleClass, cardStyleClass, bodyStyleClass}) {
     const [showFilter, setShowFilter] = useState(false)
     const containerRef = useRef(null);
 
@@ -31,7 +31,7 @@ function DropdownComponent({topic, children, styleClass, bodyStyleClass}) {
 
     return (
         <div ref={containerRef} className={`filter-container ${styleClass ?? ""} ${showFilter ? "enable": ""}`}>
-            <Card>
+            <Card className={cardStyleClass}>
                 <div className="cursor-pointer filter-head flex justify-between items-center" onClick={() => setShowFilter(prev => !prev)}>
                     <p>
                         {convertToTitleCase(topic)}
