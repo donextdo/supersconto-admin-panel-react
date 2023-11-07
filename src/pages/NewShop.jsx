@@ -683,6 +683,7 @@ const NewShop = () => {
     const resetFilter = () => {
         setData([])
         setFilterData({})
+        setFilterData2(filterData)
     }
     return (
         <div>
