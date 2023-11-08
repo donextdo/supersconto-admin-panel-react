@@ -50,7 +50,7 @@ const Catalog = () => {
   const [pageShop, setPageShop] = useState(1);
   const [dataShop, setDataShop] = useState([])
   const [loadingShop, setLoadingShop] = useState(false)
-
+  const [selectedShopList, setSelectedShopList] = useState([])
   const observer = useRef();
 
 
@@ -404,8 +404,7 @@ const Catalog = () => {
     setPageShop(1)
   }
 
-    const resetFilter = () => {
-        setFilterData({})
+  const resetFilter = () => {
         setDataShop([])
         setFilterData2(prevState => {
             if (Object.keys(prevState).length === 0) {
@@ -414,19 +413,22 @@ const Catalog = () => {
                 return {}
             }
         })
+    setFilterData({})
+
 
     }
 
-  console.log({dataShop, cloneData, catelog})
+    const getSelectedShops = (from) => {
+      return dataShop.filter((item) => from.includes(item._id));
+    }
+
+  console.log({dataShop,filterOptions, cloneData, catelog,shops: getSelectedShops(cloneData.shops)})
   return (
     <div>
-      {/* <Sidebar />
-        <Navbar />
 
-        <Content> */}
       <>
-
         <ToastContainer />
+
         {modal &&
             <Modal
                 onClose={toggleModal}
@@ -445,7 +447,7 @@ const Catalog = () => {
                   <>
                     <div className="selected-filters flex flex-wrap items-center w-full gap-4 pt-2">
                       {Object.keys(filterData).map((data, index) => (
-                          <div className="flex flex-1 items-center justify-between border-2 basis-1/5 max-w-[250px]"
+                          <div className="flex flex-1 items-center justify-between border-2 basis-1/5 max-w-[250px] pr-2 pl-2"
                                key={`${data}-${index}`}>
                             <span className="truncate">{convertToTitleCase(data)} : {filterData[data]}</span>
                             <span className="remove-filter cursor-pointer  flex-shrink-0" onClick={() => {
@@ -502,65 +504,109 @@ const Catalog = () => {
 
                   </>
 
+                  <div className="w-full">
+                    <h3 className="text-sm font-medium text-gray-900 mb-2">Result</h3>
+
+                    {loadingShop ?
+                        <p> Loading...</p> :
+                        <ul className="overflow-y-auto max-h-[200px]">
+                    {dataShop.length > 0 && dataShop.map((d, index) => {
+                      if (dataShop.length === index + 1) {
+                        return (
+                            <li ref={lastShopElement} key={`${d.shop_name} ${index}`}>
+                              <label>
+                                <input
+                                    className="m-2 ml-0"
+                                    type="checkbox"
+                                    checked={catelog?.shops?.some(shop => shop === d._id)}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setCatelog(prev => ({
+                                          ...prev,
+                                          shops: updateMode ? [d._id] : [...prev.shops, d._id]
+                                        }))
+
+                                        setSelectedShopList((prevState) => ([...prevState, d]))
+                                      } else {
+                                        setCatelog(prev => ({
+                                          ...prev,
+                                          shops: prev.shops.filter(shop => shop !== d._id)
+                                        }));
+                                        setSelectedShopList((prevState) => (prevState.filter(shop => shop._id !== d._id)))
+                                      }
+
+                                    }}
+                                />
+                                {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
+                              </label>
+                            </li>
+                        )
+                      } else {
+                        return (
+                            <li key={`${d.shop_name} ${index}`}>
+                              <label>
+                                <input
+                                    className="m-2 ml-0"
+                                    type="checkbox"
+                                    checked={catelog?.shops?.some(shop => shop === d._id)}
+                                    onChange={(e) => {
+                                      if (e.target.checked) {
+                                        setCatelog(prev => ({
+                                          ...prev,
+                                          shops: updateMode ? [d._id] : [...prev.shops, d._id]
+                                        }))
+                                        setSelectedShopList((prevState) => ([...prevState, d]))
+
+                                      }
+                                      else {
+                                        setCatelog(prev => ({
+                                          ...prev,
+                                          shops: prev.shops.filter(shop => shop !== d._id)
+                                        }));
+                                        setSelectedShopList((prevState) => (prevState.filter(shop => shop._id !== d._id)))
+
+                                      }
+                                    }}
+                                />
+                                {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
+                              </label>
+                            </li>
+                        )
+                      }
+                    })}
+                  </ul>}
+                  </div>
+
+
                 </DropdownComponent>
 
-                {loadingShop ? <p> Loading...</p> :<ul className="overflow-y-auto max-h-[200px]">
-                  {dataShop.length > 0 && dataShop.map((d, index) => {
-                    if (dataShop.length === index + 1) {
-                      return (
-                          <li ref={lastShopElement} key={`${d.shop_name} ${index}`}>
-                            <label>
-                              <input
-                                  className="m-2 ml-0"
-                                  type="checkbox"
-                                  checked={catelog?.shops?.some(shop => shop === d._id)}
-                                  onChange={(e) => {
-                                    if (e.target.checked) {
-                                      setCatelog(prev => ({
-                                        ...prev,
-                                        shops: updateMode ? [d._id] : [...prev.shops, d._id]
-                                      }))
-                                    } else {
-                                      setCatelog(prev => ({
-                                        ...prev,
-                                        shops: prev.shops.filter(shop => shop !== d._id)
-                                      }));
-                                    }
+                <div >
+                  <h4 className="text-sm font-medium text-gray-900 mb-2">Selected Shops</h4>
 
-                                  }}
-                              />
-                              {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
-                            </label>
-                          </li>
-                      )
-                    } else {
-                      return (
-                          <li key={`${d.shop_name} ${index}`}>
-                            <label>
-                              <input
-                                  className="m-2 ml-0"
-                                  type="checkbox"
-                                  checked={catelog?.shops?.some(shop => shop === d._id)}
-                                  onChange={(e) => {
-                                    if (e.target.checked)
-                                      setCatelog(prev => ({
-                                        ...prev,
-                                        shops: updateMode ? [d._id] : [...prev.shops, d._id]
-                                      }))
-                                    else
-                                      setCatelog(prev => ({
-                                        ...prev,
-                                        shops: prev.shops.filter(shop => shop !== d._id)
-                                      }));
-                                  }}
-                              />
-                              {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
-                            </label>
-                          </li>
-                      )
-                    }
-                  })}
-                </ul>}
+                  {selectedShopList.length > 0 ?
+                      <div className="flex flex-wrap gap-4">
+                        {selectedShopList.map((d, index) => (
+                            <div
+                                className="flex flex-1 items-center justify-between border-2 basis-1/5 max-w-[30%] pr-2 pl-2"
+                                key={`${d._id}-${index}`}>
+                              <span
+                                  className="truncate">{`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}</span>
+                              <span className="remove-filter cursor-pointer  flex-shrink-0" onClick={() => {
+                                setCatelog(prev => ({
+                                  ...prev,
+                                  shops: prev.shops.filter(shop => shop !== d._id)
+                                }));
+                                setSelectedShopList((prevState) => (prevState.filter(shop => shop._id !== d._id)))
+
+                              }}><XIcon className='w-4 h-4 fill-blue-500  flex-shrink-0 pointer-events-none'/></span>
+
+                            </div>
+                        ))}
+                      </div>
+
+
+                      : <p>Please select atleast single Shop*</p>}
+                </div>
 
               </Form>
               {formError && <div className='text-red-500'>{formError}</div>}
@@ -644,60 +690,105 @@ const Catalog = () => {
                 )
               })}</>
 
+            <div className="w-full">
+              <h3 className="text-sm font-medium text-gray-900 mb-2">Result</h3>
+
+              {loadingShop ? <p> Loading...</p> : <ul className="overflow-y-auto  max-h-[200px]">
+                {dataShop.length > 0 && dataShop.map((d, index) => {
+                  if (dataShop.length === index + 1) {
+                    return (
+                        <li ref={lastShopElement} key={`${d.shop_name} ${index}`}>
+                          <label>
+                            <input
+                                className="m-2 ml-0"
+                                type="checkbox"
+                                checked={cloneData?.shops?.some(shop => shop === d._id)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setCloneData(prev => ({...prev, shops: [...prev.shops, d._id]}))
+                                    setSelectedShopList((prevState) => ([...prevState, d]))
+
+                                  }
+                                  else {
+                                    setCloneData(prev => ({
+                                      ...prev,
+                                      shops: prev.shops.filter(shop => shop !== d._id)
+                                    }));
+                                    setSelectedShopList((prevState) => (prevState.filter(shop => shop._id !== d._id)))
+
+                                  }
+
+                                }}
+                            />
+                            {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
+                          </label>
+                        </li>
+                    )
+                  } else {
+                    return (
+                        <li key={`${d.shop_name} ${index}`}>
+                          <label>
+                            <input
+                                className="m-2 ml-0"
+                                type="checkbox"
+                                checked={cloneData?.shops?.some(shop => shop === d._id)}
+                                onChange={(e) => {
+                                  if (e.target.checked) {
+                                    setCloneData(prev => ({...prev, shops: [...prev.shops, d._id]}))
+                                    setSelectedShopList((prevState) => ([...prevState, d]))
+
+                                  }
+                                  else {
+                                    setCloneData(prev => ({
+                                      ...prev,
+                                      shops: prev.shops.filter(shop => shop !== d._id)
+                                    }));
+                                    setSelectedShopList((prevState) => (prevState.filter(shop => shop._id !== d._id)))
+
+                                  }
+
+                                }}
+                            />
+                            {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
+                          </label>
+                        </li>
+                    )
+                  }
+                })}
+              </ul>}
+            </div>
+
 
           </DropdownComponent>
 
-          {loadingShop ? <p> Loading...</p> : <ul className="overflow-y-auto max-h-1/5">
-            {dataShop.length > 0 && dataShop.map((d, index) => {
-              if (dataShop.length === index + 1) {
-                return (
-                    <li ref={lastShopElement} key={`${d.shop_name} ${index}`}>
-                      <label>
-                        <input
-                            className="m-2 ml-0"
-                            type="checkbox"
-                            checked={cloneData?.shops?.some(shop => shop === d._id)}
-                            onChange={(e) => {
-                              if (e.target.checked)
-                                setCloneData(prev => ({...prev, shops: [...prev.shops, d._id]}))
-                              else
-                                setCloneData(prev => ({
-                                  ...prev,
-                                  shops: prev.shops.filter(shop => shop !== d._id)
-                                }));
+          <div >
+            <h4 className="text-sm font-medium text-gray-900 mb-2">Selected Shops</h4>
 
-                            }}
-                        />
-                        {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
-                      </label>
-                    </li>
-                )
-              } else {
-                return (
-                    <li key={`${d.shop_name} ${index}`}>
-                      <label>
-                        <input
-                            className="m-2 ml-0"
-                            type="checkbox"
-                            checked={cloneData?.shops?.some(shop => shop === d._id)}
-                            onChange={(e) => {
-                              if (e.target.checked)
-                                setCloneData(prev => ({...prev, shops: [...prev.shops, d._id]}))
-                              else
-                                setCloneData(prev => ({
-                                  ...prev,
-                                  shops: prev.shops.filter(shop => shop !== d._id)
-                                }));
+            {selectedShopList.length > 0 ?
+                <div className="flex flex-wrap gap-4">
+                  {selectedShopList.map((d, index) => (
+                      <div
+                          className="flex flex-1 items-center justify-between border-2 basis-1/5 max-w-[30%] pr-2 pl-2"
+                          key={`${d._id}-${index}`}>
+                              <span
+                                  className="truncate">{`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}</span>
+                        <span className="remove-filter cursor-pointer  flex-shrink-0" onClick={() => {
+                          setCloneData(prev => ({
+                            ...prev,
+                            shops: prev.shops.filter(shop => shop !== d._id)
+                          }));
+                          setSelectedShopList((prevState) => (prevState.filter(shop => shop._id !== d._id)))
 
-                            }}
-                        />
-                        {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
-                      </label>
-                    </li>
-                )
-              }
-            })}
-          </ul>}
+                        }}><XIcon className='w-4 h-4 fill-blue-500  flex-shrink-0 pointer-events-none'/></span>
+
+                      </div>
+                  ))}
+                </div>
+
+
+                : <p>Please select atleast single Shop*</p>}
+          </div>
+
 
         </Modal>}
 
