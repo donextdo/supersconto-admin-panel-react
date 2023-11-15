@@ -76,9 +76,8 @@ const Catalog = () => {
             res = await axios.post(`${baseUrl}/shop/apply-filters`, {
               filterData:filterData2,
               params: {
-                page,
-                search,
-                itemsPerPageShop,
+                page: pageShop,
+                itemsPerPage: itemsPerPageShop,
               },
             },{
               cancelToken: new axios.CancelToken(c => cancel = c)
@@ -87,9 +86,8 @@ const Catalog = () => {
             res = await axios.post(`${baseUrl}/shop/apply-filters-vendor`, {
               filterData: {...filterData2, vendorId: userData?._id},
               params: {
-                page,
-                search,
-                itemsPerPageShop,
+                page: pageShop,
+                itemsPerPage: itemsPerPageShop,
               },
             },{
               headers: {
@@ -124,15 +122,15 @@ const Catalog = () => {
     if (loadingShop) return
     if (observer.current) observer.current.disconnect()
     observer.current = new IntersectionObserver((entries) => {
-      console.log("IntersectionObserver", entries[0].isIntersecting, page < totalPagesShop, {page, totalPagesShop})
+      console.log("IntersectionObserver", entries[0].isIntersecting, pageShop < totalPagesShop, {pageShop, totalPagesShop})
 
-      if (entries[0].isIntersecting && (page < totalPagesShop)) {
+      if (entries[0].isIntersecting && (pageShop < totalPagesShop)) {
         console.log("updates")
         setPageShop(prevState => prevState + 1)
       }
     })
     if (node) observer.current.observe(node)
-  },[loadingShop, totalPagesShop, page])
+  },[loadingShop, totalPagesShop, pageShop])
 
 
   async function fetchData() {
@@ -182,6 +180,7 @@ const Catalog = () => {
 
 
     })
+    setSelectedShopList([])
     setUpdateMode(false)
     setCloneData({catalog: null, shops:[]})
     resetFilter()
@@ -223,6 +222,7 @@ const Catalog = () => {
 
 
         })
+        setSelectedShopList([])
 
         setModal(!modal)
         return toast.success('Data saved successfully')
@@ -284,6 +284,7 @@ const Catalog = () => {
       startdate: d.startdate ? d.startdate : '',
     })
     setUpdateMode(true)
+    setSelectedShopList([d.shop_id])
     console.log(d)
     console.log(catelog)
   }
@@ -418,11 +419,11 @@ const Catalog = () => {
 
     }
 
-    const getSelectedShops = (from) => {
-      return dataShop.filter((item) => from.includes(item._id));
-    }
+  const getSelectedShops = (from) => {
+    return dataShop.filter((item) => from.includes(item._id));
+  }
 
-  console.log({dataShop,filterOptions, cloneData, catelog,shops: getSelectedShops(cloneData.shops)})
+  console.log({data, dataShop,filterOptions, cloneData, catelog,shops: getSelectedShops(cloneData.shops)})
   return (
     <div>
 
@@ -507,74 +508,76 @@ const Catalog = () => {
                   <div className="w-full">
                     <h3 className="text-sm font-medium text-gray-900 mb-2">Result</h3>
 
-                    {loadingShop ?
-                        <p> Loading...</p> :
-                        <ul className="overflow-y-auto max-h-[200px]">
-                    {dataShop.length > 0 && dataShop.map((d, index) => {
-                      if (dataShop.length === index + 1) {
-                        return (
-                            <li ref={lastShopElement} key={`${d.shop_name} ${index}`}>
-                              <label>
-                                <input
-                                    className="m-2 ml-0"
-                                    type="checkbox"
-                                    checked={catelog?.shops?.some(shop => shop === d._id)}
-                                    onChange={(e) => {
-                                      if (e.target.checked) {
-                                        setCatelog(prev => ({
-                                          ...prev,
-                                          shops: updateMode ? [d._id] : [...prev.shops, d._id]
-                                        }))
 
-                                        setSelectedShopList((prevState) => ([...prevState, d]))
-                                      } else {
-                                        setCatelog(prev => ({
-                                          ...prev,
-                                          shops: prev.shops.filter(shop => shop !== d._id)
-                                        }));
-                                        setSelectedShopList((prevState) => (prevState.filter(shop => shop._id !== d._id)))
-                                      }
+                    <ul className="overflow-y-auto max-h-[200px]">
+                      {dataShop.length > 0 && dataShop.map((d, index) => {
+                        if (dataShop.length === index + 1) {
+                          return (
+                              <li ref={lastShopElement} key={`${d.shop_name} ${index}`}>
+                                <label>
+                                  <input
+                                      className="m-2 ml-0"
+                                      type="checkbox"
+                                      checked={catelog?.shops?.some(shop => shop === d._id)}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          setCatelog(prev => ({
+                                            ...prev,
+                                            shops: updateMode ? [d._id] : [...prev.shops, d._id]
+                                          }))
 
-                                    }}
-                                />
-                                {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
-                              </label>
-                            </li>
-                        )
-                      } else {
-                        return (
-                            <li key={`${d.shop_name} ${index}`}>
-                              <label>
-                                <input
-                                    className="m-2 ml-0"
-                                    type="checkbox"
-                                    checked={catelog?.shops?.some(shop => shop === d._id)}
-                                    onChange={(e) => {
-                                      if (e.target.checked) {
-                                        setCatelog(prev => ({
-                                          ...prev,
-                                          shops: updateMode ? [d._id] : [...prev.shops, d._id]
-                                        }))
-                                        setSelectedShopList((prevState) => ([...prevState, d]))
+                                          setSelectedShopList((prevState) => (updateMode ? [d] : [...prevState, d]))
+                                        } else {
+                                          setCatelog(prev => ({
+                                            ...prev,
+                                            shops: prev.shops.filter(shop => shop !== d._id)
+                                          }));
+                                          setSelectedShopList((prevState) => (prevState.filter(shop => shop._id !== d._id)))
+                                        }
 
-                                      }
-                                      else {
-                                        setCatelog(prev => ({
-                                          ...prev,
-                                          shops: prev.shops.filter(shop => shop !== d._id)
-                                        }));
-                                        setSelectedShopList((prevState) => (prevState.filter(shop => shop._id !== d._id)))
+                                      }}
+                                  />
+                                  {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
+                                </label>
+                              </li>
+                          )
+                        } else {
+                          return (
+                              <li key={`${d.shop_name} ${index}`}>
+                                <label>
+                                  <input
+                                      className="m-2 ml-0"
+                                      type="checkbox"
+                                      checked={catelog?.shops?.some(shop => shop === d._id)}
+                                      onChange={(e) => {
+                                        if (e.target.checked) {
+                                          setCatelog(prev => ({
+                                            ...prev,
+                                            shops: updateMode ? [d._id] : [...prev.shops, d._id]
+                                          }))
+                                          setSelectedShopList((prevState) => (updateMode ? [d] : [...prevState, d]))
 
-                                      }
-                                    }}
-                                />
-                                {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
-                              </label>
-                            </li>
-                        )
+                                        }
+                                        else {
+                                          setCatelog(prev => ({
+                                            ...prev,
+                                            shops: prev.shops.filter(shop => shop !== d._id)
+                                          }));
+                                          setSelectedShopList((prevState) => (prevState.filter(shop => shop._id !== d._id)))
+
+                                        }
+                                      }}
+                                  />
+                                  {`${d.shop_name} - ${d.address.address ? d.address.address : ''} ${d.address.state ? d.address.state : ''} ${d.address.postal_code ? d.address.postal_code : ''}`}
+                                </label>
+                              </li>
+                          )
+                        }
+                      })}
+                      {loadingShop &&
+                          <li><p> Loading...</p></li>
                       }
-                    })}
-                  </ul>}
+                    </ul>
                   </div>
 
 
@@ -693,7 +696,7 @@ const Catalog = () => {
             <div className="w-full">
               <h3 className="text-sm font-medium text-gray-900 mb-2">Result</h3>
 
-              {loadingShop ? <p> Loading...</p> : <ul className="overflow-y-auto  max-h-[200px]">
+              <ul className="overflow-y-auto  max-h-[200px]">
                 {dataShop.length > 0 && dataShop.map((d, index) => {
                   if (dataShop.length === index + 1) {
                     return (
@@ -755,7 +758,11 @@ const Catalog = () => {
                     )
                   }
                 })}
-              </ul>}
+                {loadingShop &&
+                    <li><p> Loading...</p></li>
+                }
+              </ul>
+
             </div>
 
 
@@ -841,6 +848,7 @@ const Catalog = () => {
                 <TH title={'Id'}/>
                 <TH title={'Title'}/>
                 <TH title={'Shop'}/>
+                <TH title={'Address'}/>
                 <TH title={'Expired Date'}/>
                 <TH title={'Display Date'}/>
                 <TH title={'Actions'}/>
@@ -859,6 +867,16 @@ const Catalog = () => {
                     </TD>
                     <TD>
                       {d.shop_id?.shop_name ? d.shop_id?.shop_name : '-'}
+                    </TD>
+                    <TD>
+                      <CustomTooltip content={
+                        `admin 1: ${d.shop_id?.administrativeOne}
+                        admin 2: ${d.shop_id?.administrativeTwo}
+                        admin 3: ${d.shop_id?.administrativeThree}`
+                      }>
+                        {`${d.shop_id?.address?.address ? d.shop_id?.address?.address : ''} ${d.shop_id?.address?.state ? d.address.state : ''} ${d.shop_id?.address?.postal_code ? d.address.postal_code : ''}`}
+
+                      </CustomTooltip>
                     </TD>
                       <TD>
                         { normalizeDate(d.expiredate) }

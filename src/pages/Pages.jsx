@@ -128,7 +128,7 @@ const Pages = () => {
                      })
                  })*/
 
-                await axios.post(`${baseUrl}/catelog/page`, pageDto, {
+                return await axios.post(`${baseUrl}/catelog/page`, pageDto, {
                     onUploadProgress: progressEvent => {
                         console.log(progressEvent);
                         const progress = Math.round((progressEvent.loaded / progressEvent.total) * 100);
