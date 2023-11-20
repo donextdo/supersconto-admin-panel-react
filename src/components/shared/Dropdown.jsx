@@ -10,13 +10,14 @@ const Dropdown = ({
     onChange,
     isMulti,
     customDropFilter,
-    defaultValue
+    defaultValue,
+    borderColor
 }) => {
 
 const customStyles = {
     control: (styles) => ({
         ...styles,
-        border: '1px solid rgb(75 85 99)',
+        border: borderColor ?`1px solid ${borderColor}`: '1px solid rgb(75 85 99)',
         borderRadius: '0',
         width: '100%',
         fontSize: '0.875rem',

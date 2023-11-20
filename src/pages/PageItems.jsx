@@ -12,6 +12,8 @@ import baseUrl from "../utils/baseUrl";
 import { FaAngleLeft } from "react-icons/fa";
 
 import image from "../assets/flyer_1.jpg";
+import Swal from "sweetalert2";
+import {toast} from "react-toastify";
 
 const PageItems = (props) => {
   const location = useLocation();
@@ -22,6 +24,7 @@ const PageItems = (props) => {
   const [pageData, setPageData] = useState(null);
   const [exCoordinates, setExCoordinates] = useState([]);
   const [modal, setModal] = useState(false);
+  const [modelMode, setModelMode] = useState("")
   const [pageItem, setPageItem] = useState({
     shop_id: shop,
     catelog_book_id: catelog,
@@ -69,10 +72,12 @@ const PageItems = (props) => {
   };
 
   const handleSave = async (payload) => {
+    setModelMode("ADD")
     const { crop } = payload;
     let extra;
     console.log({ payload });
     if (crop.id) {
+      setModelMode("UPDATE")
       console.log("crop has id", pageData.items);
       extra = { ...crop, ...pageData?.items.find((it) => it._id === crop.id) };
     }
@@ -96,76 +101,92 @@ const PageItems = (props) => {
   };
 
   const onSave = async () => {
-    try {
-      const { product_image, ...rest } = pageItem;
-      const formData = new FormData();
-      formData.append(
-        "product_image",
-        await blobToFile(product_image, `${pageItem.product_name}.jpeg`)
-      );
-      formData.append("data", JSON.stringify(rest));
-      console.log({ formData, product_image, rest });
 
-      handleSaveProduct(rest);
+    Swal.fire({
+      title: 'Save',
+      text: 'Are you sure you want to save the changes?',
+      icon: 'info',
+      showCancelButton: true, // Add this line to show the cancel button
+      confirmButtonText: 'Done',
+      cancelButtonText: 'Cancel', // Add this line to set the cancel button text
+      confirmButtonColor: '#8DC14F',
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        try {
+          const { product_image, ...rest } = pageItem;
+          const formData = new FormData();
+          formData.append(
+              "product_image",
+              await blobToFile(product_image, `${pageItem.product_name}.jpeg`)
+          );
+          formData.append("data", JSON.stringify(rest));
+          console.log({ formData, product_image, rest });
 
-      if (!rest.id) {
-        axios
-          .post(`${baseUrl}/catelog/item`, formData)
-          .then(() => {
-            fetchData(page)
-              .then((res) => {
-                setPageData(res?.data);
-                setExCoordinates(
-                  res?.data?.items
-                    .map((it) => ({
-                      ...it.coordinates,
-                      id: it._id,
-                    }))
-                    .flatMap((a) => a) ?? []
-                );
-              })
-              .catch((error) => {
-                // TODO
-                console.log(error);
-              });
-          })
+          // handleSaveProduct(rest);
 
-          .catch((error) => {
-            // TODO
-            console.log(error);
-          });
-      } else {
-        axios
-          .patch(`${baseUrl}/catelog/item/${rest.id}`, rest)
-          .then(() => {
-            fetchData(page)
-              .then((res) => {
-                setPageData(res?.data);
-                setExCoordinates(
-                  res?.data?.items
-                    .map((it) => ({
-                      ...it.coordinates,
-                      id: it._id,
-                    }))
-                    .flatMap((a) => a) ?? []
-                );
-              })
-              .catch((error) => {
-                // TODO
-                console.log(error);
-              });
-          })
+          if (!rest.id) {
+            axios
+                .post(`${baseUrl}/catelog/item`, formData)
+                .then(() => {
+                  fetchData(page)
+                      .then((res) => {
+                        setPageData(res?.data);
+                        setExCoordinates(
+                            res?.data?.items
+                                .map((it) => ({
+                                  ...it.coordinates,
+                                  id: it._id,
+                                }))
+                                .flatMap((a) => a) ?? []
+                        );
+                      })
+                      .catch((error) => {
+                        // TODO
+                        console.log(error);
+                      });
+                })
 
-          .catch((error) => {
-            // TODO
-            console.log(error);
-          });
+                .catch((error) => {
+                  // TODO
+                  console.log(error);
+                });
+          } else {
+            axios
+                .patch(`${baseUrl}/catelog/item/${rest.id}`, rest)
+                .then(() => {
+                  fetchData(page)
+                      .then((res) => {
+                        setPageData(res?.data);
+                        setExCoordinates(
+                            res?.data?.items
+                                .map((it) => ({
+                                  ...it.coordinates,
+                                  id: it._id,
+                                }))
+                                .flatMap((a) => a) ?? []
+                        );
+                      })
+                      .catch((error) => {
+                        // TODO
+                        console.log(error);
+                      });
+                })
+
+                .catch((error) => {
+                  // TODO
+                  console.log(error);
+                });
+          }
+
+          toggleModal();
+        } catch (error) {
+          console.log(error);
+        }
+        toast.success('Data saved successfully')
       }
+    });
 
-      toggleModal();
-    } catch (error) {
-      console.log(error);
-    }
+
   };
 
   async function blobToFile(theBlob, fileName) {
@@ -201,9 +222,9 @@ const PageItems = (props) => {
               onClose={toggleModal}
               onCancel={onCancel}
               onSave={onSave}
-              title="Add page product"
+              title={modelMode === "ADD" ? "Add page product": "Edit page product"}
             >
-              <AddPageItems pageItem={pageItem} setPageItem={setPageItem} />
+              <AddPageItems pageItem={pageItem} setPageItem={setPageItem} modelMode={modelMode} />
             </Modal>
           )}
 

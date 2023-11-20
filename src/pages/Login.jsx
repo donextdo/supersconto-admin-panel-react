@@ -1,12 +1,10 @@
-import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import {useEffect, useState} from "react";
+import {Link, useNavigate} from "react-router-dom";
 import image from "../assets/login_page.jpg";
-import image1 from "../assets/login_page1.jpg";
-import { BsFillPersonFill } from "react-icons/bs";
-import { BiShow } from "react-icons/bi";
-import { Link } from "react-router-dom";
+import {BsFillPersonFill} from "react-icons/bs";
+import {BiShow} from "react-icons/bi";
 import Dropdown from "../components/shared/Dropdown";
-import { ToastContainer, toast } from "react-toastify";
+import {toast, ToastContainer} from "react-toastify";
 import * as EmailValidator from "email-validator";
 import baseUrl from "../utils/baseUrl";
 import axios from "axios";
@@ -17,6 +15,13 @@ const Login = () => {
   const [role, setRole] = useState(0);
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
+
+  useEffect(() => {
+    const userData = sessionStorage.getItem("user") ? JSON.parse(atob(sessionStorage.getItem("user"))) : null
+    if (userData && userData._id) {
+      navigate("/");
+    }
+  }, [])
 
   const onEmailChange = (e) => {
     setEmail(e.target.value);
@@ -44,7 +49,7 @@ const Login = () => {
       });
 
       localStorage.setItem("token", data.token);
-      sessionStorage.setItem("user", data.user);
+      sessionStorage.setItem('user', btoa(JSON.stringify(data.user)))
       navigate("/");
     } catch (error) {
       if (error.response) {

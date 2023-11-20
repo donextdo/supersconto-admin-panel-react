@@ -924,7 +924,7 @@ const NewShop = () => {
                             <div className="flex-1">
                                 <TextInput
                                     value={formData.website}
-                                    onChange={(e) => update("shop_unique_id", e)}
+                                    onChange={(e) => update("website", e)}
                                     label="Website"
                                     border
                                     borderColor="border-gray-600"
